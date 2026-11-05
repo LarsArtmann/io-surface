@@ -8,8 +8,8 @@ two edits + one new doc), `~/projects/InboxClean` (new manifest only).
 > **Why the report lives here:** the work spans three repos, and two of them belong
 > to other arcs (dnsblockd is held by `fleet-exec-20261105`; InboxClean is a pilot).
 > The project born this session is the only honest home. If you wanted the report at
-> `crush-daily/docs/status/`, say so and I will move it — see question 3's sibling
-> note in §g.
+> `crush-daily/docs/status/` (where this session's shell was rooted), say so and I
+> will move it.
 
 ---
 
@@ -37,10 +37,10 @@ flake/licence/house docs yet.
 
 ### a1. The premise, verified rather than assumed
 
-| Claim I started with | What I found | Verdict |
-| --- | --- | --- |
+| Claim I started with                 | What I found                                                                                                                                                                                | Verdict                |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
 | "I built an I/O review in dnsblockd" | A 4-document arc (`io-surface.md` 316 lines, `io-surface-standard.md` 332, `io-efficiency-runbook.md` 122, `io-evidence-memos.md` 146) + two Pareto plans (321 / 344) + TODO rows T517–T538 | Larger than "a review" |
-| "Worth extracting" | Zero fleet reuse: grep for `io-surface|check-io-inventory|check-io-surface` outside dnsblockd finds only the unrelated Rust crate `io-surface` and one mangled "gunio-surface" | Confirmed invisible |
+| "Worth extracting"                   | Zero fleet reuse: grep for `io-surface                                                                                                                                                      | check-io-inventory     |
 
 ### a2. Fixed a tool that had been broken for three days
 
@@ -57,26 +57,26 @@ as 100 % undeclared. Both fixed, verified (`go vet`, 116 sites extracted).
 
 ### a3. Measured the real gate deltas (the evidence the brainstorm rests on)
 
-| Direction | All tiers | Resolved-confidence only |
-| --- | --- | --- |
-| extractor findings ∖ declared | 33 | **6** |
-| declared ∖ extractor findings | 48 | — |
+| Direction                     | All tiers | Resolved-confidence only |
+| ----------------------------- | --------- | ------------------------ |
+| extractor findings ∖ declared | 33        | **6**                    |
+| declared ∖ extractor findings | 48        | —                        |
 
 Of the 6, `Server.cspReportHandler` is ID-form drift (declared as a function, now a
 method). That single number — 33 → 6 — is the whole argument for the precision work.
 
 ### a4. Built `~/projects/io-surface` (the product)
 
-| Package | Lines | Role |
-| --- | ---: | --- |
-| `internal/extract` | 491 | hermetic stdlib AST walker (go/parser, no go/packages, no network) |
-| `internal/check` | 338 | the bidirectional gate: 8 rules, pairing, classification |
-| `cmd/io-surface` | 249 | CLI: `check`, `init`, `render`, `extract`, `version` |
-| `internal/manifest` | 205 | CUE package load (in-process, `cuelang.org/go`) + schema validation |
-| `internal/scaffold` | 177 | `init`: extraction snapshot, green by construction |
-| `internal/render` | 120 | claims-aware markdown renderer ("auto-documentor" face) |
-| `internal/match` | 104 | receiver-insensitive canonicalization |
-| **total** | **2,282** | 16 Go files, 18 test functions |
+| Package             |     Lines | Role                                                                |
+| ------------------- | --------: | ------------------------------------------------------------------- |
+| `internal/extract`  |       491 | hermetic stdlib AST walker (go/parser, no go/packages, no network)  |
+| `internal/check`    |       338 | the bidirectional gate: 8 rules, pairing, classification            |
+| `cmd/io-surface`    |       249 | CLI: `check`, `init`, `render`, `extract`, `version`                |
+| `internal/manifest` |       205 | CUE package load (in-process, `cuelang.org/go`) + schema validation |
+| `internal/scaffold` |       177 | `init`: extraction snapshot, green by construction                  |
+| `internal/render`   |       120 | claims-aware markdown renderer ("auto-documentor" face)             |
+| `internal/match`    |       104 | receiver-insensitive canonicalization                               |
+| **total**           | **2,282** | 16 Go files, 18 test functions                                      |
 
 Design decisions that were made deliberately:
 
@@ -92,12 +92,12 @@ Design decisions that were made deliberately:
 
 ### a5. Proved the tool on three trees
 
-| Tree | Command | Result |
-| --- | --- | --- |
-| dnsblockd (hand-ported, 131 sites) | `check` | **5 errors, 3 warnings, 99 infos** — 460 ms over 214 non-test files |
-| InboxClean (from scratch) | `init` + `check` | 126 sites, 10 families, **0 findings** (green by construction) |
+| Tree                               | Command                | Result                                                                               |
+| ---------------------------------- | ---------------------- | ------------------------------------------------------------------------------------ |
+| dnsblockd (hand-ported, 131 sites) | `check`                | **5 errors, 3 warnings, 99 infos** — 460 ms over 214 non-test files                  |
+| InboxClean (from scratch)          | `init` + `check`       | 126 sites, 10 families, **0 findings** (green by construction)                       |
 | InboxClean + planted `os.ReadFile` | `check` on a temp copy | **1 error**, naming `internal/health.LoadSecret  internal/health/planted_probe.go:6` |
-| itself | `init` + `check` | 8 sites, 0 findings (self-hosting) |
+| itself                             | `init` + `check`       | 8 sites, 0 findings (self-hosting)                                                   |
 
 The 5 dnsblockd errors are genuine undocumented I/O: `LeaseCache.Leases`,
 `Server.bodyLimitMiddleware`, `sso.randomCookieToken`, `views.CSS` (embed var),
@@ -114,15 +114,15 @@ tracks co-tenant load; `b_op`/`allocs_op` are deterministic).
 
 ### a7. Tests
 
-| Package | Coverage | Note |
-| --- | ---: | --- |
-| `internal/scaffold` | 92.6 % | includes the round-trip that proves green-by-construction |
-| `internal/check` | 91.0 % | every rule has a case, including "advisory must not change the error count" |
-| `internal/match` | 85.4 % | plus a test that documents the known canonical collision |
-| `internal/extract` | 80.2 % | families, confidence tiers, repo-relative IDs, determinism |
-| `internal/manifest` | 0 % | only exercised indirectly from scaffold |
-| `internal/render` | 0 % | only exercised indirectly from scaffold |
-| `cmd/io-surface` | 0 % | no CLI tests at all |
+| Package             | Coverage | Note                                                                        |
+| ------------------- | -------: | --------------------------------------------------------------------------- |
+| `internal/scaffold` |   92.6 % | includes the round-trip that proves green-by-construction                   |
+| `internal/check`    |   91.0 % | every rule has a case, including "advisory must not change the error count" |
+| `internal/match`    |   85.4 % | plus a test that documents the known canonical collision                    |
+| `internal/extract`  |   80.2 % | families, confidence tiers, repo-relative IDs, determinism                  |
+| `internal/manifest` |      0 % | only exercised indirectly from scaffold                                     |
+| `internal/render`   |      0 % | only exercised indirectly from scaffold                                     |
+| `cmd/io-surface`    |      0 % | no CLI tests at all                                                         |
 
 `gofmt` clean, `go vet` clean, `go test ./...` green, GitHub Actions CI written
 (build → vet → test → gofmt gate → self-check → self-render).
@@ -148,17 +148,17 @@ constraint-enforcement claim (asserted in the README before being tested) is now
 
 ## b) PARTIALLY DONE
 
-| # | Thing | Where it stopped | What is missing |
-| --- | --- | --- | --- |
-| b1 | **dnsblockd wiring** (reverse gate + Nix check + `tools/io-extract` retirement) | Not touched at all — `scripts/session-lock.sh check` reported `fleet-exec-20261105` live (heartbeat 58 s) | Add reverse mode to `check-io-surface.sh`, retire the ±3-line gate after parity, delete the duplicate extractor |
-| b2 | **Precision (F1/F2)** | Resolved/token tiers + pairing + drift classification landed | No type-checked tier; seam registry still hardcoded; 68 of 116 dnsblockd sites remain `token` |
-| b3 | **Renderer** | Works, claims-aware, 204-line doc for InboxClean | No BEGIN/END generated blocks, no D2, no freshness/drift mode, no golden test |
-| b4 | **Pilot adoption (InboxClean)** | Manifest scaffolded and green | **Not gated**: `docs/architecture/` is untracked, no CI/Nix check → it can rot silently from minute one |
-| b5 | **Bench face** | Matrix + recommendation only | No `benchgate` tool; `check-io-perf.sh` untouched |
-| b6 | **Repo hygiene** | README, CI workflow, `.gitignore` | No `flake.nix`, no `bin/dev`, no BuildFlow config, no LICENSE (README claims MIT), no AGENTS/FEATURES/TODO_LIST/CHANGELOG |
-| b7 | **CLI contract** | Works interactively | `--json` + validation failure prints text to stderr and exits 1 with **empty stdout**; JSON has no schema-version field; `--strict` is not reported in output |
-| b8 | **Baseline discipline** | Read + canonical suppression works | No "only shrinks" enforcement, no owner/expiry fields, canonical-key suppression can hide two distinct sites |
-| b9 | **`--dirs`** | Flag added to `init`/`check`/`extract` after the README claimed it | Declared-but-unscanned sites are reported as findings with no "you used --dirs" hint |
+| #  | Thing                                                                           | Where it stopped                                                                                          | What is missing                                                                                                                                               |
+| -- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| b1 | **dnsblockd wiring** (reverse gate + Nix check + `tools/io-extract` retirement) | Not touched at all — `scripts/session-lock.sh check` reported `fleet-exec-20261105` live (heartbeat 58 s) | Add reverse mode to `check-io-surface.sh`, retire the ±3-line gate after parity, delete the duplicate extractor                                               |
+| b2 | **Precision (F1/F2)**                                                           | Resolved/token tiers + pairing + drift classification landed                                              | No type-checked tier; seam registry still hardcoded; 68 of 116 dnsblockd sites remain `token`                                                                 |
+| b3 | **Renderer**                                                                    | Works, claims-aware, 204-line doc for InboxClean                                                          | No BEGIN/END generated blocks, no D2, no freshness/drift mode, no golden test                                                                                 |
+| b4 | **Pilot adoption (InboxClean)**                                                 | Manifest scaffolded and green                                                                             | **Not gated**: `docs/architecture/` is untracked, no CI/Nix check → it can rot silently from minute one                                                       |
+| b5 | **Bench face**                                                                  | Matrix + recommendation only                                                                              | No `benchgate` tool; `check-io-perf.sh` untouched                                                                                                             |
+| b6 | **Repo hygiene**                                                                | README, CI workflow, `.gitignore`                                                                         | No `flake.nix`, no `bin/dev`, no BuildFlow config, no LICENSE (README claims MIT), no AGENTS/FEATURES/TODO_LIST/CHANGELOG                                     |
+| b7 | **CLI contract**                                                                | Works interactively                                                                                       | `--json` + validation failure prints text to stderr and exits 1 with **empty stdout**; JSON has no schema-version field; `--strict` is not reported in output |
+| b8 | **Baseline discipline**                                                         | Read + canonical suppression works                                                                        | No "only shrinks" enforcement, no owner/expiry fields, canonical-key suppression can hide two distinct sites                                                  |
+| b9 | **`--dirs`**                                                                    | Flag added to `init`/`check`/`extract` after the README claimed it                                        | Declared-but-unscanned sites are reported as findings with no "you used --dirs" hint                                                                          |
 
 ---
 
@@ -225,7 +225,7 @@ documented, not solved.
 I created the brainstorm doc and patched `tools/io-extract` in dnsblockd **before**
 running `scripts/session-lock.sh check`. When I finally checked, `fleet-exec-20261105`
 held it with a live heartbeat. The auto-committer then folded my files into that
-session's commits (`9b4d8a8f`, `219a91d…`, `15225718`), which is exactly the
+session's commits (`9b4d8a8f`, `c219a91d`, `15225718`), which is exactly the
 interleaving the lock exists to prevent. Nothing broke, but the protocol was mine to
 follow and I did it backwards. Correct order: `check` → (work) → `release`.
 
@@ -292,7 +292,7 @@ honest about in the pitch.
    inventory" is bounded by it. Either add an opt-in type-checked tier, or stop
    calling the inventory complete.
 4. **Two manifests, two formats of truth.** dnsblockd now has a hand-ported CUE
-   package *and* an extractor that disagrees with it in 40 places
+   package _and_ an extractor that disagrees with it in 40 places
    (`extraction-blind`). Regenerating dnsblockd's facts would collapse that, but the
    hand-ported rationale is the valuable part — the split needs one honest pass.
 5. **Session discipline.** Lock first, then write. And: do not create a second tool
@@ -307,84 +307,84 @@ honest about in the pitch.
 
 ### P0 — defects and honesty in what already ships
 
-| # | Task |
-| --- | --- |
-| 1 | `init --force` writes `facts.cue` only; never overwrite `claims.cue`/`baseline.cue`; plant-a-claim regression test |
-| 2 | `check --json` always emits a JSON report, including validation failures (as findings with a `validation` rule) |
-| 3 | Extract and print the actual `violations` entries when CUE unification fails, instead of "incompatible list lengths" |
-| 4 | `audit.commit` = `git rev-parse --short HEAD` (+ `-dirty`), fallback `working-tree` |
-| 5 | Answer + implement D4 (enforcement): new sites fail; record the policy in the manifest so a repo cannot silently opt out |
-| 6 | Emit a hint when declared sites fall outside `--dirs` (InboxClean `--dirs internal` silently produced 18 findings) |
-| 7 | Baseline "only shrinks": fail when the baseline grows beyond a committed count unless `--allow-baseline-growth` |
-| 8 | Baseline entries gain `owner` + `expires`; an expired entry fails |
-| 9 | CI: regenerate facts and fail on drift (freshness gate against the committed snapshot) |
-| 10 | Golden test for `render.Markdown` (multiple families, claims, scope, empty states) |
-| 11 | `cmd/io-surface` tests: exit codes 0/1/2, flag parsing, `--json` shape |
-| 12 | `manifest` package tests: decode edge cases + a planted constraint violation |
-| 13 | `render` package tests: claims columns, judgments section, scope OUT |
-| 14 | Pin `gofmt`/`vet` locally too (pre-commit), not only in CI |
+| #  | Task                                                                                                                     |
+| -- | ------------------------------------------------------------------------------------------------------------------------ |
+| 1  | `init --force` writes `facts.cue` only; never overwrite `claims.cue`/`baseline.cue`; plant-a-claim regression test       |
+| 2  | `check --json` always emits a JSON report, including validation failures (as findings with a `validation` rule)          |
+| 3  | Extract and print the actual `violations` entries when CUE unification fails, instead of "incompatible list lengths"     |
+| 4  | `audit.commit` = `git rev-parse --short HEAD` (+ `-dirty`), fallback `working-tree`                                      |
+| 5  | Answer + implement D4 (enforcement): new sites fail; record the policy in the manifest so a repo cannot silently opt out |
+| 6  | Emit a hint when declared sites fall outside `--dirs` (InboxClean `--dirs internal` silently produced 18 findings)       |
+| 7  | Baseline "only shrinks": fail when the baseline grows beyond a committed count unless `--allow-baseline-growth`          |
+| 8  | Baseline entries gain `owner` + `expires`; an expired entry fails                                                        |
+| 9  | CI: regenerate facts and fail on drift (freshness gate against the committed snapshot)                                   |
+| 10 | Golden test for `render.Markdown` (multiple families, claims, scope, empty states)                                       |
+| 11 | `cmd/io-surface` tests: exit codes 0/1/2, flag parsing, `--json` shape                                                   |
+| 12 | `manifest` package tests: decode edge cases + a planted constraint violation                                             |
+| 13 | `render` package tests: claims columns, judgments section, scope OUT                                                     |
+| 14 | Pin `gofmt`/`vet` locally too (pre-commit), not only in CI                                                               |
 
 ### P1 — make the pilot real (the tool's credibility depends on it)
 
-| # | Task |
-| --- | --- |
-| 15 | Gate InboxClean: `docs/architecture/` committed + a check in its flake/pre-commit/CI |
-| 16 | Gate io-surface itself outside CI (pre-commit or `bin/dev`) |
-| 17 | dnsblockd: reverse mode in `check-io-surface.sh` + Nix check (after `fleet-exec-20261105` releases) |
-| 18 | Declare or baseline dnsblockd's 5 errors with claims (get it to 0 errors) |
+| #  | Task                                                                                                          |
+| -- | ------------------------------------------------------------------------------------------------------------- |
+| 15 | Gate InboxClean: `docs/architecture/` committed + a check in its flake/pre-commit/CI                          |
+| 16 | Gate io-surface itself outside CI (pre-commit or `bin/dev`)                                                   |
+| 17 | dnsblockd: reverse mode in `check-io-surface.sh` + Nix check (after `fleet-exec-20261105` releases)           |
+| 18 | Declare or baseline dnsblockd's 5 errors with claims (get it to 0 errors)                                     |
 | 19 | Regenerate dnsblockd `facts.cue` from the extractor and re-port the prose into `claims.cue` (one honest pass) |
-| 20 | Retire `dnsblockd/tools/io-extract` once the new tool covers it (one tool, one source of truth) |
-| 21 | BuildFlow provider via `go-finding/toolsdk` so `./bin/dev` runs `io-surface check` |
-| 22 | Findings through `go-finding` → SARIF + suppression files + LSP diagnostics for free |
+| 20 | Retire `dnsblockd/tools/io-extract` once the new tool covers it (one tool, one source of truth)               |
+| 21 | BuildFlow provider via `go-finding/toolsdk` so `./bin/dev` runs `io-surface check`                            |
+| 22 | Findings through `go-finding` → SARIF + suppression files + LSP diagnostics for free                          |
 
 ### P2 — the consumer outputs that justify keeping the manifest alive
 
-| # | Task |
-| --- | --- |
+| #  | Task                                                                                                         |
+| -- | ------------------------------------------------------------------------------------------------------------ |
 | 23 | systemd hardening generator (`ReadWritePaths`/`ReadOnlyPaths`/`ProtectSystem` from `file-write`/`file-read`) |
-| 24 | `RestrictAddressFamilies` + seccomp notes from `listener`/`outbound`/`ipc-subprocess` |
-| 25 | Diff the generated hardening against the live unit (evo-x2, read-only) |
-| 26 | `render --format d2` (families → containers, sites → nodes) |
-| 27 | `render --check` (doc ↔ manifest drift, BEGIN/END blocks) |
-| 28 | Published `io-surface.json` + JSON Schema export, freshness-gated |
-| 29 | `io-surface diff a.cue b.cue` → "+2 listeners, −1 file writer" changelog |
-| 30 | Test-gap map: durable `file-write` sites ↔ crash-recovery tests |
-| 31 | `io-surface explain <id>`: family, calls, claims, what would change the verdict |
-| 32 | Baseline burn-down section in `render` (count, oldest entry, age) |
+| 24 | `RestrictAddressFamilies` + seccomp notes from `listener`/`outbound`/`ipc-subprocess`                        |
+| 25 | Diff the generated hardening against the live unit (evo-x2, read-only)                                       |
+| 26 | `render --format d2` (families → containers, sites → nodes)                                                  |
+| 27 | `render --check` (doc ↔ manifest drift, BEGIN/END blocks)                                                    |
+| 28 | Published `io-surface.json` + JSON Schema export, freshness-gated                                            |
+| 29 | `io-surface diff a.cue b.cue` → "+2 listeners, −1 file writer" changelog                                     |
+| 30 | Test-gap map: durable `file-write` sites ↔ crash-recovery tests                                              |
+| 31 | `io-surface explain <id>`: family, calls, claims, what would change the verdict                              |
+| 32 | Baseline burn-down section in `render` (count, oldest entry, age)                                            |
 
 ### P3 — extraction quality (raises the ceiling)
 
-| # | Task |
-| --- | --- |
-| 33 | Opt-in `--precise` tier using `golang.org/x/tools/go/packages` (needs a module graph; sandbox-off) |
+| #  | Task                                                                                                                                                       |
+| -- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 33 | Opt-in `--precise` tier using `golang.org/x/tools/go/packages` (needs a module graph; sandbox-off)                                                         |
 | 34 | Add missing families: `filepath.Walk/Glob`, `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio.NewReader/NewWriter`, `http.ServeContent` |
-| 35 | Derive seams from the manifest's `via` values instead of the hardcoded table |
-| 36 | Cross-package seam support (a `pkg/` helper that owns the raw call) |
-| 37 | Reconsider bare `.Do`/`.Close` tokens — classify as ambiguous rather than a family |
-| 38 | `extract --stats`: per-package histogram to spot outlier packages |
-| 39 | Report extraction confidence distribution in `check` output (so the ceiling is visible) |
+| 35 | Derive seams from the manifest's `via` values instead of the hardcoded table                                                                               |
+| 36 | Cross-package seam support (a `pkg/` helper that owns the raw call)                                                                                        |
+| 37 | Reconsider bare `.Do`/`.Close` tokens — classify as ambiguous rather than a family                                                                         |
+| 38 | `extract --stats`: per-package histogram to spot outlier packages                                                                                          |
+| 39 | Report extraction confidence distribution in `check` output (so the ceiling is visible)                                                                    |
 
 ### P4 — repo hygiene and fleet placement
 
-| # | Task |
-| --- | --- |
-| 40 | `flake.nix` (buildGoModule + vendorHash + `checks.{build,test,fmt,self-check}`) — **pending decision §g-2** |
-| 41 | `LICENSE` (MIT, as the README claims) |
-| 42 | `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, `CHANGELOG.md` (house convention) |
-| 43 | Register the repo in the fleet inventory (`meta` / stack-selection) so it is discoverable |
-| 44 | `io-surface version --json` with commit + build date |
-| 45 | `io-surface baseline add <id> --note <text> --date <d>` (stop hand-editing CUE) |
-| 46 | `version: "io-surface/v1"` field inside the manifest; bump on any schema change |
-| 47 | Document the taxonomy freeze rule (a new family = a schema version bump) |
-| 48 | Document ID migration for package moves (path change = a new ID set; the diff shows it) |
-| 49 | `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`) |
+| #  | Task                                                                                                                                   |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 40 | `flake.nix` (buildGoModule + vendorHash + `checks.{build,test,fmt,self-check}`) — **pending decision §g-2**                            |
+| 41 | `LICENSE` (MIT, as the README claims)                                                                                                  |
+| 42 | `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, `CHANGELOG.md` (house convention)                                                          |
+| 43 | Register the repo in the fleet inventory (`meta` / stack-selection) so it is discoverable                                              |
+| 44 | `io-surface version --json` with commit + build date                                                                                   |
+| 45 | `io-surface baseline add <id> --note <text> --date <d>` (stop hand-editing CUE)                                                        |
+| 46 | `version: "io-surface/v1"` field inside the manifest; bump on any schema change                                                        |
+| 47 | Document the taxonomy freeze rule (a new family = a schema version bump)                                                               |
+| 48 | Document ID migration for package moves (path change = a new ID set; the diff shows it)                                                |
+| 49 | `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`)                                                                    |
 | 50 | Run it against `crush-daily` (named tier-1 in the brainstorm, never executed) + ~10 daemon repos to publish a real family distribution |
 
 ---
 
 ## g) THREE QUESTIONS I CANNOT ANSWER MYSELF
 
-**Q1 — Which repo gets the first *blocking* gate, and may I take dnsblockd?**
+**Q1 — Which repo gets the first _blocking_ gate, and may I take dnsblockd?**
 dnsblockd is the only tree with a hand-ported manifest rich enough to be worth
 gating, but `fleet-exec-20261105` held the lock the whole session and may still be
 mid-plan. InboxClean is free but has zero claims, so its gate would be a smoke test,
@@ -396,7 +396,7 @@ A flake buys `nix build` + `nix flake check` + sandbox-native gating, and costs 
 row in the fleet's dependency/pin matrix (which already fights pin drift:
 templ↔components pairing, cqrs-lite pin table, T224 sweeps). I will not add it
 without your call, because "own CI so it can't rot" is already satisfied by the
-GitHub workflow for the tool itself — the flake only matters once *consumers* gate
+GitHub workflow for the tool itself — the flake only matters once _consumers_ gate
 through it.
 
 **Q3 — may the weak (heuristic) tier ever fail a build, or is it advisory forever?**

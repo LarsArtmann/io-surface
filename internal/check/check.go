@@ -23,7 +23,9 @@ package check
 
 import (
 	"fmt"
+	"slices"
 	"sort"
+	"strings"
 
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -316,23 +318,17 @@ func firstLocation(locs []string) string {
 }
 
 func hasString(list []string, v string) bool {
-	for _, x := range list {
-		if x == v {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(list, v)
 }
 
 func join(items []string) string {
-	out := ""
+	var out strings.Builder
 	for i, c := range items {
 		if i > 0 {
-			out += ", "
+			out.WriteString(", ")
 		}
-		out += c
+		out.WriteString(c)
 	}
 
-	return out
+	return out.String()
 }

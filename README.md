@@ -60,27 +60,27 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 
 ## Commands
 
-| Command | What it does |
-| --- | --- |
-| `io-surface init [--root DIR] [--force]` | Extract the tree and write the CUE package (green by construction) |
-| `io-surface check [--root] [--manifest] [--json] [--advisory] [--strict]` | The bidirectional gate (exit 1 on error findings) |
-| `io-surface render [--root] [--out FILE]` | Render the inventory markdown from the manifest (claims-aware) |
-| `io-surface extract [--root] [--include-tests]` | Print the raw extraction as JSON (debugging, counts) |
+| Command                                                                   | What it does                                                       |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `io-surface init [--root DIR] [--force]`                                  | Extract the tree and write the CUE package (green by construction) |
+| `io-surface check [--root] [--manifest] [--json] [--advisory] [--strict]` | The bidirectional gate (exit 1 on error findings)                  |
+| `io-surface render [--root] [--out FILE]`                                 | Render the inventory markdown from the manifest (claims-aware)     |
+| `io-surface extract [--root] [--include-tests]`                           | Print the raw extraction as JSON (debugging, counts)               |
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
 
 ## Findings
 
-| Rule | Severity | Meaning |
-| --- | --- | --- |
-| `undeclared-site` | **error** | A high-confidence I/O site is neither declared nor baselined |
-| `stale-claim` | warning | Declared site's symbol is gone from its file — the claim now lies |
-| `id-drift` | warning | Same symbol, different ID form (function became a method); update the ID, it is not a new site |
-| `missing-location` | warning | Site is declared extractable but carries no location |
-| `location-drift` | info | Line numbers moved (derived data — regenerate `facts.cue`) |
-| `extraction-blind` | info | Symbol exists but no watched I/O call extracts from it — mark `extractable: false` or teach the extractor the seam |
-| `ambiguous-match` | info | Two symbols in one package share a base name; declare the exact ID form |
-| `weak-site` | info | Heuristic-tier finding (method-name token like `.Do`, `.Serve`); advisory only |
+| Rule               | Severity  | Meaning                                                                                                            |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------------------------ |
+| `undeclared-site`  | **error** | A high-confidence I/O site is neither declared nor baselined                                                       |
+| `stale-claim`      | warning   | Declared site's symbol is gone from its file — the claim now lies                                                  |
+| `id-drift`         | warning   | Same symbol, different ID form (function became a method); update the ID, it is not a new site                     |
+| `missing-location` | warning   | Site is declared extractable but carries no location                                                               |
+| `location-drift`   | info      | Line numbers moved (derived data — regenerate `facts.cue`)                                                         |
+| `extraction-blind` | info      | Symbol exists but no watched I/O call extracts from it — mark `extractable: false` or teach the extractor the seam |
+| `ambiguous-match`  | info      | Two symbols in one package share a base name; declare the exact ID form                                            |
+| `weak-site`        | info      | Heuristic-tier finding (method-name token like `.Do`, `.Serve`); advisory only                                     |
 
 Only `error` fails the gate. That is deliberate: line numbers are output, not input,
 and a heuristics tier that could block a merge would be switched off within a week.
