@@ -97,3 +97,26 @@ func TestExtract_MissingDirsIsNotAnError(t *testing.T) {
 		t.Errorf("expected no sites, got %d", len(sites))
 	}
 }
+
+func TestSiteFamily_Precedence(t *testing.T) {
+	tests := []struct {
+		name     string
+		families []string
+		want     string
+	}{
+		{"writer beats reader", []string{"file-read", "file-write"}, "file-write"},
+		{"listener beats read", []string{"file-read", "listener"}, "listener"},
+		{"db beats read", []string{"file-read", "database"}, "database"},
+		{"stream beats read", []string{"file-read", "stream-copy"}, "stream-copy"},
+		{"single family", []string{"entropy"}, "entropy"},
+		{"unclassified", nil, ""},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			s := &Site{Families: tc.families}
+			if got := s.Family(); got != tc.want {
+				t.Errorf("Family() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+}
