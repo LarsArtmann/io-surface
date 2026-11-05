@@ -33,6 +33,7 @@ import (
 	"go/token"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -467,13 +468,7 @@ func embedVarName(file *ast.File, pos token.Pos) string {
 }
 
 func contains(list []string, v string) bool {
-	for _, x := range list {
-		if x == v {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(list, v)
 }
 
 // sortedSites returns sites ordered by ID with deterministic inner slices.

@@ -57,8 +57,8 @@ func Aspect(id string) string {
 
 // stripAspect removes a trailing "#aspect" marker.
 func stripAspect(id string) string {
-	if i := strings.Index(id, "#"); i >= 0 {
-		return id[:i]
+	if before, _, ok := strings.Cut(id, "#"); ok {
+		return before
 	}
 
 	return id
