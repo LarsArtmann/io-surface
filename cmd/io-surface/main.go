@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/larsartmann/io-surface/internal/check"
@@ -64,10 +65,10 @@ func usage() {
 	fmt.Print(`io-surface — the I/O surface manifest gate (io-surface/v1)
 
 usage:
-  io-surface check   [--root DIR] [--manifest DIR] [--json] [--no-advisory] [--strict]
-  io-surface init    [--root DIR] [--force]
-  io-surface render  [--manifest DIR] [--out FILE]
-  io-surface extract [--root DIR] [--include-tests]
+  io-surface check   [--root DIR] [--manifest DIR] [--json] [--advisory] [--strict] [--dirs a,b]
+  io-surface init    [--root DIR] [--force] [--dirs a,b]
+  io-surface render  [--root DIR] [--manifest DIR] [--out FILE]
+  io-surface extract [--root DIR] [--include-tests] [--dirs a,b]
   io-surface version
 
 check exits 0 when clean, 1 when the gate has error findings, 2 on usage errors.
@@ -76,6 +77,24 @@ The manifest defaults to <root>/` + scaffold.Dir + `.
 }
 
 var errFindings = errors.New("gate findings")
+
+// parseDirs splits a comma-separated --dirs value; empty means the default
+// cmd,internal walk.
+func parseDirs(raw string) []string {
+	if raw == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+
+	return out
+}
 
 // manifestDir resolves --manifest, defaulting to <root>/docs/architecture/io-surface.
 func manifestDir(root, flagValue string) string {
@@ -93,6 +112,7 @@ func runCheck(args []string) error {
 	asJSON := fs.Bool("json", false, "emit the report as JSON")
 	advisory := fs.Bool("advisory", true, "include weak-tier advisory findings")
 	strict := fs.Bool("strict", false, "treat warnings as failures")
+	dirs := fs.String("dirs", "", "comma-separated directories to scan (default cmd,internal)")
 	err := fs.Parse(args)
 	if err != nil {
 		return err
@@ -110,7 +130,7 @@ func runCheck(args []string) error {
 		return errFindings
 	}
 
-	rep, err := check.Run(*root, m, check.Options{Advisory: *advisory})
+	rep, err := check.Run(*root, m, check.Options{Advisory: *advisory, Dirs: parseDirs(*dirs)})
 	if err != nil {
 		return err
 	}
@@ -150,12 +170,13 @@ func runInit(args []string) error {
 	fs := flag.NewFlagSet("init", flag.ExitOnError)
 	root := fs.String("root", ".", "repository root")
 	force := fs.Bool("force", false, "overwrite an existing facts.cue")
+	dirs := fs.String("dirs", "", "comma-separated directories to scan (default cmd,internal)")
 	err := fs.Parse(args)
 	if err != nil {
 		return err
 	}
 
-	sites, err := extract.Extract(*root, extract.Options{})
+	sites, err := extract.Extract(*root, extract.Options{Dirs: parseDirs(*dirs)})
 	if err != nil {
 		return err
 	}
@@ -211,12 +232,13 @@ func runExtract(args []string) error {
 	fs := flag.NewFlagSet("extract", flag.ExitOnError)
 	root := fs.String("root", ".", "repository root")
 	includeTests := fs.Bool("include-tests", false, "include *_test.go files (report only)")
+	dirs := fs.String("dirs", "", "comma-separated directories to scan (default cmd,internal)")
 	err := fs.Parse(args)
 	if err != nil {
 		return err
 	}
 
-	sites, err := extract.Extract(*root, extract.Options{IncludeTests: *includeTests})
+	sites, err := extract.Extract(*root, extract.Options{IncludeTests: *includeTests, Dirs: parseDirs(*dirs)})
 	if err != nil {
 		return err
 	}

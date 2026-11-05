@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+      - name: gofmt
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "unformatted files:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      # Self-hosting: the tool gates its own repository. The committed manifest
+      # is the snapshot, so this fails the moment the tool adds undocumented I/O.
+      - name: Self-check
+        run: go run ./cmd/io-surface check --root .
+
+      - name: Self-render is stable
+        run: go run ./cmd/io-surface render --root . > /dev/null
