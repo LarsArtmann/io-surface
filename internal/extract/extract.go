@@ -56,13 +56,36 @@ type Site struct {
 	Confidence string   `json:"confidence"`
 }
 
-// Family returns the dominant family hint (first registered), or "".
+// familyPrecedence orders the families by "how much this tells you about the
+// site". A function that stats a file and then renames it is a file WRITER, not
+// a reader; one that listens and also dials is a listener. The first family in
+// this list that a site touches becomes its dominant family.
+var familyPrecedence = []string{
+	"file-write",
+	"database",
+	"listener",
+	"outbound",
+	"ipc-subprocess",
+	"embed",
+	"entropy",
+	"stream-copy",
+	"env",
+	"file-read",
+}
+
+// Family returns the dominant family hint for the site (the highest-precedence
+// family it touches), or "" when the extraction could not classify it.
 func (s *Site) Family() string {
-	if len(s.Families) == 0 {
-		return ""
+	for _, fam := range familyPrecedence {
+		if contains(s.Families, fam) {
+			return fam
+		}
+	}
+	if len(s.Families) > 0 {
+		return s.Families[0]
 	}
 
-	return s.Families[0]
+	return ""
 }
 
 // Options controls an extraction run.
