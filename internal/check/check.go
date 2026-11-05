@@ -28,11 +28,13 @@ import (
 // Rule identifiers. These are stable: they become SARIF ruleIds and
 // suppression keys, so renaming one is a breaking change.
 const (
-	RuleUndeclared    = "io-surface/undeclared-site"
-	RuleStaleClaim    = "io-surface/stale-claim"
-	RuleIDDrift       = "io-surface/id-drift"
-	RuleLocationDrift = "io-surface/location-drift"
-	RuleWeakSite      = "io-surface/weak-site"
+	RuleUndeclared      = "io-surface/undeclared-site"
+	RuleStaleClaim      = "io-surface/stale-claim"
+	RuleIDDrift         = "io-surface/id-drift"
+	RuleLocationDrift   = "io-surface/location-drift"
+	RuleMissingLocation = "io-surface/missing-location"
+	RuleExtractionBlind = "io-surface/extraction-blind"
+	RuleWeakSite        = "io-surface/weak-site"
 )
 
 // Severity of a finding.
@@ -157,12 +159,31 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		if !site.Facts.Extractable {
 			continue
 		}
+		if len(site.Location) == 0 {
+			rep.add(Finding{
+				Rule: RuleMissingLocation, Severity: SeverityWarning, ID: id, Family: site.Family,
+				Message: "declared as extractable but carries no location; regenerate facts.cue with -mode audit",
+			})
+		}
 		found, ok := extracted[match.Canonical(id)]
 		if !ok {
+			// Two very different situations look identical from the extracted
+			// set: the symbol was deleted/renamed (a lying claim) or the
+			// extractor simply cannot see its I/O (a blind spot). Telling
+			// them apart is what keeps the warning list believable.
+			if symbolVisible(root, site.Location, match.Symbol(id)) {
+				rep.add(Finding{
+					Rule: RuleExtractionBlind, Severity: SeverityInfo, ID: id, Family: site.Family,
+					Location: firstLocation(site.Location),
+					Message:  "declared symbol exists but no watched I/O call extracts from it; mark facts.extractable=false or teach the extractor the seam",
+				})
+
+				continue
+			}
 			rep.add(Finding{
 				Rule: RuleStaleClaim, Severity: SeverityWarning, ID: id, Family: site.Family,
 				Location: firstLocation(site.Location),
-				Message:  "declared site no longer extracts; regenerate facts (the symbol moved, was renamed, or the call was removed)",
+				Message:  "declared site no longer extracts and its symbol is not in the declared file; the symbol moved, was renamed, or the call was removed",
 			})
 
 			continue
@@ -177,9 +198,9 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		for _, loc := range site.Location {
 			if !hasString(found.Locations, loc) {
 				rep.add(Finding{
-					Rule: RuleLocationDrift, Severity: SeverityWarning, ID: id, Family: site.Family,
+					Rule: RuleLocationDrift, Severity: SeverityInfo, ID: id, Family: site.Family,
 					Location: loc,
-					Message:  "declared location does not match the extraction; regenerate facts.cue with -mode audit",
+					Message:  "declared location differs from the extraction (line numbers are derived data); regenerate facts.cue",
 				})
 			}
 		}

@@ -157,8 +157,12 @@ func Load(dir string) (*Manifest, error) {
 }
 
 // Validate reports schema-level problems the CUE types cannot express cheaply:
-// an unknown family, a missing location on an extractable site, an unknown
-// discipline tag.
+// an unknown family, an unknown discipline tag, a malformed ID. These are hard
+// errors: the manifest cannot be trusted until they are fixed.
+//
+// Missing locations on extractable sites are NOT here — they are findings
+// (check.RuleMissingLocation), because a real manifest can carry them while the
+// next audit regenerates facts.cue.
 func (m *Manifest) Validate() []error {
 	var errs []error
 	famOK := map[string]bool{}
@@ -173,9 +177,6 @@ func (m *Manifest) Validate() []error {
 		s := m.Sites[id]
 		if !famOK[s.Family] {
 			errs = append(errs, fmt.Errorf("%s: unknown family %q", id, s.Family))
-		}
-		if s.Facts.Extractable && len(s.Location) == 0 {
-			errs = append(errs, fmt.Errorf("%s: extractable site has no location", id))
 		}
 		for _, d := range s.Claims.Discipline {
 			if !discOK[d] {
