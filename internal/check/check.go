@@ -2,18 +2,23 @@
 //
 // The four directions, in the standard's order:
 //
-//  1. declared-sites-exist   — every declared location exists in the tree, and
-//     for extractable sites the extraction agrees on the symbol
-//     (rule: location-drift / missing-location)
+//  1. declared-sites-exist    — every declared site still resolves in the tree
+//     (rule: stale-claim) and its locations agree with the extraction
+//     (rule: location-drift)
 //  2. undeclared-sites-absent — every high-confidence extraction finding is
 //     declared or baselined (rule: undeclared-site)
-//  3. constraints hold       — enforced by CUE at load time (disciplines.cue)
+//  3. constraints hold        — enforced by CUE at load time (disciplines.cue)
 //     plus the schema checks in manifest.Validate
-//  4. published-artifact fresh — the renderer's freshness mode
+//  4. published-artifact fresh — the renderer's job
 //
 // Direction 2 is the one that makes the manifest complete: before it, a silent
 // manifest passed every gate. Only ConfidenceResolved sites may fail; the weak
 // token tier is advisory by construction.
+//
+// Pairing is done per canonical group (package + base symbol), so a method that
+// became a free function is drift, not a new site — while two DIFFERENT symbols
+// that share a base name in one package (AllowlistManager.Load and
+// PermanentAllowlist.Load) are never silently merged.
 package check
 
 import (
@@ -35,6 +40,7 @@ const (
 	RuleMissingLocation = "io-surface/missing-location"
 	RuleExtractionBlind = "io-surface/extraction-blind"
 	RuleWeakSite        = "io-surface/weak-site"
+	RuleAmbiguousMatch  = "io-surface/ambiguous-match"
 )
 
 // Severity of a finding.
@@ -87,6 +93,13 @@ type Options struct {
 	Advisory bool
 }
 
+// bucket is one canonical group: every declared ID and every extracted site
+// that share a package and base symbol.
+type bucket struct {
+	declared  []string
+	extracted []*extract.Site
+}
+
 // Run extracts the tree under root and compares it against the manifest.
 func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	sites, err := extract.Extract(root, extract.Options{Dirs: opts.Dirs})
@@ -95,82 +108,125 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	}
 
 	rep := &Report{}
-	declared := map[string]string{} // canonical -> declared raw ID
-	for _, id := range m.IDs() {
-		declared[match.Canonical(id)] = id
-	}
-	baselined := map[string]bool{}
-	for _, id := range m.BaselineIDs() {
-		baselined[match.Canonical(id)] = true
-	}
-
 	rep.Stats.Declared = len(m.Sites)
 	rep.Stats.Baselined = len(m.Baseline)
 	rep.Stats.Extracted = len(sites)
 
-	extracted := map[string]*extract.Site{}
+	buckets := map[string]*bucket{}
+	get := func(canon string) *bucket {
+		b, ok := buckets[canon]
+		if !ok {
+			b = &bucket{}
+			buckets[canon] = b
+		}
+
+		return b
+	}
+	for _, id := range m.IDs() {
+		b := get(match.Canonical(id))
+		b.declared = append(b.declared, id)
+	}
 	for _, s := range sites {
-		extracted[match.Canonical(s.ID)] = s
+		b := get(match.Canonical(s.ID))
+		b.extracted = append(b.extracted, s)
 		if s.Confidence == extract.ConfidenceResolved {
 			rep.Stats.Resolved++
 		} else {
 			rep.Stats.Token++
 		}
 	}
-
-	// Direction 2: undeclared-sites-absent.
-	for _, s := range sites {
-		canon := match.Canonical(s.ID)
-		if _, ok := declared[canon]; ok {
-			continue
-		}
-		if baselined[canon] {
-			continue
-		}
-		if s.Confidence != extract.ConfidenceResolved {
-			if opts.Advisory {
-				loc := ""
-				if len(s.Locations) > 0 {
-					loc = s.Locations[0]
-				}
-				rep.add(Finding{
-					Rule: RuleWeakSite, Severity: SeverityInfo, ID: s.ID,
-					Family: s.Family(), Location: loc,
-					Message: fmt.Sprintf("weak-tier I/O site (%s) is not declared; declare it or convert the call to a resolved form", joinCalls(s.Calls)),
-				})
-			}
-
-			continue
-		}
-		loc := ""
-		if len(s.Locations) > 0 {
-			loc = s.Locations[0]
-		}
-		rep.add(Finding{
-			Rule: RuleUndeclared, Severity: SeverityError, ID: s.ID,
-			Family: s.Family(), Location: loc,
-			Message: fmt.Sprintf("undeclared I/O site (%s); declare it in facts/claims or add it to baseline with a note", joinCalls(s.Calls)),
-		})
+	baselined := map[string]bool{}
+	for _, id := range m.BaselineIDs() {
+		baselined[match.Canonical(id)] = true
 	}
 
-	// Directions 1 + 2's converse: declared sites must still exist and agree.
-	for _, id := range m.IDs() {
-		site := m.Sites[id]
-		if !site.Facts.Extractable {
-			continue
+	for _, canon := range sortedKeys(buckets) {
+		b := buckets[canon]
+		declaredSet := map[string]bool{}
+		for _, id := range b.declared {
+			declaredSet[id] = true
 		}
-		if len(site.Location) == 0 {
+		paired := map[string]*extract.Site{} // declared ID -> extracted site
+		usedExtracted := map[*extract.Site]bool{}
+
+		// 1. Exact ID matches pair first; they are never ambiguous.
+		for _, s := range b.extracted {
+			if declaredSet[s.ID] && !usedExtracted[s] {
+				paired[s.ID] = s
+				usedExtracted[s] = true
+			}
+		}
+		// 2. Then a 1:1 leftover pair is ID drift (method -> function etc.).
+		var leftoversDeclared []string
+		for _, id := range b.declared {
+			if paired[id] == nil {
+				leftoversDeclared = append(leftoversDeclared, id)
+			}
+		}
+		var leftoversExtracted []*extract.Site
+		for _, s := range b.extracted {
+			if !usedExtracted[s] {
+				leftoversExtracted = append(leftoversExtracted, s)
+			}
+		}
+		if len(leftoversDeclared) == 1 && len(leftoversExtracted) == 1 {
+			id, s := leftoversDeclared[0], leftoversExtracted[0]
+			paired[id] = s
+			usedExtracted[s] = true
 			rep.add(Finding{
-				Rule: RuleMissingLocation, Severity: SeverityWarning, ID: id, Family: site.Family,
-				Message: "declared as extractable but carries no location; regenerate facts.cue with -mode audit",
+				Rule: RuleIDDrift, Severity: SeverityWarning, ID: id, Family: familyOf(m, id, s),
+				Location: firstLocation(s.Locations),
+				Message:  fmt.Sprintf("declared as %q but extracts as %q; update the ID form (same symbol, different receiver)", id, s.ID),
+			})
+			leftoversDeclared, leftoversExtracted = nil, nil
+		}
+
+		// 3. Anything still unpaired on the extraction side is undeclared.
+		for _, s := range leftoversExtracted {
+			if baselined[canon] {
+				continue
+			}
+			if s.Confidence != extract.ConfidenceResolved {
+				if opts.Advisory {
+					rep.add(Finding{
+						Rule: RuleWeakSite, Severity: SeverityInfo, ID: s.ID, Family: s.Family(),
+						Location: firstLocation(s.Locations),
+						Message:  fmt.Sprintf("weak-tier I/O site (%s) is not declared; declare it or convert the call to a resolved form", join(s.Calls)),
+					})
+				}
+
+				continue
+			}
+			rep.add(Finding{
+				Rule: RuleUndeclared, Severity: SeverityError, ID: s.ID, Family: s.Family(),
+				Location: firstLocation(s.Locations),
+				Message:  fmt.Sprintf("undeclared I/O site (%s); declare it in facts/claims or add it to baseline with a note", join(s.Calls)),
 			})
 		}
-		found, ok := extracted[match.Canonical(id)]
-		if !ok {
-			// Two very different situations look identical from the extracted
-			// set: the symbol was deleted/renamed (a lying claim) or the
-			// extractor simply cannot see its I/O (a blind spot). Telling
-			// them apart is what keeps the warning list believable.
+
+		// 4. Declared sites with no extraction partner: classify honestly.
+		for _, id := range leftoversDeclared {
+			site := m.Sites[id]
+			if !site.Facts.Extractable {
+				continue
+			}
+			if len(site.Location) == 0 {
+				rep.add(Finding{
+					Rule: RuleMissingLocation, Severity: SeverityWarning, ID: id, Family: site.Family,
+					Message: "declared as extractable but carries no location; regenerate facts.cue",
+				})
+			}
+			if len(b.extracted) > 0 {
+				// The group exists but the pairing stayed ambiguous: two
+				// different symbols share a base name, so a guess would lie.
+				rep.add(Finding{
+					Rule: RuleAmbiguousMatch, Severity: SeverityInfo, ID: id, Family: site.Family,
+					Location: firstLocation(site.Location),
+					Message:  fmt.Sprintf("cannot be paired unambiguously (%d declared, %d extracted here share a base symbol); declare the exact ID form", len(b.declared), len(b.extracted)),
+				})
+
+				continue
+			}
 			if symbolVisible(root, site.Location, match.Symbol(id)) {
 				rep.add(Finding{
 					Rule: RuleExtractionBlind, Severity: SeverityInfo, ID: id, Family: site.Family,
@@ -185,23 +241,23 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 				Location: firstLocation(site.Location),
 				Message:  "declared site no longer extracts and its symbol is not in the declared file; the symbol moved, was renamed, or the call was removed",
 			})
+		}
 
-			continue
-		}
-		if match.Canonical(found.ID) == match.Canonical(id) && found.ID != id {
-			rep.add(Finding{
-				Rule: RuleIDDrift, Severity: SeverityWarning, ID: id, Family: site.Family,
-				Location: firstLocation(found.Locations),
-				Message:  fmt.Sprintf("declared as %q but extracts as %q; update the ID form (receiver-insensitive match, not a new site)", id, found.ID),
-			})
-		}
-		for _, loc := range site.Location {
-			if !hasString(found.Locations, loc) {
-				rep.add(Finding{
-					Rule: RuleLocationDrift, Severity: SeverityInfo, ID: id, Family: site.Family,
-					Location: loc,
-					Message:  "declared location differs from the extraction (line numbers are derived data); regenerate facts.cue",
-				})
+		// 5. Paired sites: locations are derived data, so a mismatch is a
+		// maintenance nudge (info), never a failure.
+		for _, id := range b.declared {
+			s := paired[id]
+			if s == nil {
+				continue
+			}
+			for _, loc := range m.Sites[id].Location {
+				if !hasString(s.Locations, loc) {
+					rep.add(Finding{
+						Rule: RuleLocationDrift, Severity: SeverityInfo, ID: id, Family: m.Sites[id].Family,
+						Location: loc,
+						Message:  "declared location differs from the extraction (line numbers are derived data); regenerate facts.cue",
+					})
+				}
 			}
 		}
 	}
@@ -232,6 +288,25 @@ func (r *Report) add(f Finding) {
 	}
 }
 
+// familyOf prefers the declared family, falling back to the extraction hint.
+func familyOf(m *manifest.Manifest, id string, s *extract.Site) string {
+	if site, ok := m.Sites[id]; ok && site.Family != "" {
+		return site.Family
+	}
+
+	return s.Family()
+}
+
+func sortedKeys[T any](m map[string]T) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	sort.Strings(out)
+
+	return out
+}
+
 func firstLocation(locs []string) string {
 	if len(locs) == 0 {
 		return ""
@@ -250,9 +325,9 @@ func hasString(list []string, v string) bool {
 	return false
 }
 
-func joinCalls(calls []string) string {
+func join(items []string) string {
 	out := ""
-	for i, c := range calls {
+	for i, c := range items {
 		if i > 0 {
 			out += ", "
 		}
