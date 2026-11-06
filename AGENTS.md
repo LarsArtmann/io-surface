@@ -226,6 +226,9 @@ is the honest record of this repo's origin (defects §d, open questions §g).
 - `cue` binary is never needed at runtime or for tests; `cue fmt` is only a
   hand-editing habit.
 - CHANGELOG follows Keep a Changelog; version const in `cmd/io-surface/main.go`.
+- Every health/report claim names its verifying command ("verified how" is part
+  of the claim — a number or state without the command that produced it is
+  unverified and says so).
 - Docs ownership: `README` (users) / `AGENTS` (agent context) / `FEATURES`
   (status inventory) / `TODO_LIST` (open work) / `ROADMAP` (vision, open
   questions) — one fact, one home.
