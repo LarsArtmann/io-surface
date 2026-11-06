@@ -68,11 +68,14 @@ func usage() {
 usage:
   io-surface check   [--root DIR] [--manifest DIR] [--json] [--advisory] [--strict] [--dirs a,b]
   io-surface init    [--root DIR] [--force] [--dirs a,b]
-  io-surface render  [--root DIR] [--manifest DIR] [--out FILE]
+  io-surface render  [--root DIR] [--manifest DIR] [--out FILE] [--doc FILE] [--check]
   io-surface extract [--root DIR] [--include-tests] [--dirs a,b]
   io-surface version
 
 check exits 0 when clean, 1 when the gate has error findings, 2 on usage errors.
+render --doc FILE rewrites the block between the io-surface:begin/end markers
+in FILE, preserving the surrounding prose; --check reports drift (exit 1)
+instead of rewriting.
 The manifest defaults to <root>/` + scaffold.Dir + `.
 `)
 }
