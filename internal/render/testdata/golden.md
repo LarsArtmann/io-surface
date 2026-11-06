@@ -46,6 +46,19 @@
 | --------------- | -------------------- | -------- | ------- | ---------- |
 | `cmd/app.fetch` | `cmd/app/main.go:18` | —        | —       | —          |
 
+## Reachability (capabilities)
+
+> Engine-observed by capslock v0.3.4 of `abc1234` (2026-11-06): what each package can REACH, beyond its declared sites.
+> `direct` = through the package's own code (high signal); `deep` adds transitive
+> dependency paths (stdlib linkage reaches everywhere and carries no per-package signal).
+> Advisory: a package whose direct capability has no covered family is a `shadow-capability` info.
+
+| Package          | Direct    | Deep (transitive) | Judgment                                                    |
+| ---------------- | --------- | ----------------- | ----------------------------------------------------------- |
+| `cmd/app`        | `NETWORK` | `NETWORK`         | —                                                           |
+| `internal/ghost` | —         | `EXEC`            | —                                                           |
+| `internal/store` | `FILES`   | `EXEC`, `FILES`   | direct EXEC here is the test helper's git call, judged fine |
+
 ## Deliberately out of scope
 
 - `testdata/` — fixture I/O never ships

@@ -92,6 +92,15 @@ func fixtureManifest() *manifest.Manifest {
 			},
 		},
 		Audit: manifest.Audit{Commit: "abc1234", Date: "2026-11-06", Claims: 3, Method: "manual audit"},
+		Baseline: []manifest.BaselineEntry{
+			{ID: "internal/store", Note: "direct EXEC here is the test helper's git call, judged fine", Date: "2026-11-06"},
+		},
+		Capabilities: []manifest.Capability{
+			{Pkg: "cmd/app", Direct: []string{"NETWORK"}, Deep: []string{"NETWORK"}},
+			{Pkg: "internal/ghost", Deep: []string{"EXEC"}},
+			{Pkg: "internal/store", Direct: []string{"FILES"}, Deep: []string{"EXEC", "FILES"}},
+		},
+		CapabilityAudit: &manifest.CapabilityAudit{Engine: "capslock", Version: "v0.3.4", Commit: "abc1234", Date: "2026-11-06"},
 		Scope: manifest.Scope{Out: []string{
 			"`testdata/` — fixture I/O never ships",
 			"`vendor/` — third-party code, not ours to declare",
@@ -180,4 +189,26 @@ func splitLines(s string) []string {
 	}
 
 	return strings.Split(s, "\n")
+}
+
+func TestMarkdown_CapabilitiesSection(t *testing.T) {
+	m := fixtureManifest()
+	got := Markdown(m)
+	for _, want := range []string{
+		"## Reachability (capabilities)",
+		"capslock v0.3.4 of `abc1234`",
+		"`internal/ghost`",                                            // deep-only entry renders with an empty direct cell
+		"direct EXEC here is the test helper's git call, judged fine", // judgment verbatim
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("capabilities section missing %q", want)
+		}
+	}
+
+	// No capabilities → no section at all (empty-manifest case).
+	m.Capabilities = nil
+	m.CapabilityAudit = nil
+	if strings.Contains(Markdown(m), "Reachability") {
+		t.Error("capability-free manifest must not render a reachability section")
+	}
 }
