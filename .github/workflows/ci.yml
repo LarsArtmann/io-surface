@@ -80,6 +80,13 @@ jobs:
           path: io-surface.sarif
           if-no-files-found: error
 
+      # Docs battery: the five doc gates (freshness, audit-all, annotate,
+      # routing, cadence) as one standing gate. Pinned to a docs-gates rev so
+      # a fleet-side rule change cannot redden this repo silently — bump the
+      # pin deliberately, rerun the battery locally first.
+      - name: Docs gates
+        run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@2278406afdfd run
+
   # Capability facts (v1.1, advisory): the reachability half of the unified
   # gate. This is the ONLY place the external engine runs — the `test` job
   # above stays hermetic (GOPROXY-independent, sandbox-clean) by contract.
@@ -117,3 +124,26 @@ jobs:
           name: capslock-report
           path: capslock.json
           if-no-files-found: error
+
+  # Module-path tripwire (TODO #44): the public path is the product — a
+  # rename or a broken go.mod would silently kill every consumer's
+  # `go install`. Installs the module through the public proxy from a clean
+  # module cache and runs the real binary.
+  public-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: stable
+
+      - name: Install from the public module path
+        run: go install github.com/larsartmann/io-surface/cmd/io-surface@latest
+
+      - name: The binary runs
+        run: |
+          v="$($(go env GOPATH)/bin/io-surface version)"
+          echo "installed: $v"
+          case "$v" in
+            io-surface\ *) exit 0 ;;
+            *) echo "::error::unexpected version output: $v"; exit 1 ;;
+          esac
