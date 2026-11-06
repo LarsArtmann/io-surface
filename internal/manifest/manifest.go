@@ -201,7 +201,11 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 			continue
 		}
 		seen[key] = true
-		fmt.Fprintf(&b, "\n  - %s: %s", v.ID, v.Msg)
+		if v.ID != "" {
+			fmt.Fprintf(&b, "\n  - %s: %s", v.ID, v.Msg)
+		} else {
+			fmt.Fprintf(&b, "\n  - %s", v.Msg)
+		}
 	}
 
 	return fmt.Errorf("%w %s", ErrConstraints, b.String())
@@ -212,22 +216,40 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 // decodes even though the whole value does not.
 func violationEntries(value cue.Value) []Violation {
 	var out []Violation
-	if v := value.LookupPath(violationsPath); v.Err() == nil {
-		if err := v.Decode(&out); err != nil {
-			out = nil
+	field := value.LookupPath(violationsPath)
+	if field.Err() == nil {
+		if err := field.Decode(&out); err == nil && len(out) > 0 {
+			return out
+		}
+	}
+	// The field errs on conflicting conjuncts (the "incompatible list
+	// lengths" shape); decompose the field itself — every conjunct still
+	// decodes, and the violating one carries the entries. A decode can be
+	// partial when the conflict keeps a comprehension binding non-concrete:
+	// keep whatever decoded (the msg always survives; the id survives
+	// whenever CUE can resolve it).
+	if _, operands := field.Expr(); operands != nil {
+		for _, o := range operands {
+			var entries []Violation
+			if err := o.Decode(&entries); err == nil || len(entries) > 0 {
+				out = append(out, entries...)
+			}
 		}
 	}
 	if len(out) > 0 {
 		return out
 	}
+	// File-level conjuncts of the whole value: when the conflict sits inside
+	// one file's multiple declarations, that operand is skipped above, so
+	// also probe per-file conjuncts that carry a clean violations field.
 	if _, operands := value.Expr(); operands != nil {
 		for _, o := range operands {
-			v := o.LookupPath(violationsPath)
-			if v.Err() != nil {
+			sub := o.LookupPath(violationsPath)
+			if sub.Err() != nil {
 				continue
 			}
 			var entries []Violation
-			if err := v.Decode(&entries); err == nil {
+			if err := sub.Decode(&entries); err == nil {
 				out = append(out, entries...)
 			}
 		}
