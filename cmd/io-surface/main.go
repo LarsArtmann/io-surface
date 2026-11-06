@@ -67,7 +67,7 @@ func usage() {
 	fmt.Print(`io-surface — the I/O surface manifest gate (io-surface/v1)
 
 usage:
-  io-surface check   [--root DIR] [--manifest DIR] [--json] [--advisory] [--strict] [--dirs a,b]
+  io-surface check   [--root DIR] [--manifest DIR] [--json] [--format text|json|sarif] [--advisory] [--strict] [--dirs a,b]
   io-surface init    [--root DIR] [--force] [--dirs a,b]
   io-surface render  [--root DIR] [--manifest DIR] [--out FILE] [--doc FILE] [--check]
   io-surface extract [--root DIR] [--include-tests] [--dirs a,b]

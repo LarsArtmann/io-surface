@@ -61,3 +61,16 @@ jobs:
       # match the committed manifest.
       - name: Inventory doc is fresh
         run: go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --check
+
+      # Self-hosted SARIF: the gate's own findings as a machine-renderable
+      # artifact (GitHub can display SARIF natively; a clean run yields an
+      # empty results list, which still proves the emission path).
+      - name: Emit self-hosted SARIF
+        run: go run ./cmd/io-surface check --root . --format sarif > io-surface.sarif
+
+      - name: Upload SARIF artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: io-surface-sarif
+          path: io-surface.sarif
+          if-no-files-found: error
