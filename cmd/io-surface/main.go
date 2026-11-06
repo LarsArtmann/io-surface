@@ -52,8 +52,9 @@ var errFindings = errors.New("gate findings")
 
 // rootFlags are the persistent flags every subcommand inherits.
 type rootFlags struct {
-	Root string `flag:"root" default:"." help:"repository root"`
-	Dirs string `flag:"dirs" help:"comma-separated directories to scan (default cmd,internal)"`
+	Root   string `flag:"root" default:"." help:"repository root"`
+	Dirs   string `flag:"dirs" help:"comma-separated directories to scan (default cmd,internal)"`
+	Ignore string `flag:"ignore" help:"comma-separated glob patterns to skip, e.g. *_templ.go,zz_generated* (matched against repo-relative paths and file names)"`
 }
 
 // newApp wires the command tree. Batteries bring strict validation, error
