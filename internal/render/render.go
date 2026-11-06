@@ -114,6 +114,10 @@ func sections(m *manifest.Manifest) string {
 		}
 	}
 
+	if len(m.Capabilities) > 0 {
+		b.WriteString(capabilitiesSection(m))
+	}
+
 	if len(m.Scope.Out) > 0 {
 		b.WriteString("## Deliberately out of scope\n\n")
 		for _, entry := range m.Scope.Out {
@@ -123,6 +127,52 @@ func sections(m *manifest.Manifest) string {
 	}
 
 	return b.String()
+}
+
+// capabilitiesSection renders the engine-observed reachability facts:
+// package → direct/deep capability sets, with the human judgment that answers
+// a shadow (the baseline note, verbatim — it is the only package-keyed
+// judgment the manifest carries). Advisory tier: this table informs, it never
+// gates.
+func capabilitiesSection(m *manifest.Manifest) string {
+	var b strings.Builder
+	b.WriteString("## Reachability (capabilities)\n\n")
+	if m.CapabilityAudit != nil {
+		fmt.Fprintf(&b, "> Engine-observed by %s %s of `%s` (%s): what each package can REACH, beyond its declared sites.\n",
+			m.CapabilityAudit.Engine, m.CapabilityAudit.Version, m.CapabilityAudit.Commit, m.CapabilityAudit.Date)
+	}
+	b.WriteString("> `direct` = through the package's own code (high signal); `deep` adds transitive\n")
+	b.WriteString("> dependency paths (stdlib linkage reaches everywhere and carries no per-package signal).\n")
+	b.WriteString("> Advisory: a package whose direct capability has no covered family is a `shadow-capability` info.\n\n")
+
+	baseline := map[string]string{}
+	for _, entry := range m.Baseline {
+		baseline[entry.ID] = entry.Note
+	}
+	caps := newTable(
+		[]string{"Package", "Direct", "Deep (transitive)", "Judgment"},
+		make([]bool, 4),
+	)
+	for _, c := range m.Capabilities {
+		caps.row("`"+c.Pkg+"`", joinCaps(c.Direct), joinCaps(c.Deep), cell(baseline[c.Pkg]))
+	}
+	b.WriteString(caps.render())
+	b.WriteString("\n")
+
+	return b.String()
+}
+
+// joinCaps renders a capability list for a table cell.
+func joinCaps(names []string) string {
+	if len(names) == 0 {
+		return "—"
+	}
+	quoted := make([]string, len(names))
+	for i, n := range names {
+		quoted[i] = "`" + n + "`"
+	}
+
+	return strings.Join(quoted, ", ")
 }
 
 // cell keeps empty table cells from collapsing the row.
