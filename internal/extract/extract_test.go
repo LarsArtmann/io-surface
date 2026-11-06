@@ -28,12 +28,8 @@ func TestPkgOf_CoversEveryWatchedPackage(t *testing.T) {
 			resolvable[key] = true
 		}
 	}
-	for range importSubstring {
-		for _, key := range importSubstring {
-			resolvable[key] = true
-		}
-
-		break
+	for _, key := range importSubstring {
+		resolvable[key] = true
 	}
 	for pkgKey := range callFamily {
 		if !resolvable[pkgKey] {

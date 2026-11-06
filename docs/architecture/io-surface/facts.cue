@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "5a6c289-dirty"
+	commit: "84e6fb9-dirty"
 	date:   "2026-11-06"
 	claims: 20
 	method: "io-surface extract (AST, stdlib-only)"
@@ -98,7 +98,7 @@ sites: {
 	}
 	"internal/extract.extractor.parseFile": {
 		location: [
-			"internal/extract/extract.go:276",
+			"internal/extract/extract.go:279",
 		]
 		family: "file-read"
 		facts: {
@@ -107,7 +107,7 @@ sites: {
 	}
 	"internal/extract.extractor.walk": {
 		location: [
-			"internal/extract/extract.go:237",
+			"internal/extract/extract.go:240",
 		]
 		family: "file-read"
 		facts: {
