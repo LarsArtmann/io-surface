@@ -199,7 +199,7 @@ _(observed state at HEAD; not authored by this session)_
 | 33 | Register repo in fleet inventory (`meta` / stack-selection)                                                             | Low    | 30min          | TODO #33              |
 | 34 | `-race` + very-large-repo benchmark; record results                                                                     | Low    | 1h             | TODO #34              |
 | 35 | Family-distribution run over crush-daily + ~10 daemon repos                                                             | Low    | 2h             | TODO #35              |
-| 36 | Tag `v0.1.0` (const/README/CHANGELOG all say 0.1.0; no git tag)                                                         | Low    | 15min          | TODO #36              |
+| 36 | ~~Tag `v0.1.0` (const/README/CHANGELOG all say 0.1.0; no git tag)~~ RESOLVED 2026-11-06: `v0.1.0` annotated tag verified pushed to both remotes (`git ls-remote --tags` → `596be743`); superseded same day by the v0.2.0 release (CHANGELOG cut, CI green, proxy serving)                                                         | Low    | 15min          | TODO #36              |
 | 37 | Smoke-test public `go install …@latest` through proxy.golang.org                                                        | High   | 10min          | TODO #37              |
 | 38 | Verify pkg.go.dev indexing after proxy cache                                                                            | Low    | 10min          | TODO #38              |
 | 39 | Review/merge the open Dependabot actions-group PR                                                                       | Med    | 15min          | TODO #39              |

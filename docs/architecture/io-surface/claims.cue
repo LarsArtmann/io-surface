@@ -45,3 +45,10 @@ sites: "internal/manifest.AppendBaseline": claims: {
 	discipline: []
 	rationale:  "the machine's only sanctioned write into a judgment file: a surgical insertion of one {id, note, date} entry, refusing duplicates and noteless entries so the baseline keeps its only-shrinks shape; the read-modify-write is single-file, unbuffered, and fails loudly on a missing file"
 }
+
+sites: "internal/extract.extractor.collectSeamDecl": claims: {
+	resource:   "candidate Go source files during the seam-collection pass"
+	trigger:    "pass A of every two-pass extraction walk"
+	discipline: ["bounded"]
+	rationale:  "the substring prefilter gates the parse: a file is read and parsed only when it contains `func <watched-seam>(`, so the extra pass reads the tree once more but parses almost nothing — the cross-package seam index is worth one sequential read for caller-before-declarer resolution"
+}

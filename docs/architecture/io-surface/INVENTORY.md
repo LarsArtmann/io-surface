@@ -12,26 +12,28 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Family           | Sites | Claimed | With rationale |
 | ---------------- | ----: | ------: | -------------: |
-| `file-read`      |     7 |       1 |              1 |
+| `file-read`      |     8 |       2 |              2 |
 | `file-write`     |     5 |       2 |              2 |
 | `embed`          |     1 |       0 |              0 |
 | `ipc-subprocess` |     2 |       1 |              1 |
 
-## `file-read` (7)
+## `file-read` (8)
 
-| Site                                   | Location                            | Resource                    | Trigger                           | Discipline |
-| -------------------------------------- | ----------------------------------- | --------------------------- | --------------------------------- | ---------- |
-| `internal/absorb.ModulePath`           | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo | every absorb run without --module | —          |
-| `internal/check.symbolVisible`         | `internal/check/location.go:23`     | —                           | —                                 | —          |
-| `internal/extract.Extract`             | `internal/extract/extract.go:130`   | —                           | —                                 | —          |
-| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:328`   | —                           | —                                 | —          |
-| `internal/extract.extractor.walk`      | `internal/extract/extract.go:264`   | —                           | —                                 | —          |
-| `internal/manifest.Load`               | `internal/manifest/manifest.go:170` | —                           | —                                 | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:380` | —                           | —                                 | —          |
+| Site                                         | Location                            | Resource                                                  | Trigger                                  | Discipline |
+| -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- |
+| `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          |
+| `internal/check.symbolVisible`               | `internal/check/location.go:23`     | —                                                         | —                                        | —          |
+| `internal/extract.Extract`                   | `internal/extract/extract.go:133`   | —                                                         | —                                        | —          |
+| `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:368`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    |
+| `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:431`   | —                                                         | —                                        | —          |
+| `internal/extract.extractor.walk`            | `internal/extract/extract.go:291`   | —                                                         | —                                        | —          |
+| `internal/manifest.Load`                     | `internal/manifest/manifest.go:170` | —                                                         | —                                        | —          |
+| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:380` | —                                                         | —                                        | —          |
 
 ### Judgments
 
 - **`internal/absorb.ModulePath`** — a single small read to resolve the first-party package prefix; --module exists for manifests analyzed outside their repo
+- **`internal/extract.extractor.collectSeamDecl`** — the substring prefilter gates the parse: a file is read and parsed only when it contains `func <watched-seam>(`, so the extra pass reads the tree once more but parses almost nothing — the cross-package seam index is worth one sequential read for caller-before-declarer resolution
 
 ## `file-write` (5)
 

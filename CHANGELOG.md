@@ -136,6 +136,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   edit. The hardcoded table shrinks to the built-in default vocabulary that
   keeps first `init` scaffolds useful; seam callers now also record the
   wrapper name in their `via` fact instead of leaving it empty
+- Cross-package seams (#21): a caller in ANOTHER package
+  (`cmd/app.mirror` calling `store.genWrite`) resolves against the seam
+  vocabulary by import-path suffix matching — a two-pass hermetic walk, no
+  go/packages, token confidence like every seam attribution
 - `--strict-dirs`: the scope-hint gains teeth on demand — a `--dirs`
   narrowing that blinds the gate to declared sites then FAILS (error) instead
   of hinting (info); default stays advisory because narrower scans are often
