@@ -62,7 +62,7 @@ func fixtureManifest() *manifest.Manifest {
 				Facts:    manifest.Facts{Extractable: true},
 			},
 			"cmd/app.serve": {
-				Location: []string{"cmd/app/main.go:19"},
+				Location: []string{"cmd/app/main.go:21"},
 				Family:   "stream-copy",
 				Facts:    manifest.Facts{Extractable: true},
 			},
@@ -92,6 +92,14 @@ func fixtureManifest() *manifest.Manifest {
 			},
 			"internal/store.callGenWrite": {
 				Location: []string{"internal/store/gen_seam.go:12"},
+				Family:   "file-write",
+				Facts:    manifest.Facts{Extractable: false},
+			},
+			// cross-package seam caller: exempt here (resolves only when the
+			// manifest vocabulary reaches the extractor via facts.via; pinned by
+			// the seam pairing tests)
+			"cmd/app.mirror": {
+				Location: []string{"cmd/app/main.go:24"},
 				Family:   "file-write",
 				Facts:    manifest.Facts{Extractable: false},
 			},
