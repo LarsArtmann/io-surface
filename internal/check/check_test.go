@@ -74,6 +74,20 @@ func fixtureManifest() *manifest.Manifest {
 				Family:   "file-write",
 				Facts:    manifest.Facts{Extractable: true},
 			},
+			// repo-specific seam: the raw wrapper extracts (resolved); its
+			// caller is exempt here because the built-in vocabulary does not
+			// know genWrite — TestRun_ManifestDerivedSeamPairs proves the
+			// manifest teaches it
+			"internal/store.genWrite": {
+				Location: []string{"internal/store/gen_seam.go:8"},
+				Family:   "file-write",
+				Facts:    manifest.Facts{Extractable: true},
+			},
+			"internal/store.callGenWrite": {
+				Location: []string{"internal/store/gen_seam.go:12"},
+				Family:   "file-write",
+				Facts:    manifest.Facts{Extractable: false},
+			},
 			// visible claim, exempt from extraction
 			"internal/store.DocOnly": {
 				Location: []string{"internal/store/store.go:1"},

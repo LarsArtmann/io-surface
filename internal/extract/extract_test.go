@@ -159,7 +159,7 @@ func TestExtract_IgnoreGlobs(t *testing.T) {
 		t.Fatalf("fixture lost the generated file — the skip test is vacuous")
 	}
 
-	ignored, err := Extract("../../testdata/extract", Options{Ignore: []string{"zz_generated*", "internal/store/gen_*.go"}})
+	ignored, err := Extract("../../testdata/extract", Options{Ignore: []string{"zz_generated*", "docs/*.go"}})
 	if err != nil {
 		t.Fatalf("extract: %v", err)
 	}

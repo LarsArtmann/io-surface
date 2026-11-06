@@ -398,7 +398,7 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 			if !ok {
 				if ident, ok := node.Fun.(*ast.Ident); ok {
 					if fam, isSeam := e.seams[ident.Name]; isSeam {
-						e.record(id, node, testinfra, ident.Name, fam, ConfidenceToken, "")
+						e.record(id, node, testinfra, ident.Name, fam, ConfidenceToken, ident.Name)
 					}
 				}
 

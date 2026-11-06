@@ -120,6 +120,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   match repo-relative paths and bare file names, so one pattern covers any
   depth. Generated I/O is not authored I/O; declaring it would be inventory
   noise the generator rewrites anyway
+- Manifest-derived seams (#20): `check` learns the repo's wrapper vocabulary
+  from declared sites' `facts.via` values — a repo-specific seam
+  (dnsblockd's `writeMapping`) surfaces its callers without an extractor
+  edit. The hardcoded table shrinks to the built-in default vocabulary that
+  keeps first `init` scaffolds useful; seam callers now also record the
+  wrapper name in their `via` fact instead of leaving it empty
 
 ### Fixed
 
