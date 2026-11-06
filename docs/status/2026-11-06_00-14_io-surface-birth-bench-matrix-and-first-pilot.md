@@ -331,7 +331,7 @@ honest about in the pitch.
 | 15 | Gate InboxClean: `docs/architecture/` committed + a check in its flake/pre-commit/CI                          |
 | 16 | Gate io-surface itself outside CI (pre-commit or `bin/dev`)                                                   |
 | 17 | dnsblockd: reverse mode in `check-io-surface.sh` + Nix check (after `fleet-exec-20261105` releases)           |
-| 18 | Declare or baseline dnsblockd's 5 errors with claims (get it to 0 errors)                                     |
+| 18 | ~~Declare or baseline dnsblockd's 5 errors with claims (get it to 0 errors)~~ RESOLVED 2026-11-06 as TODO_LIST #26: 4 sites declared with claims, gate reached 0 errors 0 warnings (commit `50f19b10`)                                     |
 | 19 | Regenerate dnsblockd `facts.cue` from the extractor and re-port the prose into `claims.cue` (one honest pass) |
 | 20 | Retire `dnsblockd/tools/io-extract` once the new tool covers it (one tool, one source of truth)               |
 | 21 | BuildFlow provider via `go-finding/toolsdk` so `./bin/dev` runs `io-surface check`                            |
@@ -372,7 +372,7 @@ honest about in the pitch.
 | 41 | `LICENSE` (MIT, as the README claims)                                                                                                  |
 | 42 | `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, `CHANGELOG.md` (house convention)                                                          |
 | 43 | Register the repo in the fleet inventory (`meta` / stack-selection) so it is discoverable                                              |
-| 44 | `io-surface version --json` with commit + build date                                                                                   |
+| 44 | ~~`io-surface version --json` with commit + build date~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE                                     |
 | 45 | `io-surface baseline add <id> --note <text> --date <d>` (stop hand-editing CUE)                                                        |
 | 46 | `version: "io-surface/v1"` field inside the manifest; bump on any schema change                                                        |
 | 47 | Document the taxonomy freeze rule (a new family = a schema version bump)                                                               |
