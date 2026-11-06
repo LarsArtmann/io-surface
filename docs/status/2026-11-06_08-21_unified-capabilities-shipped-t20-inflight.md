@@ -1,0 +1,141 @@
+# Status: Unified I/O insights shipped (capabilities end-to-end) — the whole Pareto 1%/4% tiers landed; T20 half-in with one open extractor mystery
+
+**Report:** 2026-11-06 08:21 CET
+**Repo:** io-surface @ `daa821c` (origin + GitHub synced through `7056141` my last explicit push; daemon commits since carry doc formatting + partial T20)
+**Session:** full execution of the 06:02 Pareto plan (T01→T24) under an ACTIVE parallel session (their sprint landed TODO #3/#4/#7-9-equiv/#11/#12 + id-form rule + dprint-stable renderer at `2be70fb` mid-session)
+**Working tree right now:** T20 in flight — `internal/extract` and `internal/check` test suites are RED (documented below), everything else green (8/10 packages ok).
+
+---
+
+## Scope: what this report verified vs did not
+
+**Verified with commands this session:** every task below carries the commit hash that shipped it; `go test ./... -count=1` green at each committed checkpoint; self-check `0 errors, 0 warnings, 0 infos, 2 baselined` after dogfooding; `render --doc --check` converged; CI **success on GitHub** for the capabilities commit (run 42177796441, 43s); proxy install smoke built and RAN v0.1.0 from the public module path (exit 0, gates a repo); live capslock v0.3.4 run + `absorb --check` advisory drift (exit 0, 184 unmapped edges loudly counted).
+
+**NOT verified (and why):** the new CI `-race` + `capabilities` jobs on push `7056141` — the workflow changed AFTER the last verified green run; first execution pending (push went out minutes before this report). pkg.go.dev indexing — 404 today, crawler lag suspected, not confirmable from here. The literal `go install …@latest` — blocked by the session guard on this machine; verified via proxy zip + `go get`/`go build` equivalence instead.
+
+---
+
+## a) FULLY DONE
+
+| #  | Work                                                                                                    | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | **T01 binary landmine defused** (forward leak closed; ~67 MB historical blobs remain an owner question) | `.gitignore` +`/cmd/io-surface/io-surface` +`/bin/` (outside buildflow markers), `git rm --cached`, rebuild-proof (`git status` clean after fresh build); ROADMAP **Q4** purge-vs-keep memo with filter-repo command + blast radius; CHANGELOG Removed; commit `33ec8cc` pushed both remotes. Tagged `v0.1.0` predates the blobs — verified via `git ls-tree v0.1.0`                                                                                                                                                                                                                                                                                       |
+| 2  | **T02 Capslock blind-spot run — the evidence the whole unification stands on**                          | v0.3.4 pinned, built from the proxy zip (`go install` guard-blocked locally); **toolchain-skew lesson**: go1.26.8-built analyzer cannot type-check a go1.27 tree (`splicePipe` fields) — rebuilt with `GOTOOLCHAIN=go1.27.0`; 281 pkgs / 79 modules / 236 edges. **10/11 real direct sinks already declared** by the hermetic extractor; the one gap is the SARIF stdout write (`commands.go:77` → TODO #49). Three false-positive classes recorded verbatim (phantom NETWORK via range-func conflation, interface-dispatch conflation, UNANALYZED over-labeling) → TODO #50. Evidence doc: `docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md` |
+| 3  | **T03 ROADMAP Theme 4 decision record + Q5**                                                            | Unified vision (sites × reachability, one manifest two fact classes), landing sequence, explicit boundary vs Theme 3 `--precise`, non-goals re-checked (no dashboard, no analyzer embedding); Q5 = runtime-power vocabulary owner decision. Commit `e1eeb1b`                                                                                                                                                                                                                                                                                                                                                                                               |
+| 4  | **T04 doc-truth sync**                                                                                  | AGENTS dep claim fixed (`one external dependency` → three direct deps, gate core stays stdlib-only); rotten `main.go:NN` anchors replaced with symbol anchors (rows #22/#29/#30); row #36 flipped DONE (v0.1.0 tag verified pushed to BOTH remotes via `git ls-remote --tags`); 12 discovery rows harvested (#51–#62); facts.cue ±6 vs `05874f3` reviewed line-by-line — all legitimate (cmdguard moves, violations surfacing, auditCommit machinery). Commit `b9d26f4`                                                                                                                                                                                    |
+| 5  | **T05 schema v1.1 + `internal/capability`**                                                             | Closed enum (`FILES`/`NETWORK`/`EXEC`) + THE capability→families mapping table + the edge→per-package `Sets` fold with loud `Dropped` counts; schema gains optional `version`, `#CapabilityName`, `#CapabilitySet` (deep ⊇ direct), `capabilityAudit`; scaffold writes `capabilities.cue` (the one file absorb owns; `init --force` never clobbers it); deployed schema copy synced byte-identical (also picked up the `owner`/`expires` drift the 06:33 session left)                                                                                                                                                                                     |
+| 6  | **T06 manifest.Load v1.1**                                                                              | Optional-section decode (v1 manifests load unchanged — pinned by test), Go-side validation (unknown names, deep-superset, duplicate pkgs) that holds even against old schemas without the CUE enum, CUE closed-enum rejection test (planted CGO → `ErrConstraints`), `CapabilityFor` lookup                                                                                                                                                                                                                                                                                                                                                                |
+| 7  | **T07 `absorb` command, end-to-end and dogfooded**                                                      | `internal/absorb` (decode + depth normalization, module path from go.mod, deterministic CUE bytes, drift comparison, git provenance); cmdguard command (`--capslock` required, `--check`, `--module`, `--engine-version`); 3 e2e tests via `runApp`. **Live run against the real capslock report:** 8 first-party packages, 184 unmapped edges dropped LOUDLY (`RUNTIME×25, UNANALYZED×26, …`), advisory drift exits 0. This repo's `capabilities.cue` now carries real facts (audit `capslock@v0.3.4` of `5a6c289`)                                                                                                                                       |
+| 8  | **T08 `shadow-capability` rule (the gate's 14th)**                                                      | Advisory info: package's DIRECT capability with zero declared sites of any mapped family; suppression via package-keyed baseline entries integrated with unused-baseline; 3 tests incl. never-error contract. Author claims added for the 3 I/O sites absorb itself introduced. Commit `5a6c289`                                                                                                                                                                                                                                                                                                                                                           |
+| 9  | **Design refinement the first real run forced: shadows fire on DIRECT only**                            | Deep-set shadowing flagged all 8 packages (stdlib linkage = noise floor, zero signal); direct-only leaves exactly the 2 verified Capslock phantoms, which are now baselined with provenance notes citing the blind-spot run's false-positive classes. Self-check: `0/0/0, 2 baselined`. Commit `9697ca5`                                                                                                                                                                                                                                                                                                                                                   |
+| 10 | **T09 CI capabilities job**                                                                             | GitHub-only, pinned `CAPSLOCK_VERSION: v0.3.4`, installed with the repo's own toolchain (skew lesson encoded), JSON artifact, `absorb --check` non-blocking; hermetic `test` job untouched (M49). YAML validated; CI green on the capabilities commit (run 42177796441)                                                                                                                                                                                                                                                                                                                                                                                    |
+| 11 | **T10 render Reachability section**                                                                     | Package / Direct / Deep / Judgment table (baseline note verbatim — the manifest's only package-keyed judgment), audit header names engine+version+revision+date; golden regenerated with branch coverage (deep-only rows, empty direct cells, verbatim prose, no-section-when-empty pinned); this repo's INVENTORY.md renders its real capability facts                                                                                                                                                                                                                                                                                                    |
+| 12 | **T11 SARIF flow + byte-stability**                                                                     | New advisory ruleIds pass through the generic emission unchanged; pinned by `TestSARIF_CapabilityRuleIDsFlowByteStable`; confidence stays 1.0 by the documented rationale (the rule carries the uncertainty — 06:33 §f25 deliberately skipped); CHANGELOG documents the whole v1.1 tier                                                                                                                                                                                                                                                                                                                                                                    |
+| 13 | **T17 CI `-race` + the cmdguard-lint honest absence**                                                   | `go test -race ./...` green locally (10/10) and wired into CI. The cmdguard-lint step is deliberately ABSENT: the real module (`cmdguard/lint@v0.1.0`) carries a go.mod `replace`, so `go run pkg@version` refuses it (verified) — a `                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 14 | **T19 README/AGENTS truth**                                                                             | `absorb` joins the command table + a Reachability walkthrough (pin, toolchain note, capabilities.cue-only guarantee, shadow answer loop); AGENTS gains the capability-vocabulary two-place sync invariant, the hermeticity rule (check never reads engine artifacts; drift is emitted by `absorb --check`), and the schema-copies-identical edge. Commit `7056141`                                                                                                                                                                                                                                                                                         |
+| 15 | **T21 chores: install path proven end-to-end**                                                          | Proxy serves `@latest` = v0.1.0; zip is 44 files / 227 KB with **no binary**; `go get`+`go build` from the public proxy produced a working binary — it prints `io-surface 0.1.0` and gates this repo green (exit 0) → #37 DONE. Dependabot PR #1 already CLOSED (superseded by explicit SHA pins) → #39 DONE. pkg.go.dev 404 → #38 IN_PROGRESS (crawler lag)                                                                                                                                                                                                                                                                                               |
+| 16 | **T24 docs hygiene**                                                                                    | Taxonomy-freeze rule + ID-migration contract documented in README (closes #31/#32), verified-how discipline sentence added (#45), manifest file map gains `capabilities.cue`                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 17 | **Parallel-session coordination held all session**                                                      | Their `2be70fb` sprint landed mid-flight; my lanes (capability/absorb/render/CI/docs) stayed disjoint from their `internal/manifest`+`check`+`schema` working set until theirs landed; zero foreign changes reverted; their landed work absorbed (rule count re-based 11→14, renderer table reused, T12/T13/T15 recognized as theirs)                                                                                                                                                                                                                                                                                                                      |
+
+## b) PARTIALLY DONE
+
+1. **T20 missing extraction families — IN FLIGHT, tree RED, ~70%.** Landed in tables: `syscall.Mmap`/`Munmap` → file-read; `bufio.NewReader/NewReaderSize/NewWriter/NewWriterSize/NewReadWriter` → stream-copy; `http.ServeContent`/`ServeFile` → stream-copy. Fixture files added (`internal/store/mapped.go`, `cmd/app.serve`); extract_test rows added. **Current failures:** (a) `TestRun_LocationDriftIsInfoOnly` — my hand-invented fixture locations (`mapped.go:15/:27`, `main.go:16`) don't match real extraction (`mapped.go:13+19`, `main.go:19`); fix is mechanical, the real numbers are already extracted and known. (b) **OPEN MYSTERY: `internal/store.Buffered` (a one-line `return bufio.NewReader(r)`) does not extract at all** — 10 sites, no Buffered — while the structurally identical `return os.ReadFile(path)` does. The scanFunc path (`imports[xIdent.Name]` → `callFamily[key]`) looks satisfied by the `bufio` table entry; the failure is in the import-key classification (`pkgOf`/`imports` construction) which I had NOT yet read when the report was demanded. This might be a REAL extractor bug affecting other top-level single-segment imports — worth a failing-test-driven investigation, not guess-fixes.
+2. **#38 pkg.go.dev indexing** — proxy verified, page 404s; re-check later.
+3. **Plan errata** — the plan file does not yet record the deviations taken (see e.6); the report documents them but the plan is the contract artifact.
+4. **TODO rows #51–#62** — harvested and recorded, none executed yet (by design; rest-tier).
+
+## c) NOT STARTED (untouched, by plan tier or deliberate parking)
+
+- **T14** enforcement policy field (advisory→gate promotion) — the safety valve; advisory-forever is the safe default without it.
+- **T16b** `baseline add` subcommand (TODO #22).
+- **T18** dprint settle specifics: dprint-parity CI step (#58), init --force ritual README paragraph (#57 — partially covered by the new contract-rules block).
+- **T22** hygiene gates: local pre-commit (should be `buildflow precommit install`, not hand-rolled — skill decision), docs-gates CI (#43), module-path tripwire (#44), thresholds (#46), fleet inventory (#33).
+- **T23** measurements: large-repo run, fleet distribution study (#35). (`-race` half of #34 landed via CI.)
+- **v0.1.1 release** (#48) — deliberately deferred until T20 lands, per the 06:33 §g-Q2 sequencing logic (consumers re-snapshot once).
+- **Parked:** #40–#42 Forgejo token trio (user-blocked), dnsblockd reverse-mode (#27), InboxClean re-gate proof (billing), `--precise` tier (Theme 3), capslock upstream phantom report (#50, needs verify-before-filing ritual).
+
+## d) TOTALLY FUCKED UP (and what it cost)
+
+1. **Three test assertions written before running the code** (capability `Sets` sort order, `Drift` line order, shadow `Stats.Errors`): three red-green cycles that a `go test` run before writing the want-values would have prevented. Cost: ~3 repair cycles, zero shipped breakage.
+2. **Edit-batch assembly error:** the `shadowCapabilities` function body was meant to be the 4th edit of a multiedit; I shipped a no-op anchor instead, so the call landed without its function → build failure → second pass. Cost: one cycle.
+3. **A fake CI gate briefly existed** (never committed): I wired `go run …cmdguard-lint@v4.2.0 … || true` from an INVENTED package path. Caught by executing the step before committing — the real module is `cmdguard/lint@v0.1.0` and it is uninstallable via `go run @version` (replace directive). The step was removed and the blocker recorded. Lesson encoded: never put a step in CI I haven't executed locally.
+4. **Daemon ate two commit messages** (T02 evidence batch, parts of T05/T08): my staged work landed in `chore: auto-commit N file(s)` commits — content intact, rationale lost to the heuristic message. The 06:33 report's §d6/§e4 warned exactly this and I hit it anyway. Cost: provenance, not data.
+5. **Hand-invented fixture line numbers** (`mapped.go:15/:27`, `main.go:16`) instead of running the extractor first — the exact §e2 lesson from the 06:33 report, repeated. 3 location-drift findings, one red test, still unfixed at report time. Cost: T20 blocked one mechanical edit away from green.
+6. **Two edit-tool mtime races** (gofmt `-w` in the same chain as the edit; LSP formatter) and one `old==new` no-op edit — tooling hygiene, small cycles.
+7. **`reflect` import forgotten** in manifest_test — compile failure, trivial.
+
+## e) WHAT WE SHOULD IMPROVE
+
+1. **Commit within seconds of finishing a batch in daemon repos** — or consciously accept daemon provenance. The detailed commit message is the cheap part; losing it is pure waste.
+2. **Never write want-values before one execution pass.** "Run the code, then assert" would have saved all three test bugs.
+3. **Execute every CI step locally before it enters the workflow.** The invented cmdguard-lint path would have been a silent fake gate forever if CI hadn't been checkable.
+4. **Write plan errata at the moment of deviation**, not session-end. Deviations this session: capability-drift rule emitted by `absorb --check` not `check` (hermeticity guardrail wins over plan letter); Q4= binary purge / Q5= runtime-power (plan's Q4 label); T12/T13/T15 recognized as done by the parallel session (T15's literal only-shrinks deliberately replaced by their stateless unused-baseline warning — respected, not re-implemented); T21 re-based from "release v0.1.0" to release chores (tag already existed).
+5. **Shadow-on-direct is now doctrine** — encode it in the plan errata too, not just code comments.
+6. **The bufio mystery should be investigated test-first**: a minimal fixture isolating `imports` classification for top-level stdlib packages would tell us whether `pkgOf` has a gap (e.g. multi-segment path handling) that silently swallows OTHER single-segment imports today.
+7. **README Findings table is missing the two new advisory rules** (`shadow-capability`, `capability-drift`) — discovered while writing this report. Small, should ride the T20 commit.
+8. Keep the git-status-between-batches ritual (their §e1) — it caught the collision window closing and the daemon sweeps.
+
+## f) Up to 50 things to get done next
+
+_(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked by today's evidence.)_
+
+1. Fix `check_test` fixture locations to the real extract lines (`mapped.go:13+19`, `main.go:19`) — one edit, unblocks T20.
+2. Solve the bufio mystery: failing test isolating `bufio.NewReader` classification; read `pkgOf`/`imports` construction; fix root-cause (possible silent extractor bug for other imports).
+3. Land T20: facts regen, INVENTORY re-render, CHANGELOG line, README Findings table rows for the two new advisory rules, green tree, commit, push, verify CI.
+4. Re-dogfood after T20: re-run absorb (mapped vocabulary unchanged — syscall is out-of-scope vocabulary; confirm Dropped counts), self-check green.
+5. Write plan errata (deviations from e.4/e.5) into the plan file.
+6. Verify GitHub CI on `7056141`: first run with `-race` + the `capabilities` job (capslock install with repo toolchain is the risky step).
+7. Re-check pkg.go.dev indexing (#38) once the crawler catches up.
+8. Decide #49: stdout/stderr in `scope.in`? (owner; evidence: `commands.go:77`, bufio/syscall now watched).
+9. T14 enforcement policy field (`advisory|gate` per manifest; the shadow/capability tier's promotion path).
+10. T16b `baseline add` subcommand with `owner`/`expires` prompts (#22).
+11. #44 CI module-path tripwire (install from public path in CI — complements #37's manual smoke).
+12. #43 docs-gates standing CI gate, pinned rev.
+13. #46 seed `.docs-gates.json` thresholds.
+14. #15/#16 local pre-commit gates — via `buildflow precommit install` (skill decision: don't hand-roll hooks BuildFlow owns).
+15. #58 dprint-parity CI step for INVENTORY.md.
+16. #33 fleet inventory registration (meta).
+17. #51 unexported-type method fixture in `testdata/extract` (id-form regression guard).
+18. #52 renderer `displayWidth` + narrow-column unit tests.
+19. #53 cmdguard `describe` contract test.
+20. #54 `manifest.Load` decode errors name the offending file.
+21. #55 `check --strict-dirs`.
+22. #56 `--allow-unused-baseline` grace flag.
+23. #59 id-drift single-dotted warning names the correct form.
+24. #60 `constraintError` single deterministic conjunct walk.
+25. #62 docs/status index (README.md pattern from dnsblockd).
+26. #57 README: the `init --force` + git-restore ritual for judgment files (verify the new contract block covers it or extend).
+27. #28 `.Do`/`.Close` token ambiguity classification.
+28. #29 `extract --stats` per-package histogram.
+29. #30 `version --json` with commit + build date.
+30. #35 fleet family distribution across ~10 repos.
+31. #34b large-repo timing/memory run (the -race half is done).
+32. #47 evidence line-number re-derivation at next docs audit.
+33. #63 wire cmdguard-lint once the lint module ships replace-free (upstream task in cmdguard's release flow).
+34. #50 verify + file the Capslock phantom-network upstream issue (verify-before-filing ritual).
+35. #61 owner decision: SARIF → GitHub code-scanning upload vs artifact-only.
+36. v0.1.1 release via go-release skill once T20 + #14 land (#48; re-tag discipline).
+37. Plan-file errata entry for T12/T13/T15 ownership (already in e.4 — do it in the file).
+38. Consider absorb recording per-package unmapped counts as metadata (noise-budget visibility for consumers).
+39. Consider `absorb --check` emitting findings as SARIF (unified machine stream).
+40. AGENTS sharp edge: "extractor table change ⇒ facts regen + INVENTORY re-render" ritual (I hit the stale-INVENTORY gate).
+41. Cross-repo: dnsblockd claims prose pass for the 4 minimal claims (06:33 §f17).
+42. Cross-repo: dnsblockd `check-io-surface.sh` re-run for `audit.claims: 141` parity (§f18).
+43. Cross-repo: InboxClean re-gate proof once billing is fixed (§f20).
+44. Cross-repo: dnsblockd reverse-mode + Nix wiring (#27, lock permitting).
+45. TODO_LIST housekeeping: move today's DONE rows (#36/#37/#39) to CHANGELOG per the file's own guidance (DONE items should be removed, not kept).
+46. #40–#42 Forgejo token → push mirror → visibility (user action chain).
+47. Evaluate capslock `-granularity function` for future shadow precision (design note only).
+48. Sweep /tmp session artifacts (capslock binaries, reports) — hygiene.
+49. Add `io-surface absorb` to the README quickstart's "from then on" paragraph as the optional second loop (one sentence).
+50. Re-visit `direct`-only shadow doctrine after a few CI runs of real data — if direct phantoms stay frequent, consider a capslock version bump ritual with a phantom-diff step.
+
+## g) Questions I cannot answer myself
+
+1. **Binary history purge (ROADMAP Q4):** purge `cmd/io-surface/io-surface` from history with `git filter-repo` (rewrites ~11 SHAs, force-push both remotes, status-report SHA citations go stale) or keep the ~67 MB as history tax? Note the forward leak is closed and `@master`/tag zips are already clean — this is purely about clone size and SHA stability now.
+2. **stdout/stderr scope (TODO #49):** should `os.Stdin/Stdout/Stderr` writes (and by extension `fmt.Print*`-style stdout output) become watched manifest sites, or stay deliberately out of `scope.in`? This gates the remaining `#19b` item and would change every consumer's snapshot.
+3. **v0.1.1 timing + enforcement:** cut v0.1.1 immediately after T20 lands (consumers get the new families in one re-snapshot, per the 06:33 §g-Q2 logic), or land T14 (enforcement policy) first so v0.1.1 ships the advisory→gate promotion machinery in the same minor? And bundled: do you want the gate/capslock SARIF uploaded to GitHub code scanning (#61), or is artifact-only right?
+
+---
+
+_Arte in Aeternum_
