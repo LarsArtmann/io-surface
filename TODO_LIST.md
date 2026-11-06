@@ -54,17 +54,29 @@
 
 ## Low Impact
 
-| #  | Task                                                                                | Status    | Impact | Effort | Evidence                                                           |
-| -- | ----------------------------------------------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------ |
-| 28 | Reconsider bare `.Do`/`.Close` tokens — classify as ambiguous rather than a family  | 🔴 `TODO` | Low    | 30min  | `"Do": "outbound"` in `internal/extract/extract.go:206`; P3-37     |
-| 29 | `extract --stats`: per-package histogram to spot outlier packages                   | 🔴 `TODO` | Low    | 1h     | No stats flag: `cmd/io-surface/main.go:231-249`; P3-38             |
-| 30 | `io-surface version --json` with commit + build date                                | 🔴 `TODO` | Low    | 30min  | `version` prints plain text: `cmd/io-surface/main.go:42-43`; P4-44 |
-| 31 | Document the taxonomy freeze rule (a new family = a schema version bump)            | 🔴 `TODO` | Low    | 15min  | Not documented anywhere; report P4-47                              |
-| 32 | Document ID migration for package moves (path change = a new ID set)                | 🔴 `TODO` | Low    | 15min  | Not documented anywhere; report P4-48                              |
-| 33 | Register the repo in the fleet inventory (`meta` / stack-selection)                 | 🔴 `TODO` | Low    | 30min  | Report P4-43; repo currently invisible to own tooling              |
-| 34 | Run the checker under `-race` and on a very large repo; record results              | 🔴 `TODO` | Low    | 1h     | Never measured; report §c-18                                       |
-| 35 | Run against crush-daily + ~10 daemon repos; publish a real family distribution      | 🔴 `TODO` | Low    | 2h     | Report P4-50                                                       |
-| 36 | Tag `v0.1.0` (version const, README Status and CHANGELOG all say 0.1.0; no git tag) | 🔴 `TODO` | Low    | 15min  | `git tag` is empty; `cmd/io-surface/main.go:25`                    |
+| #  | Task                                                                                                 | Status       | Impact | Effort | Evidence                                                                  |
+| -- | ---------------------------------------------------------------------------------------------------- | ------------ | ------ | ------ | ------------------------------------------------------------------------- |
+| 28 | Reconsider bare `.Do`/`.Close` tokens — classify as ambiguous rather than a family                   | 🔴 `TODO`    | Low    | 30min  | `"Do": "outbound"` in `internal/extract/extract.go:206`; P3-37            |
+| 29 | `extract --stats`: per-package histogram to spot outlier packages                                    | 🔴 `TODO`    | Low    | 1h     | No stats flag: `cmd/io-surface/main.go:231-249`; P3-38                    |
+| 30 | `io-surface version --json` with commit + build date                                                 | 🔴 `TODO`    | Low    | 30min  | `version` prints plain text: `cmd/io-surface/main.go:42-43`; P4-44        |
+| 31 | Document the taxonomy freeze rule (a new family = a schema version bump)                             | 🔴 `TODO`    | Low    | 15min  | Not documented anywhere; report P4-47                                     |
+| 32 | Document ID migration for package moves (path change = a new ID set)                                 | 🔴 `TODO`    | Low    | 15min  | Not documented anywhere; report P4-48                                     |
+| 33 | Register the repo in the fleet inventory (`meta` / stack-selection)                                  | 🔴 `TODO`    | Low    | 30min  | Report P4-43; repo currently invisible to own tooling                     |
+| 34 | Run the checker under `-race` and on a very large repo; record results                               | 🔴 `TODO`    | Low    | 1h     | Never measured; report §c-18                                              |
+| 35 | Run against crush-daily + ~10 daemon repos; publish a real family distribution                       | 🔴 `TODO`    | Low    | 2h     | Report P4-50                                                              |
+| 36 | Tag `v0.1.0` (version const, README Status and CHANGELOG all say 0.1.0; no git tag)                  | 🔴 `TODO`    | Low    | 15min  | `git tag` is empty; `cmd/io-surface/main.go:25`                           |
+| 37 | Smoke-test `go install github.com/larsartmann/io-surface/cmd/io-surface@latest` via proxy.golang.org | 🔴 `TODO`    | High   | 10min  | Public install path never executed; session report 2026-11-06 §d2         |
+| 38 | Check pkg.go.dev indexes the module once the proxy caches it                                         | 🔴 `TODO`    | Low    | 10min  | Follows from #37                                                          |
+| 39 | Handle the open Dependabot PR (actions group bump): review + merge or close                          | 🔴 `TODO`    | Med    | 15min  | Open since publishing; title-read only; session report §c3                |
+| 40 | Provision a Forgejo API token on this machine (unlocks #41/#42 + fleet automation)                   | 🔵 `BLOCKED` | Med    | 15min  | No token found (env/netrc/tea/credentials searched); session report §g-Q1 |
+| 41 | Configure server-side push mirror Forgejo → GitHub (end manual dual-push)                            | 🔵 `BLOCKED` | Med    | 15min  | `push_mirrors` API → 403 anon; gogenfilter has one; blocked by #40        |
+| 42 | Flip Forgejo repo visibility per owner decision (gogenfilter is public; io-surface is private)       | 🔵 `BLOCKED` | Low    | 5min   | Anon API → 404; blocked by #40; session report §g-Q2                      |
+| 43 | Wire `docs-gates` into CI as a standing gate, pinned to a rev                                        | 🔴 `TODO`    | Med    | 1h     | One-shot PASS only; session report §b4                                    |
+| 44 | Add a CI job that installs the module from the public path (module-path tripwire)                    | 🔴 `TODO`    | Med    | 30min  | Session report §g-Q3                                                      |
+| 45 | Add "verified how" discipline to future health reports (name the command per claim)                  | 🔴 `TODO`    | Low    | 15min  | Session report §d2                                                        |
+| 46 | Seed `.docs-gates.json` thresholds for this repo                                                     | 🔴 `TODO`    | Low    | 15min  | Defaults used; session report §f-46                                       |
+| 47 | Re-derive TODO_LIST evidence line numbers at the next docs audit (they rot)                          | 🔴 `TODO`    | Low    | 15min  | Inherent to the format; session report §e5                                |
+| 48 | Consider `go-release` flow for v0.1.1 once P0 items #1-4 land                                        | 🔴 `TODO`    | Low    | 30min  | go-release skill; session report §f-48                                    |
 
 ---
 
