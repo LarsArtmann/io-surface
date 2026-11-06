@@ -312,3 +312,66 @@ func TestRun_ScopeHintNamesTheDirsCause(t *testing.T) {
 		t.Errorf("default scope must not hint, got %d findings", n)
 	}
 }
+
+func TestRun_ShadowCapabilityNamesHiddenIO(t *testing.T) {
+	m := fixtureManifest()
+	m.Capabilities = []manifest.Capability{
+		// store declares file-read/file-write/embed: FILES is covered, NETWORK is not.
+		{Pkg: "internal/store", Direct: []string{"NETWORK"}, Deep: []string{"FILES", "NETWORK"}},
+		// cmd/app has no declared sites in the fixture: EXEC is a pure shadow.
+		{Pkg: "cmd/app", Deep: []string{"EXEC"}},
+	}
+	rep := runFixture(t, m, Options{})
+
+	shadow := findingsByRule(rep, RuleShadowCapability)
+	if len(shadow) != 2 {
+		t.Fatalf("want 2 shadow findings, got %d (%v)", len(shadow), shadow)
+	}
+	for _, f := range shadow {
+		if f.Severity != SeverityInfo {
+			t.Errorf("shadow findings are advisory by contract, got %s for %s", f.Severity, f.ID)
+		}
+	}
+	joined := shadow[0].Message + shadow[1].Message
+	if !strings.Contains(joined, "NETWORK") || !strings.Contains(joined, "EXEC") {
+		t.Errorf("shadow messages must name the uncovered capability, got: %s", joined)
+	}
+	if !strings.Contains(joined, "listener") || !strings.Contains(joined, "outbound") {
+		t.Errorf("shadow message must name the mapped families, got: %s", joined)
+	}
+	if len(findingsByRule(rep, RuleUndeclared)) != 2 {
+		t.Errorf("fixture baseline drifted: want exactly the 2 known undeclared sites, stats: %+v", rep.Stats)
+	}
+}
+
+func TestRun_ShadowCapabilityCoveredAndBaselined(t *testing.T) {
+	m := fixtureManifest()
+	m.Capabilities = []manifest.Capability{
+		{Pkg: "internal/store", Deep: []string{"FILES"}},
+	}
+	rep := runFixture(t, m, Options{})
+	if got := findingsByRule(rep, RuleShadowCapability); len(got) != 0 {
+		t.Fatalf("covered capability must not shadow, got %v", got)
+	}
+
+	// A baseline entry keyed on the package suppresses the shadow and stays
+	// "used" for the only-shrinks machinery.
+	m.Capabilities = []manifest.Capability{{Pkg: "cmd/app", Deep: []string{"EXEC"}}}
+	m.Baseline = []manifest.BaselineEntry{{ID: "cmd/app", Note: "engine-only transitives, judged fine", Date: "2026-11-06"}}
+	rep = runFixture(t, m, Options{})
+	if got := findingsByRule(rep, RuleShadowCapability); len(got) != 0 {
+		t.Fatalf("baselined shadow must be suppressed, got %v", got)
+	}
+	if got := findingsByRule(rep, RuleBaselineUnused); len(got) != 0 {
+		t.Fatalf("a shadow-suppressing baseline entry must count as used, got %v", got)
+	}
+}
+
+func TestRun_ShadowCapabilityUnknownNameIsSkipped(t *testing.T) {
+	m := fixtureManifest()
+	m.Capabilities = []manifest.Capability{{Pkg: "internal/store", Deep: []string{"CGO"}}}
+	rep := runFixture(t, m, Options{})
+	if got := findingsByRule(rep, RuleShadowCapability); len(got) != 0 {
+		t.Fatalf("unknown names are manifest.Validate's job, got %v", got)
+	}
+}
