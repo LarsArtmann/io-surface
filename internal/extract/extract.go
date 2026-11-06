@@ -125,6 +125,7 @@ func Extract(root string, opts Options) ([]*Site, error) {
 var pkgOf = map[string]string{
 	"os":                         "os",
 	"io":                         "io",
+	"bufio":                      "bufio",
 	"net":                        "net",
 	"crypto":                     "",
 	"net/http":                   "http",

@@ -16,6 +16,32 @@ func siteByID(t *testing.T, sites []*Site, id string) *Site {
 	return nil
 }
 
+// TestPkgOf_CoversEveryWatchedPackage pins the bufio lesson: a callFamily
+// entry whose package key no import can resolve to is dead code — the call
+// sites silently never extract, and only an end-to-end fixture test catches
+// it. Every watched package key must be reachable through pkgOf (exact) or
+// importSubstring (fragment).
+func TestPkgOf_CoversEveryWatchedPackage(t *testing.T) {
+	resolvable := map[string]bool{}
+	for _, key := range pkgOf {
+		if key != "" {
+			resolvable[key] = true
+		}
+	}
+	for range importSubstring {
+		for _, key := range importSubstring {
+			resolvable[key] = true
+		}
+
+		break
+	}
+	for pkgKey := range callFamily {
+		if !resolvable[pkgKey] {
+			t.Errorf("callFamily[%q] is unreachable: add %q to pkgOf (or an importSubstring fragment), otherwise its call sites never extract", pkgKey, pkgKey)
+		}
+	}
+}
+
 func TestExtract_FamiliesAndConfidence(t *testing.T) {
 	sites, err := Extract("../../testdata/extract", Options{})
 	if err != nil {
