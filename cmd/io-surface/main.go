@@ -103,7 +103,18 @@ func newApp() (*v4.CLI[rootFlags], error) {
 				return err
 			}
 
-			return v4.AddCommands(app, checkCmd, initCmd, renderCmd, extractCmd)
+			absorbCmd, err := v4.NewCommand("absorb", absorbFlags{}, runAbsorb,
+				v4.WithShort("Ingest a pinned Capslock report as capability facts (advisory)"),
+				v4.WithLong("Folds a Capslock JSON report into per-package capability sets and writes capabilities.cue — that file ONLY; "+
+					"claims, baseline and facts are never machine-written. With --check it reports advisory drift between the committed capabilities "+
+					"and a fresh report; capability findings never exit 1 (promotion to a gate is an enforcement-policy decision, not this command's)."),
+				v4.WithExample("io-surface absorb --capslock capslock-report.json"),
+			)
+			if err != nil {
+				return err
+			}
+
+			return v4.AddCommands(app, checkCmd, initCmd, renderCmd, extractCmd, absorbCmd)
 		},
 		v4.WithCLIVersion(version),
 		v4.WithBatteries(),

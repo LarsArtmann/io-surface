@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/larsartmann/io-surface/internal/check"
@@ -286,5 +287,108 @@ func TestExecute_VersionAndUnknownCommand(t *testing.T) {
 	}
 	if exitCode(err) != 2 {
 		t.Errorf("unknown command exit class = %d, want 2", exitCode(err))
+	}
+}
+
+const absorbFixtureReport = `{
+  "capabilityInfo": [
+    {"capabilityName": "FILES", "capabilityType": "CAPABILITY_TYPE_DIRECT", "packageDir": "example.com/fixture/internal/store"},
+    {"capabilityName": "NETWORK", "capabilityType": "CAPABILITY_TYPE_DIRECT", "packageDir": "example.com/fixture/internal/store"},
+    {"capabilityName": "EXEC", "capabilityType": "CAPABILITY_TYPE_TRANSITIVE", "packageDir": "example.com/fixture/internal/store"},
+    {"capabilityName": "REFLECT", "capabilityType": "CAPABILITY_TYPE_TRANSITIVE", "packageDir": "example.com/fixture/internal/store"}
+  ]
+}`
+
+func absorbFixtureRoot(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	scaffoldFixture(t, root)
+	if err := os.WriteFile(filepath.Join(root, "go.mod"), []byte("module example.com/fixture\n\ngo 1.27\n"), 0o644); err != nil {
+		t.Fatalf("write go.mod: %v", err)
+	}
+
+	return root
+}
+
+func TestRunAbsorb_WritesCapabilitiesOnly(t *testing.T) {
+	root := absorbFixtureRoot(t)
+	report := filepath.Join(t.TempDir(), "capslock.json")
+	if err := os.WriteFile(report, []byte(absorbFixtureReport), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	out, err := runApp(t, "absorb", "--root", root, "--capslock", report, "--engine-version", "v0.3.4")
+	if err != nil {
+		t.Fatalf("absorb: %v (out: %s)", err, out)
+	}
+	if !strings.Contains(out, "capabilities.cue") || !strings.Contains(out, "v0.3.4") {
+		t.Errorf("absorb summary missing facts: %s", out)
+	}
+	if !strings.Contains(out, "REFLECT") {
+		t.Errorf("unmapped capability must be reported loudly, out: %s", out)
+	}
+
+	body, err := os.ReadFile(filepath.Join(root, scaffold.Dir, "capabilities.cue"))
+	if err != nil {
+		t.Fatalf("capabilities.cue missing: %v", err)
+	}
+	for _, want := range []string{`pkg: "internal/store"`, `direct: ["FILES", "NETWORK"]`, `deep: ["EXEC", "FILES", "NETWORK"]`, `engine:  "capslock"`} {
+		if !strings.Contains(string(body), want) {
+			t.Errorf("capabilities.cue missing %q:\n%s", want, body)
+		}
+	}
+	for _, forbidden := range []string{"claims:", "baseline:", "sites:"} {
+		if strings.Contains(string(body), forbidden) {
+			t.Errorf("capabilities.cue must never carry %q", forbidden)
+		}
+	}
+
+	// The manifest with capabilities must still load and gate green
+	// (capabilities are advisory; check ignores them).
+	if _, err := runApp(t, "check", "--root", root); err != nil {
+		t.Errorf("check after absorb must stay green: %v", err)
+	}
+}
+
+func TestRunAbsorb_CheckReportsDriftAdvisory(t *testing.T) {
+	root := absorbFixtureRoot(t)
+	report := filepath.Join(t.TempDir(), "capslock.json")
+	if err := os.WriteFile(report, []byte(absorbFixtureReport), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Fresh manifest (no capabilities committed): every package is missing.
+	out, err := runApp(t, "absorb", "--root", root, "--capslock", report, "--check", "--module", "example.com/fixture")
+	if err != nil {
+		t.Fatalf("absorb --check must never fail: %v (out: %s)", err, out)
+	}
+	if !strings.Contains(out, "io-surface/capability-drift") || !strings.Contains(out, "internal/store") {
+		t.Errorf("drift report missing capability-drift line, out: %s", out)
+	}
+	if !strings.Contains(out, "advisory") {
+		t.Errorf("drift output must say advisory, out: %s", out)
+	}
+
+	// After --write, the same report must produce zero drift.
+	if _, err := runApp(t, "absorb", "--root", root, "--capslock", report, "--engine-version", "v0.3.4"); err != nil {
+		t.Fatalf("absorb write: %v", err)
+	}
+	out, err = runApp(t, "absorb", "--root", root, "--capslock", report, "--check", "--module", "example.com/fixture")
+	if err != nil {
+		t.Fatalf("absorb --check after write: %v", err)
+	}
+	if strings.Contains(out, "internal/store: committed") {
+		t.Errorf("in-sync run must not report store drift, out: %s", out)
+	}
+}
+
+func TestRunAbsorb_MissingCapslockFlag(t *testing.T) {
+	root := absorbFixtureRoot(t)
+	_, err := runApp(t, "absorb", "--root", root)
+	if err == nil {
+		t.Fatal("--capslock is required")
+	}
+	if exitCode(err) != 2 {
+		t.Errorf("usage error exit class = %d, want 2", exitCode(err))
 	}
 }
