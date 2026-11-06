@@ -57,6 +57,31 @@ github  git@github.com:LarsArtmann/io-surface.git            # public mirror
   be public (as gogenfilter is), flip it in the Forgejo UI — repo creation and
   visibility changes need a Forgejo API token that is not on this machine.
 
+## Releases & the BuildFlow provider
+
+- `provider/` (repo root, NOT internal/ — BuildFlow must import it)
+  self-registers as a BuildFlow DAG tool via `go-finding/toolsdk`. Both halves
+  of that loop ship together: the package here AND the blank import in
+  BuildFlow's `tools/providers/sdk_imports.go` (its go.mod requires the
+  published tag, so a provider change means a new release before BuildFlow
+  can pick it up).
+- Releases are 0.x SemVer (features = MINOR): v0.2.0 shipped 2026-11-06.
+  Protocol that worked: version const + CHANGELOG cut + README status line →
+  full gates → push → CI green on THAT commit → annotated tag to BOTH remotes
+  → proxy `go list -m @vX` check → GitHub Release. pkg.go.dev indexing lags
+  (404s are crawler lag, not breakage — the proxy is the hard guarantee).
+- The BuildFlow pre-commit hook lives at `.githooks/pre-commit`
+  (`core.hooksPath=.githooks`), fleet-template generated. The 2026-11-06
+  template had a bash syntax bug (missing outer `done` + `$( )` close in the
+  staged-module loop) — fixed HERE; the upstream template fix belongs in the
+  BuildFlow repo. The hook's file-size gate reads `max_file_size` from
+  `.buildflow.yml` — this repo pins 650 with rationale (split tracked as
+  TODO #64).
+- Upstream Capslock phantom-edge issue (#50) is BLOCKED, not fileable: the
+  verify-before-filing gate failed — a minimal zero-network FieldsSeq repro
+  yields zero NETWORK edges under v0.3.4, so the conflation needs the fuller
+  io-surface call graph. Don't re-attempt without a faithful repro.
+
 ## Self-hosting: editing Go code updates the gate contract
 
 This repo is gated by its own tool. The committed manifest

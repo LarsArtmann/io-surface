@@ -73,7 +73,7 @@ jobs:
       - name: Inventory survives dprint
         uses: dprint/check@371a959e3c77f34a76a03d2c50df2e3f2302d016 # v2.6
         with:
-          dprint-flags: "docs/architecture/io-surface/INVENTORY.md"
+          args: "docs/architecture/io-surface/INVENTORY.md"
 
       # Self-hosted SARIF: the gate's own findings as a machine-renderable
       # artifact (GitHub can display SARIF natively; a clean run yields an
