@@ -70,6 +70,7 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 | `io-surface render [--root] [--out FILE]`                                                              | Render the inventory markdown from the manifest (claims-aware)                                                     |
 | `io-surface render --doc FILE [--check]`                                                               | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                              |
 | `io-surface extract [--root] [--include-tests]`                                                        | Print the raw extraction as JSON (debugging, counts)                                                               |
+| `io-surface absorb --capslock REPORT [--check] [--module] [--engine-version]`                          | Fold a pinned Capslock JSON report into `capabilities.cue` (that file only); `--check` reports advisory drift, never exits 1 |
 | `io-surface version` / `doctor` / `describe`                                                           | cmdguard-provided: version line, DI/config health, hidden machine-readable CLI contract (`describe --output json`) |
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
@@ -100,6 +101,31 @@ io-surface render --doc docs/architecture/IO.md --check # exit 1 when stale
 
 Put the `--check` form in CI and the published inventory can never silently
 go stale; regenerate with the plain form after manifest edits.
+
+### Reachability facts (optional, advisory): `absorb`
+
+Sites answer **where** I/O sits; capabilities answer **what a package can
+reach**. The second half comes from Google's
+[Capslock](https://github.com/google/capslock) (SSA callgraph, transitive
+through dependencies), run externally and pinned — io-surface never imports
+it, so the gate stays hermetic:
+
+```bash
+go install github.com/google/capslock/cmd/capslock@v0.3.4 # pin deliberately; build with the repo's own Go toolchain
+capslock -output=json -packages=./... > capslock.json
+io-surface absorb --capslock capslock.json --engine-version v0.3.4
+io-surface absorb --capslock capslock.json --check # advisory drift report, never exits 1
+```
+
+`absorb` writes `capabilities.cue` — that file ONLY (`claims.cue`,
+`baseline.cue` and `facts.cue` are never machine-written). The mapped
+vocabulary (`FILES`, `NETWORK`, `EXEC`) lands per package as `direct` (the
+package's own code — high signal) and `deep` (including transitive dependency
+paths — linkage, not behavior). The gate rule `io-surface/shadow-capability`
+(info, never fails) names a package whose **direct** capability has no covered
+family: hidden I/O becomes a named finding, and a package-keyed baseline entry
+is the deliberate answer. This repository's CI runs the same steps as a
+non-blocking job and uploads the raw report as an artifact.
 
 ## Findings
 
