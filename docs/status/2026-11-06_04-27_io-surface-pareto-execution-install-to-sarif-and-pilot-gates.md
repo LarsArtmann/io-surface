@@ -76,7 +76,7 @@ mine) · **dnsblockd:** manifest edits in working tree, **uncommitted**
    compiler, fixed by edit — but appending code via heredoc when write/edit
    tools exist was the wrong tool and cost a cycle.
 4. **dnsblockd edit failed twice on the stale-guard** — I attempted an edit
-   against a file I had only `sed`/`grep`ed, not Viewed. Then Viewed the
+   against a file I had only touched with `sed` or `grep`, not Viewed. Then Viewed the
    WRONG region (lines 890-917) for an append that belongs at the true end
    of the sites map. The 4 drafted entries still sit only in this report.
    Sloppy sequencing on the last step of the run.
@@ -112,7 +112,7 @@ mine) · **dnsblockd:** manifest edits in working tree, **uncommitted**
 
 1. **Finish #26**: append the 4 drafted declarations to dnsblockd facts.cue
    (text already drafted in this session), re-check → 0 errors
-2. Re-verify dnsblockd gate; check `audit.claims: 141` still truthful
+2. ~~Re-verify dnsblockd gate; check `audit.claims: 141` still truthful~~ RESOLVED 2026-11-06: dnsblockd gate re-verified 0 errors 0 warnings at commit `50f19b10`; claims count superseded by that manifest's own audit block
 3. Commit dnsblockd ID fix + declarations (ONLY manifest paths; foreign
    working-tree changes untouched)
 4. Update dnsblockd facts.cue header (no longer tools/io-extract generated)
@@ -161,7 +161,7 @@ mine) · **dnsblockd:** manifest edits in working tree, **uncommitted**
     free at 04:00)
 38. **#28 `.Do`/`.Close` tokens → ambiguous tier**
 39. **#29 `extract --stats`** histogram
-40. **#30 `version --json`**
+40. ~~**#30 `version --json`**~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE
 41. **#31 taxonomy freeze rule docs** (needs #23 first per Table A)
 42. **#32 ID-migration doc** — NOW HIGH-VALUE after the sso/views lesson
 43. **#33 register in fleet inventory** (meta/stack-selection)

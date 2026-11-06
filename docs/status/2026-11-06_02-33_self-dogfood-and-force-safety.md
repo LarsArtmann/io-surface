@@ -274,7 +274,7 @@ direct consequences of THIS session.
 | 37 | 🆕 Decide buildflow-vs-CI-bar reconciliation (g2): 350-line limit, golangci, -race — adopt fleet bar or document divergence | 🆕   | Med    | 30min  |
 | 38 | #29 `extract --stats` family census (the blindness-audit tool, §e2)                                                         | TODO | Low    | 1h     |
 | 39 | #28 Reconsider the noisy bare `.Do` token (classify ambiguous)                                                              | TODO | Low    | 30min  |
-| 40 | #30 `version --json` with commit + date                                                                                     | TODO | Low    | 30min  |
+| 40 | #30 `version --json` with commit + date — RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE                                                                                     | DONE | Low    | 30min  |
 | 41 | #36 Tag v0.1.0 (const says 0.1.0; no tag exists)                                                                            | TODO | Low    | 15min  |
 | 42 | #37 Smoke-test `go install …@latest` through the public proxy                                                               | TODO | High   | 10min  |
 | 43 | #38 Check pkg.go.dev indexing after #42                                                                                     | TODO | Low    | 10min  |

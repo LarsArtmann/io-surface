@@ -193,7 +193,7 @@ _(observed state at HEAD; not authored by this session)_
 | 27 | dnsblockd reverse-mode check + retire `tools/io-extract` (BLOCKED: fleet lock)                                          | Med    | 2h             | TODO #27              |
 | 28 | Reclassify bare `.Do`/`.Close` tokens as ambiguous, not a family                                                        | Low    | 30min          | TODO #28              |
 | 29 | `extract --stats` per-package histogram                                                                                 | Low    | 1h             | TODO #29              |
-| 30 | `version --json` with commit + build date                                                                               | Low    | 30min          | TODO #30              |
+| 30 | ~~`version --json` with commit + build date~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE                                                                               | Low    | 30min          | DONE 2026-11-06       |
 | 31 | Document taxonomy freeze rule (new family = schema version bump)                                                        | Low    | 15min          | TODO #31              |
 | 32 | Document ID migration for package moves                                                                                 | Low    | 15min          | TODO #32              |
 | 33 | Register repo in fleet inventory (`meta` / stack-selection)                                                             | Low    | 30min          | TODO #33              |
