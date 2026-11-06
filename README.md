@@ -260,6 +260,24 @@ failures included), `init --force` can no longer clobber `claims.cue`/
 markers with a `--check` drift gate — this repository's own inventory doc is
 gated by it in CI.
 
+### Adoption safety: the refresh ritual
+
+`init --force` regenerates ONLY `facts.cue` — `claims.cue`, `baseline.cue` and
+`schema.cue` are never overwritten once they exist (a planted-file test pins
+this). The safe loop after any I/O-adding change:
+
+```bash
+go run ./cmd/io-surface init --root . --force   # facts only
+git diff docs/architecture/io-surface/facts.cue # review the mechanical delta
+go run ./cmd/io-surface check --root .          # gate must stay green
+```
+
+If a refresh surprises you, `git restore docs/architecture/io-surface/facts.cue`
+puts it back — the mechanical file has no judgment to lose. NEVER hand-edit
+`facts.cue` locations; never expect tooling to rewrite `claims.cue`/
+`baseline.cue` (the one sanctioned machine write is `baseline add`, which
+appends a note+date entry surgically).
+
 ## Development
 
 ```bash
