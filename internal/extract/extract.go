@@ -232,7 +232,7 @@ var methodToken = map[string]string{
 	// .Do is ambiguous by design: every http.Client.Do, sql.Tx.Do-style
 	// helper and task-runner shares the name, so the token records the site
 	// but claims no family (the manifest's family is the claim).
-	"Do": "",
+	"Do":          "",
 	"ExecContext": "database", "QueryContext": "database", "QueryRowContext": "database",
 	"BeginTx": "database", "PingContext": "database", "PrepareContext": "database",
 	"AppendBatch": "database", "SaveQuery": "database", "EnqueueOp": "database", "EnqueueCommand": "database",
