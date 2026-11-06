@@ -64,8 +64,7 @@ snapshot of the tree. Consequences of touching any `.go` file under `cmd/` or
   `undeclared-site` (error severity) → CI fails. Declare the site in
   `facts.cue` (or `claims.cue`).
 - **Moved lines around** in a file that has declared sites → `location-drift`
-  (info only, does NOT fail CI). Two such infos are live right now and
-  tolerated.
+  (info only, does NOT fail CI). Such infos are tolerated by design.
 
 To refresh facts after an I/O-adding change:
 
@@ -73,14 +72,12 @@ To refresh facts after an I/O-adding change:
 go run ./cmd/io-surface init --root . --force
 ```
 
-**⚠️ Known defect (status report §d1, P0 task #1):** `init --force` rewrites
-ALL FOUR manifest files, including hand-written `claims.cue` and `baseline.cue`
-(`internal/scaffold/scaffold.go` — `Files()` returns all four and `Write()`
-writes them all; `--force` only bypasses the already-exists check). In THIS
-repo `claims.cue` currently has no site entries and `baseline.cue` is empty,
-so it is currently lossless — but if claims are ever added, recover them from
-git afterwards, or hand-edit `facts.cue` locations instead. Do not "fix" this
-by casually deleting claims.
+**⚠️ Hazard:** `init --force` rewrites ALL FOUR manifest files, including
+hand-written `claims.cue` and `baseline.cue` (`internal/scaffold/scaffold.go`
+— `Files()` returns all four and `Write()` writes them all; `--force` only
+bypasses the already-exists check). Until the fix lands (TODO_LIST #1): if
+`claims.cue`/`baseline.cue` carry hand-written entries, recover them from git
+after a `--force`, or hand-edit `facts.cue` locations instead.
 
 ## Architecture
 
@@ -152,24 +149,32 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   must be green (green-by-construction guarantee).
 - **No direct tests** exist for `cmd/io-surface`, `internal/manifest`, and
   `internal/render` (0% direct coverage; only exercised via scaffold's test) —
-  known gap, status report §d9 / P0 tasks #11–13.
+  known gap, tracked in TODO_LIST.
 - Table-driven stdlib tests, no external test framework, no mocks (the tool is
   hermetic; keep it that way).
 
-## Known defects / sharp edges (verified, from docs/status/…)
+## Sharp edges (current constraints)
 
-The status report `docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`
-is the honest record of this repo's birth, including a prioritized P0–P4 task
-list (§f). Read §b/§d before "discovering" these the hard way:
+Fix work is tracked in `TODO_LIST.md`; this section is what to WATCH OUT for
+while working here:
 
 - `check --json` with a manifest validation failure prints text to stderr and
-  exits 1 with NO JSON on stdout (§d7).
+  exits 1 with NO JSON on stdout — do not build a JSON-parsing consumer on
+  that path yet.
 - CUE constraint violations surface as an opaque "incompatible list lengths"
-  error, not the actual violation entries (§d4).
-- `audit.commit` is always the literal `"working-tree"` (§d8).
-- Baseline has no "only shrinks" enforcement and no owner/expiry (§b8).
+  error, not the actual violation entries — grep `violations` in the CUE
+  package when debugging one.
+- `audit.commit` in a freshly scaffolded manifest is always the literal
+  `"working-tree"`, not a real commit.
+- Baseline suppression is canonical-key based: two distinct same-base-name
+  sites can hide behind one baseline entry, and nothing enforces
+  "only shrinks".
 - `--dirs` that skips declared sites produces findings with no hint that the
-  flag caused them (§b9).
+  flag caused them.
+
+The birth status report
+(`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
+is the honest record of this repo's origin (defects §d, open questions §g).
 
 ## Conventions
 
@@ -187,3 +192,6 @@ list (§f). Read §b/§d before "discovering" these the hard way:
 - `cue` binary is never needed at runtime or for tests; `cue fmt` is only a
   hand-editing habit.
 - CHANGELOG follows Keep a Changelog; version const in `cmd/io-surface/main.go`.
+- Docs ownership: `README` (users) / `AGENTS` (agent context) / `FEATURES`
+  (status inventory) / `TODO_LIST` (open work) / `ROADMAP` (vision, open
+  questions) — one fact, one home.
