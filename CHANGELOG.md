@@ -45,6 +45,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   and verified against code
 - Repository publishing: Forgejo primary (`forgejo.home.lan/lars/io-surface`)
   and public GitHub mirror (`github.com/LarsArtmann/io-surface`, CI green)
+- Constraint failures now name the violations: when a `disciplines.cue` rule
+  fires, the load error lists the actual `id: msg` entries (recovered from
+  the CUE conjuncts on "incompatible list lengths" conflicts, checked
+  explicitly otherwise) instead of CUE's opaque list-length message; the
+  `io-surface/manifest-validation` sentinel is `errors.Is`-matchable
+- New gate rule `io-surface/id-form` (error): a declared ID that encodes a
+  subpackage with a dot (`internal/server.sso.Manager`, the dnsblockd
+  adoption lesson) can never pair with the extractor's slash-package form —
+  the gate now names the correct form instead of reporting a generic
+  undeclared site, without false-positiving on legal unexported-type IDs
+  (`internal/extract.extractor.parseFile` stays legal)
+- Baseline lifecycle rules: an entry suppressing nothing today warns
+  (`io-surface/unused-baseline` — the only-shrinks rule, enforced), and an
+  entry past its `expires` date fails (`io-surface/baseline-expired`,
+  error). `#BaselineEntry` gains optional `owner` and `expires` fields —
+  additive, backward-compatible: manifests that use them need this schema
+  version or newer
+- New gate rule `io-surface/scope-hint` (info): a `--dirs` narrowing that
+  excludes declared sites now names the flag as the cause instead of
+  producing findings that look like manifest rot
+- `audit.commit` in freshly scaffolded/refreshed manifests records the real
+  short HEAD hash (`-dirty` when the worktree carries changes; the literal
+  `working-tree` survives only outside a git repo), and the CI
+  facts-freshness gate ignores the audit `commit:`/`date:` lines so HEAD
+  drift between refresh and CI cannot structurally redden the gate
+- Direct test suite for `internal/manifest` (decode edge cases, sentinel
+  errors, planted constraint violations through both the conflict and the
+  explicit path) and `auditCommit` git-repo tests for the scaffold
 
 ### Fixed
 
@@ -58,6 +86,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `LICENSE` contradicted the README's MIT claim (a proprietary placeholder had
   landed post-birth); replaced with the standard MIT text, matching the
   birth-session intent and the house pattern for public tools
+- A bare `io-surface` line at the top of `.gitignore` (meant for the compiled
+  binary) silently swallowed every NEW file under `cmd/io-surface/` and
+  `docs/architecture/io-surface/` — the inventory doc and the CLI test file
+  went uncommitted past two commits until CI caught it. The pattern is now
+  anchored (`/io-surface`), joining the existing line-61 entry
+- Generated inventory tables are emitted in the pipe-aligned shape dprint and
+  prettier produce, so a formatter pass over an embedded `--doc` block is now
+  a byte-level no-op and the `render --check` gate can no longer fail on a
+  doc nobody hand-edited
 
 ### Removed
 
