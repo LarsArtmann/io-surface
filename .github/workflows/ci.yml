@@ -45,10 +45,15 @@ jobs:
       # Facts freshness: a committed manifest that no longer matches the tree
       # means someone shipped code without regenerating facts.cue. Safe since
       # init --force only rewrites facts.cue (claims/baseline/schema survive).
+      # The audit's commit/date lines legitimately drift (HEAD moves between
+      # the refresh commit and CI), so the gate ignores exactly those.
       - name: Facts are fresh
         run: |
           go run ./cmd/io-surface init --root . --force
-          if ! git diff --quiet docs/architecture/io-surface/facts.cue; then
+          if ! git diff --quiet \
+            -I'^[[:space:]]*commit:' \
+            -I'^[[:space:]]*date:' \
+            docs/architecture/io-surface/facts.cue; then
             echo "::error::facts.cue is stale — run 'go run ./cmd/io-surface init --root . --force' and commit the result"
             git diff docs/architecture/io-surface/facts.cue
             exit 1

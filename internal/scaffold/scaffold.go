@@ -19,6 +19,7 @@ import (
 	_ "embed"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -33,11 +34,12 @@ var schemaCUE []byte
 const Dir = "docs/architecture/io-surface"
 
 // Files returns the scaffold file set as path->content (paths relative to the
-// manifest dir).
-func Files(sites []*extract.Site, date string) map[string][]byte {
+// manifest dir). root names the repository the snapshot is taken from and only
+// feeds the audit provenance line.
+func Files(root string, sites []*extract.Site, date string) map[string][]byte {
 	return map[string][]byte{
 		"schema.cue":   schemaCUE,
-		"facts.cue":    factsCUE(sites, date),
+		"facts.cue":    factsCUE(sites, date, auditCommit(root)),
 		"claims.cue":   claimsCUE(),
 		"baseline.cue": baselineCUE(),
 	}
@@ -56,7 +58,7 @@ func Write(root string, sites []*extract.Site, date string, force bool) (string,
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return dir, err
 	}
-	files := Files(sites, date)
+	files := Files(root, sites, date)
 	names := make([]string, 0, len(files))
 	for name := range files {
 		names = append(names, name)
@@ -78,7 +80,7 @@ func Write(root string, sites []*extract.Site, date string, force bool) (string,
 }
 
 // factsCUE renders the committed extraction snapshot.
-func factsCUE(sites []*extract.Site, date string) []byte {
+func factsCUE(sites []*extract.Site, date, commit string) []byte {
 	var b strings.Builder
 	b.WriteString(`// facts.cue — extracted from code by ` + "`io-surface init`" + `.
 //
@@ -88,7 +90,7 @@ package io_surface
 
 `)
 	fmt.Fprintf(&b, "audit: {\n\tcommit: %q\n\tdate:   %q\n\tclaims: %d\n\tmethod: %q\n}\n\n",
-		"working-tree", date, countLocations(sites), "io-surface extract (AST, stdlib-only)")
+		commit, date, countLocations(sites), "io-surface extract (AST, stdlib-only)")
 
 	b.WriteString(`scope: {
 	in: [
@@ -175,6 +177,39 @@ package io_surface
 
 baseline: []
 `)
+}
+
+// auditCommit resolves the commit the facts were extracted at: the short
+// HEAD hash of the repo containing root, suffixed -dirty when the worktree
+// carries uncommitted changes (the snapshot then spans unextracted edits).
+// Outside a git repo — a tarball, a sandbox checkout without .git — it falls
+// back to the literal "working-tree" so scaffolded manifests stay valid.
+func auditCommit(root string) string {
+	head, err := git(root, "rev-parse", "--short", "HEAD")
+	if err != nil {
+		return "working-tree"
+	}
+	dirty, err := git(root, "status", "--porcelain")
+	if err != nil {
+		return head
+	}
+	if strings.TrimSpace(dirty) != "" {
+		return head + "-dirty"
+	}
+
+	return head
+}
+
+// git runs one git invocation in dir and returns trimmed stdout.
+func git(dir string, args ...string) (string, error) {
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(string(out)), nil
 }
 
 func countLocations(sites []*extract.Site) int {
