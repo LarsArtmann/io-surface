@@ -139,6 +139,8 @@ non-blocking job and uploads the raw report as an artifact.
 | `extraction-blind` | info      | Symbol exists but no watched I/O call extracts from it — mark `extractable: false` or teach the extractor the seam |
 | `ambiguous-match`  | info      | Two symbols in one package share a base name; declare the exact ID form                                            |
 | `weak-site`        | info      | Heuristic-tier finding (method-name token like `.Do`, `.Serve`); advisory only                                     |
+| `shadow-capability`| info      | Extracted call family not covered by the package's declared capability set — declare it or drop the call (advisory) |
+| `capability-drift` | info      | Committed `capabilities.cue` disagrees with a fresh engine run; from `absorb --check`, never the hermetic gate      |
 
 Only `error` fails the gate. That is deliberate: line numbers are output, not input,
 and a heuristics tier that could block a merge would be switched off within a week.
