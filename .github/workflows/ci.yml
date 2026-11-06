@@ -79,3 +79,41 @@ jobs:
           name: io-surface-sarif
           path: io-surface.sarif
           if-no-files-found: error
+
+  # Capability facts (v1.1, advisory): the reachability half of the unified
+  # gate. This is the ONLY place the external engine runs — the `test` job
+  # above stays hermetic (GOPROXY-independent, sandbox-clean) by contract.
+  # Everything here is non-blocking by design: capability findings never fail
+  # CI; they inform. Bump CAPSLOCK_VERSION deliberately (schema churn).
+  capabilities:
+    runs-on: ubuntu-latest
+    env:
+      CAPSLOCK_VERSION: v0.3.4
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      # Install with the SAME toolchain the target repo loads with: a
+      # version-skewed analyzer fails to type-check the stdlib internals
+      # (observed locally with go1.26-built capslock on a go1.27 tree).
+      - name: Install pinned Capslock (toolchain-matched)
+        run: go install github.com/google/capslock/cmd/capslock@${CAPSLOCK_VERSION}
+
+      - name: Reachability report
+        run: $(go env GOPATH)/bin/capslock -output=json -packages=./... > capslock.json
+
+      - name: Absorb advisory drift report
+        run: |
+          go run ./cmd/io-surface absorb --capslock capslock.json --check
+          echo "Capability facts are advisory: drift above never fails CI (ROADMAP Q5 / plan guardrail 2)."
+
+      - name: Upload capability report artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: capslock-report
+          path: capslock.json
+          if-no-files-found: error

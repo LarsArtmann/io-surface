@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
 )
 
@@ -133,5 +134,59 @@ func TestSARIF_Deterministic(t *testing.T) {
 	}
 	if string(a) != string(b) {
 		t.Error("SARIF output is not deterministic")
+	}
+}
+
+// TestSARIF_CapabilityRuleIDsFlowByteStable pins the v1.1 contract end to
+// end: the advisory capability rules ride the same SARIF stream unchanged,
+// and the whole document is byte-identical across runs (M55).
+func TestSARIF_CapabilityRuleIDsFlowByteStable(t *testing.T) {
+	rep := &check.Report{
+		Stats: check.Stats{Infos: 2},
+		Findings: []check.Finding{
+			{
+				Rule:     check.RuleShadowCapability,
+				Severity: check.SeverityInfo,
+				ID:       "internal/store",
+				Message:  "reachability engine observes NETWORK in this package, but no declared site covers those families",
+			},
+			{
+				Rule:     absorb.RuleCapabilityDrift,
+				Severity: check.SeverityInfo,
+				ID:       "internal/store",
+				Message:  "committed deep [FILES] ≠ fresh deep [EXEC, FILES]",
+			},
+		},
+	}
+	first, err := SARIF(rep, "test")
+	if err != nil {
+		t.Fatalf("SARIF: %v", err)
+	}
+	second, err := SARIF(rep, "test")
+	if err != nil {
+		t.Fatalf("SARIF again: %v", err)
+	}
+	if string(first) != string(second) {
+		t.Error("SARIF output must be byte-stable for an identical report")
+	}
+	var doc struct {
+		Runs []struct {
+			Results []struct {
+				RuleID string `json:"ruleId"`
+			} `json:"results"`
+		} `json:"runs"`
+	}
+	if err := json.Unmarshal(first, &doc); err != nil {
+		t.Fatalf("parse SARIF: %v", err)
+	}
+	if len(doc.Runs) != 1 || len(doc.Runs[0].Results) != 2 {
+		t.Fatalf("want one run with 2 results, got %+v", doc)
+	}
+	got := map[string]bool{}
+	for _, r := range doc.Runs[0].Results {
+		got[r.RuleID] = true
+	}
+	if !got[check.RuleShadowCapability] || !got[absorb.RuleCapabilityDrift] {
+		t.Errorf("capability ruleIds must pass through unchanged, got %v", got)
 	}
 }
