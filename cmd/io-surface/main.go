@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/larsartmann/io-surface/internal/check"
+	"github.com/larsartmann/io-surface/internal/emit"
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
 	"github.com/larsartmann/io-surface/internal/render"
@@ -114,6 +115,7 @@ func runCheck(args []string, stdout io.Writer) error {
 	root := fs.String("root", ".", "repository root")
 	man := fs.String("manifest", "", "manifest package directory (default <root>/"+scaffold.Dir+")")
 	asJSON := fs.Bool("json", false, "emit the report as JSON")
+	format := fs.String("format", "", "output format: text, json, or sarif (--json is shorthand for --format json)")
 	advisory := fs.Bool("advisory", true, "include weak-tier advisory findings")
 	strict := fs.Bool("strict", false, "treat warnings as failures")
 	dirs := fs.String("dirs", "", "comma-separated directories to scan (default cmd,internal)")
@@ -139,13 +141,26 @@ func runCheck(args []string, stdout io.Writer) error {
 		}
 	}
 
-	if *asJSON {
+	// One emission decision for every gate outcome; the exit-code decision
+	// happens strictly after, so machines always get a parseable stdout.
+	useJSON := *asJSON || *format == "json"
+	switch {
+	case *format == "sarif":
+		data, sErr := emit.SARIF(rep, version)
+		if sErr != nil {
+			return sErr
+		}
+		if _, err = stdout.Write(data); err != nil {
+			return err
+		}
+		fmt.Fprintln(stdout)
+	case useJSON:
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
 		if err = enc.Encode(rep); err != nil {
 			return err
 		}
-	} else {
+	default:
 		printReport(rep, stdout)
 	}
 
