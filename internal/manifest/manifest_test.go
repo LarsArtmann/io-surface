@@ -133,6 +133,59 @@ sites: "a.B": {location: ["a.go:1"], family: "env", facts: {call: ["os.Getenv"]}
 	}
 }
 
+// TestLoad_EnforcementPolicy pins the D4 field: absent normalizes to "gate",
+// "audit" decodes, an unknown value is a validation error (not a silent
+// default), and the report-facing policy accessor never returns "".
+func TestLoad_EnforcementPolicy(t *testing.T) {
+	site := `sites: "a.B": {location: ["a.go:1"], family: "env", facts: {call: ["os.Getenv"]}}`
+
+	t.Run("absent means gate", func(t *testing.T) {
+		dir := writeManifest(t, map[string]string{
+			"schema.cue": schemaBody,
+			"facts.cue":  "package io_surface\n\n" + site,
+		})
+		m, err := Load(dir)
+		if err != nil {
+			t.Fatalf("load: %v", err)
+		}
+		if m.Enforcement != "" {
+			t.Errorf("raw Enforcement = %q, want \"\" (field optional)", m.Enforcement)
+		}
+		if got := m.EnforcementPolicy(); got != EnforcementGate {
+			t.Errorf("EnforcementPolicy = %q, want %q", got, EnforcementGate)
+		}
+	})
+
+	t.Run("audit decodes", func(t *testing.T) {
+		dir := writeManifest(t, map[string]string{
+			"schema.cue": schemaBody,
+			"facts.cue":  "package io_surface\n\nenforcement: \"audit\"\n\n" + site,
+		})
+		m, err := Load(dir)
+		if err != nil {
+			t.Fatalf("load: %v", err)
+		}
+		if got := m.EnforcementPolicy(); got != EnforcementAudit {
+			t.Errorf("EnforcementPolicy = %q, want %q", got, EnforcementAudit)
+		}
+	})
+
+	t.Run("unknown value is a validation error", func(t *testing.T) {
+		dir := writeManifest(t, map[string]string{
+			"schema.cue": schemaBody,
+			"facts.cue":  "package io_surface\n\nenforcement: \"yolo\"\n\n" + site,
+		})
+		m, err := Load(dir)
+		if err != nil {
+			t.Fatalf("load must succeed (Go-side validate owns the closed set here): %v", err)
+		}
+		errs := m.Validate()
+		if len(errs) != 1 || !strings.Contains(errs[0].Error(), "unknown policy") {
+			t.Errorf("Validate() = %v, want one unknown-policy error", errs)
+		}
+	})
+}
+
 // TestLoad_NonEmptyViolationsFails pins the disciplines contract for the
 // common shape: a computed violations list with no conflicting default
 // anywhere. The load fails and the message names the actual violation.

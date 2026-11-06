@@ -101,8 +101,14 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 
 	if rep.Failing() || (flags.Strict && rep.Stats.Warnings > 0) {
 		if m.EnforcementPolicy() == manifest.EnforcementAudit && !flags.Enforce {
-			fmt.Fprintf(stdout, "io-surface: enforcement: audit — %d error(s) reported but not failing (the manifest records the policy; override with --enforce)\n",
-				rep.Stats.Errors)
+			// Human-facing note: stdout in text mode, stderr in machine
+			// modes (the JSON/SARIF stdout contract must stay parseable).
+			note := fmt.Sprintf("io-surface: enforcement: audit — %d error(s) reported but not failing (the manifest records the policy; override with --enforce)\n", rep.Stats.Errors)
+			if flags.Format == "sarif" || flags.JSON || flags.Format == "json" {
+				fmt.Fprint(os.Stderr, note)
+			} else {
+				fmt.Fprint(stdout, note)
+			}
 
 			return nil
 		}

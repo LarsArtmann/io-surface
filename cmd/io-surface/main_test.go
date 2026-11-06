@@ -13,6 +13,7 @@ import (
 
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
+	"github.com/larsartmann/io-surface/internal/manifest"
 	"github.com/larsartmann/io-surface/internal/scaffold"
 )
 
@@ -288,6 +289,59 @@ func TestExecute_VersionAndUnknownCommand(t *testing.T) {
 	if exitCode(err) != 2 {
 		t.Errorf("unknown command exit class = %d, want 2", exitCode(err))
 	}
+}
+
+// TestRunCheck_EnforcementAuditMode pins the D4 policy contract end to end:
+// a manifest that records `enforcement: "audit"` reports error findings but
+// exits 0 (the opt-out lives in the manifest — a committed, reviewable diff),
+// `--enforce` overrides it, and the JSON report carries the policy so CI logs
+// show it without re-reading the manifest.
+func TestRunCheck_EnforcementAuditMode(t *testing.T) {
+	root := t.TempDir()
+	scaffoldFixture(t, root)
+
+	// Plant one undeclared resolved site so the gate has real errors to
+	// suppress, then flip the recorded policy to audit.
+	late := filepath.Join(root, "internal", "store", "late.go")
+	if err := os.WriteFile(late, []byte("package store\n\nimport \"os\"\n\nfunc Late() ([]byte, error) {\n\treturn os.ReadFile(\"late.bin\")\n}\n"), 0o644); err != nil {
+		t.Fatalf("plant undeclared site: %v", err)
+	}
+	facts := filepath.Join(root, scaffold.Dir, "facts.cue")
+	raw, err := os.ReadFile(facts)
+	if err != nil {
+		t.Fatalf("read facts: %v", err)
+	}
+	audited := strings.Replace(string(raw), "enforcement: \"gate\"", "enforcement: \"audit\"", 1)
+	if audited == string(raw) {
+		t.Fatal("fixture facts.cue lost the enforcement line — scaffold template changed")
+	}
+	if err := os.WriteFile(facts, []byte(audited), 0o644); err != nil {
+		t.Fatalf("write facts: %v", err)
+	}
+
+	t.Run("audit reports but exits 0", func(t *testing.T) {
+		out, err := runApp(t, "check", "--root", root, "--json")
+		if err != nil {
+			t.Fatalf("audit mode must not fail: %v", err)
+		}
+		var rep check.Report
+		if uErr := json.Unmarshal([]byte(out), &rep); uErr != nil {
+			t.Fatalf("stdout not JSON: %v\n%s", uErr, out)
+		}
+		if rep.Enforcement != manifest.EnforcementAudit {
+			t.Errorf("report enforcement = %q, want %q", rep.Enforcement, manifest.EnforcementAudit)
+		}
+		if rep.Stats.Errors == 0 {
+			t.Error("audit mode must still COUNT the errors, not hide them")
+		}
+	})
+
+	t.Run("enforce overrides the audit policy", func(t *testing.T) {
+		_, err := runApp(t, "check", "--root", root, "--enforce")
+		if !errors.Is(err, errFindings) {
+			t.Fatalf("--enforce err = %v, want errFindings", err)
+		}
+	})
 }
 
 const absorbFixtureReport = `{
