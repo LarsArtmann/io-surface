@@ -33,6 +33,13 @@ package io_surface
 // casual edit (taxonomy freeze).
 version?: "io-surface/v1" | "io-surface/v1.1"
 
+// Enforcement policy (decision D4: new undeclared sites fail the build).
+// "gate" is the default and the birth decision; "audit" reports findings
+// without failing (adoption posture). The policy is recorded HERE, in the
+// manifest, so an opt-out is a committed, reviewable diff — never a silent
+// CI edit or an uncommitted flag. Absent = "gate".
+enforcement?: "gate" | "audit"
+
 #Family: "file-read" | "file-write" | "embed" | "database" | "listener" | "outbound" | "stream-copy" | "entropy" | "ipc-subprocess" | "env"
 
 // Cross-cutting I/O disciplines, as tags. disciplines.cue turns them into

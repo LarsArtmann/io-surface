@@ -94,11 +94,34 @@ type Manifest struct {
 	Baseline []BaselineEntry
 	// Version is the declared contract version ("" in v1 manifests).
 	Version string
+	// Enforcement is the recorded gate policy (D4): "gate" — error-severity
+	// findings fail the build; "audit" — findings are reported but never
+	// fail (adoption posture). "" normalizes to "gate". The choice lives in
+	// the manifest so an opt-out is a committed, reviewable diff, never a
+	// silent CI edit.
+	Enforcement string
 	// Capabilities are the v1.1 reachability facts (nil when absent).
 	Capabilities []Capability
 	// CapabilityAudit is the provenance of the last absorb run (nil when the
 	// manifest carries no capabilities yet).
 	CapabilityAudit *CapabilityAudit
+}
+
+// Enforcement policy values (D4).
+const (
+	EnforcementGate  = "gate"
+	EnforcementAudit = "audit"
+)
+
+// EnforcementPolicy returns the manifest's recorded policy, normalized:
+// an absent field means "gate" (the birth decision — new undeclared sites
+// fail; a repo opts out by changing the manifest, visibly).
+func (m *Manifest) EnforcementPolicy() string {
+	if m.Enforcement == EnforcementAudit {
+		return EnforcementAudit
+	}
+
+	return EnforcementGate
 }
 
 // Capability is one package's reachability set observed by the external
@@ -193,6 +216,7 @@ func Load(dir string) (*Manifest, error) {
 	}
 	// v1.1 sections are optional: a v1 manifest loads unchanged.
 	_ = value.LookupPath(cue.ParsePath("version")).Decode(&m.Version)
+	_ = value.LookupPath(cue.ParsePath("enforcement")).Decode(&m.Enforcement)
 	if err = value.LookupPath(cue.ParsePath("capabilities")).Decode(&m.Capabilities); err != nil {
 		m.Capabilities = nil
 	}
@@ -333,6 +357,9 @@ func (m *Manifest) Validate() []error {
 	}
 	if _, err := os.Stat(filepath.Join(m.Dir, "schema.cue")); err != nil {
 		errs = append(errs, fmt.Errorf("%s: no schema.cue (is this an io-surface package?)", m.Dir))
+	}
+	if e := m.Enforcement; e != "" && e != EnforcementGate && e != EnforcementAudit {
+		errs = append(errs, fmt.Errorf("enforcement: unknown policy %q (want %q or %q)", e, EnforcementGate, EnforcementAudit))
 	}
 
 	errs = append(errs, m.validateCapabilities()...)

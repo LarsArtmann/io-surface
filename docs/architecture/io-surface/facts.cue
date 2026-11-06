@@ -5,11 +5,13 @@
 package io_surface
 
 audit: {
-	commit: "84e6fb9-dirty"
+	commit: "6b56dfa-dirty"
 	date:   "2026-11-06"
 	claims: 20
 	method: "io-surface extract (AST, stdlib-only)"
 }
+
+enforcement: "gate"
 
 scope: {
 	in: [
@@ -32,8 +34,8 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:241",
-			"cmd/io-surface/commands.go:277",
+			"cmd/io-surface/commands.go:249",
+			"cmd/io-surface/commands.go:285",
 		]
 		family: "file-write"
 		facts: {
@@ -42,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:155",
-			"cmd/io-surface/commands.go:184",
+			"cmd/io-surface/commands.go:163",
+			"cmd/io-surface/commands.go:192",
 		]
 		family: "file-write"
 		facts: {
@@ -52,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:234",
+			"cmd/io-surface/commands.go:242",
 		]
 		family: "file-write"
 		facts: {
@@ -116,7 +118,7 @@ sites: {
 	}
 	"internal/manifest.Load": {
 		location: [
-			"internal/manifest/manifest.go:147",
+			"internal/manifest/manifest.go:170",
 		]
 		family: "file-read"
 		facts: {
@@ -125,7 +127,7 @@ sites: {
 	}
 	"internal/manifest.Manifest.Validate": {
 		location: [
-			"internal/manifest/manifest.go:334",
+			"internal/manifest/manifest.go:358",
 		]
 		family: "file-read"
 		facts: {
@@ -146,7 +148,7 @@ sites: {
 	}
 	"internal/scaffold.git": {
 		location: [
-			"internal/scaffold/scaffold.go:221",
+			"internal/scaffold/scaffold.go:223",
 		]
 		family: "ipc-subprocess"
 		facts: {

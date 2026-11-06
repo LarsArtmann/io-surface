@@ -93,6 +93,8 @@ package io_surface
 	fmt.Fprintf(&b, "audit: {\n\tcommit: %q\n\tdate:   %q\n\tclaims: %d\n\tmethod: %q\n}\n\n",
 		commit, date, countLocations(sites), "io-surface extract (AST, stdlib-only)")
 
+	b.WriteString("enforcement: \"gate\"\n\n")
+
 	b.WriteString(`scope: {
 	in: [
 		"file system (reads, writes, embeds)",
