@@ -5,9 +5,9 @@
 package io_surface
 
 audit: {
-	commit: "working-tree"
+	commit: "986fbad"
 	date:   "2026-11-06"
-	claims: 14
+	claims: 15
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -96,7 +96,7 @@ sites: {
 	}
 	"internal/manifest.Manifest.Validate": {
 		location: [
-			"internal/manifest/manifest.go:190",
+			"internal/manifest/manifest.go:295",
 		]
 		family: "file-read"
 		facts: {
@@ -105,19 +105,28 @@ sites: {
 	}
 	"internal/scaffold.Write": {
 		location: [
-			"internal/scaffold/scaffold.go:53",
-			"internal/scaffold/scaffold.go:56",
-			"internal/scaffold/scaffold.go:68",
-			"internal/scaffold/scaffold.go:72",
+			"internal/scaffold/scaffold.go:55",
+			"internal/scaffold/scaffold.go:58",
+			"internal/scaffold/scaffold.go:70",
+			"internal/scaffold/scaffold.go:74",
 		]
 		family: "file-write"
 		facts: {
 			call: ["os.MkdirAll", "os.Stat", "os.WriteFile"]
 		}
 	}
+	"internal/scaffold.git": {
+		location: [
+			"internal/scaffold/scaffold.go:205",
+		]
+		family: "ipc-subprocess"
+		facts: {
+			call: ["exec.Command"]
+		}
+	}
 	"internal/scaffold.schemaCUE": {
 		location: [
-			"internal/scaffold/scaffold.go:29",
+			"internal/scaffold/scaffold.go:30",
 		]
 		family: "embed"
 		facts: {
