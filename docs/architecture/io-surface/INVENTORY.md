@@ -23,9 +23,9 @@ CI fails when this block goes stale (`render --doc … --check`).
 | -------------------------------------- | ----------------------------------- | --------------------------- | --------------------------------- | ---------- |
 | `internal/absorb.ModulePath`           | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo | every absorb run without --module | —          |
 | `internal/check.symbolVisible`         | `internal/check/location.go:23`     | —                           | —                                 | —          |
-| `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —                           | —                                 | —          |
-| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:279`   | —                           | —                                 | —          |
-| `internal/extract.extractor.walk`      | `internal/extract/extract.go:240`   | —                           | —                                 | —          |
+| `internal/extract.Extract`             | `internal/extract/extract.go:116`   | —                           | —                                 | —          |
+| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:309`   | —                           | —                                 | —          |
+| `internal/extract.extractor.walk`      | `internal/extract/extract.go:245`   | —                           | —                                 | —          |
 | `internal/manifest.Load`               | `internal/manifest/manifest.go:170` | —                           | —                                 | —          |
 | `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:358` | —                           | —                                 | —          |
 
