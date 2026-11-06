@@ -33,6 +33,7 @@ func TestExtract_FamiliesAndConfidence(t *testing.T) {
 		{"resolved file write", "internal/store.WriteTemp", "file-write", "os.CreateTemp", ConfidenceResolved},
 		{"resolved outbound", "cmd/app.fetch", "outbound", "http.Get", ConfidenceResolved},
 		{"resolved database", "cmd/app.openDB", "database", "sql.Open", ConfidenceResolved},
+		{"resolved fs walk", "internal/store.WalkFiles", "file-read", "filepath.WalkDir", ConfidenceResolved},
 		{"seam ident is weak tier", "internal/store.persistAll", "file-write", "atomicWriteFile", ConfidenceToken},
 		{"method token is weak tier", "internal/store.Server.Serve", "listener", ".ListenAndServe", ConfidenceToken},
 		{"embed var", "internal/store.quotaJSON", "embed", "go:embed quota.json", ConfidenceResolved},

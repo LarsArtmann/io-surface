@@ -169,7 +169,7 @@ func printReport(rep *check.Report) {
 func runInit(args []string) error {
 	fs := flag.NewFlagSet("init", flag.ExitOnError)
 	root := fs.String("root", ".", "repository root")
-	force := fs.Bool("force", false, "overwrite an existing facts.cue")
+	force := fs.Bool("force", false, "refresh facts.cue in an existing manifest (never touches claims/baseline/schema)")
 	dirs := fs.String("dirs", "", "comma-separated directories to scan (default cmd,internal)")
 	err := fs.Parse(args)
 	if err != nil {

@@ -41,6 +41,12 @@ func fixtureManifest() *manifest.Manifest {
 				Family:   "embed",
 				Facts:    manifest.Facts{Extractable: true},
 			},
+			// resolved fs-walk site from the second store file, paired exactly
+			"internal/store.WalkFiles": {
+				Location: []string{"internal/store/walk.go:10"},
+				Family:   "file-read",
+				Facts:    manifest.Facts{Extractable: true},
+			},
 			// visible claim, exempt from extraction
 			"internal/store.DocOnly": {
 				Location: []string{"internal/store/store.go:1"},

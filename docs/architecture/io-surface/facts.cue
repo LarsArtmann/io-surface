@@ -6,8 +6,8 @@ package io_surface
 
 audit: {
 	commit: "working-tree"
-	date:   "2026-11-05"
-	claims: 10
+	date:   "2026-11-06"
+	claims: 12
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -50,7 +50,7 @@ sites: {
 	}
 	"internal/extract.Extract": {
 		location: [
-			"internal/extract/extract.go:109",
+			"internal/extract/extract.go:111",
 		]
 		family: "file-read"
 		facts: {
@@ -59,11 +59,20 @@ sites: {
 	}
 	"internal/extract.extractor.parseFile": {
 		location: [
-			"internal/extract/extract.go:272",
+			"internal/extract/extract.go:276",
 		]
 		family: "file-read"
 		facts: {
 			call: ["os.ReadFile"]
+		}
+	}
+	"internal/extract.extractor.walk": {
+		location: [
+			"internal/extract/extract.go:237",
+		]
+		family: "file-read"
+		facts: {
+			call: ["filepath.Walk"]
 		}
 	}
 	"internal/manifest.Load": {
@@ -86,9 +95,10 @@ sites: {
 	}
 	"internal/scaffold.Write": {
 		location: [
-			"internal/scaffold/scaffold.go:47",
-			"internal/scaffold/scaffold.go:50",
-			"internal/scaffold/scaffold.go:60",
+			"internal/scaffold/scaffold.go:53",
+			"internal/scaffold/scaffold.go:56",
+			"internal/scaffold/scaffold.go:68",
+			"internal/scaffold/scaffold.go:72",
 		]
 		family: "file-write"
 		facts: {
@@ -97,7 +107,7 @@ sites: {
 	}
 	"internal/scaffold.schemaCUE": {
 		location: [
-			"internal/scaffold/scaffold.go:26",
+			"internal/scaffold/scaffold.go:29",
 		]
 		family: "embed"
 		facts: {

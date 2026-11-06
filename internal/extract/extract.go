@@ -8,7 +8,8 @@
 // What it detects:
 //   - package-qualified calls through resolved imports (os.*, io.*, net.*,
 //     tls.*, quic.*, http3.*, http.*, rand.*, rsa.*, x509.*, sql.Open,
-//     exec.*, syscall.*, otel exporters, oidc, cqrs-lite engines)
+//     exec.*, syscall.*, path/filepath walks and globs, otel exporters,
+//     oidc, cqrs-lite engines)
 //   - method-name tokens on unresolvable receivers (ListenAndServe, Dial,
 //     RoundTrip, ExecContext, ...) — the honest weak tier, attributed to the
 //     enclosing symbol
@@ -134,6 +135,7 @@ var pkgOf = map[string]string{
 	"crypto/tls":                 "tls",
 	"database/sql":               "sql",
 	"os/exec":                    "exec",
+	"path/filepath":              "filepath",
 	"syscall":                    "syscall",
 	"github.com/quic-go/quic-go": "quic",
 	"github.com/quic-go/http3":   "http3",
@@ -184,6 +186,7 @@ var callFamily = map[string]map[string]string{
 	"x509":          {"CreateCertificate": "entropy"},
 	"tls":           {"Listen": "listener", "Dial": "outbound", "LoadX509KeyPair": "file-read", "Server": "listener"},
 	"sql":           {"Open": "database", "OpenDB": "database"},
+	"filepath":      {"Walk": "file-read", "WalkDir": "file-read", "Glob": "file-read"},
 	"exec":          {"Command": "ipc-subprocess", "CommandContext": "ipc-subprocess", "LookPath": "ipc-subprocess"},
 	"syscall":       {"SetsockoptInt": "listener", "RawConn": "listener"},
 	"quic":          {"Listen": "listener", "Dial": "outbound", "Accept": "listener", "AcceptStream": "listener"},

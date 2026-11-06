@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `path/filepath` extraction (`Walk`/`WalkDir`/`Glob` → `file-read`, resolved
+  tier): directory traversal and globbing are now visible I/O. The
+  self-hosting gate immediately caught the extractor's own `filepath.Walk` —
+  now declared in this repo's manifest
 - House documentation set: `AGENTS.md` (agent context), `FEATURES.md`,
   `TODO_LIST.md`, `ROADMAP.md` — harvested from the birth status report
   (`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
@@ -18,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `init --force` refreshes ONLY `facts.cue`: `claims.cue`, `baseline.cue` and
+  `schema.cue` survive once present, so human judgment can no longer be
+  clobbered by a facts regeneration (guarded by a plant-a-claim test)
 - `LICENSE` contradicted the README's MIT claim (a proprietary placeholder had
   landed post-birth); replaced with the standard MIT text, matching the
   birth-session intent and the house pattern for public tools
