@@ -29,6 +29,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/larsartmann/io-surface/internal/capability"
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
 	"github.com/larsartmann/io-surface/internal/match"
@@ -49,6 +50,7 @@ const (
 	RuleBaselineUnused     = "io-surface/unused-baseline"
 	RuleBaselineExpired    = "io-surface/baseline-expired"
 	RuleScopeHint          = "io-surface/scope-hint"
+	RuleShadowCapability   = "io-surface/shadow-capability"
 	RuleManifestValidation = "io-surface/manifest-validation"
 )
 
@@ -337,6 +339,16 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		})
 	}
 
+	// Shadow capabilities: the reachability engine says a package can do I/O
+	// in a class the manifest declares no site for. This is the hole neither
+	// engine fills alone: the hermetic extractor cannot see transitive
+	// reachability, and the reachability engine cannot name a call site. The
+	// gate names the package; claims justify it or baseline grandfathers it.
+	// Advisory by contract (info forever unless an enforcement policy says
+	// otherwise): graph facts are noisy — the blind-spot run measured three
+	// false-positive classes in a single small repo.
+	shadowCapabilities(m, baselined, usedBaseline, rep)
+
 	// Baseline lifecycle: the baseline only shrinks, so an entry that
 	// suppresses nothing today is a stale suppression (warning — it would
 	// silently swallow a future re-offender under the same canonical key),
@@ -369,6 +381,60 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	})
 
 	return rep, nil
+}
+
+// shadowCapabilities emits one info per package whose reachability facts name
+// a capability class the package declares no mapped-family site for.
+// Suppression is the ordinary baseline: an entry keyed on the package marks
+// the shadow deliberate and keeps the entry alive for only-shrinks.
+func shadowCapabilities(m *manifest.Manifest, baselined map[string]bool, usedBaseline map[string]bool, rep *Report) {
+	declaredFamilies := map[string]map[string]bool{}
+	for _, site := range m.Sites {
+		if len(site.Location) == 0 {
+			continue
+		}
+		path, _, _ := strings.Cut(filepath.ToSlash(site.Location[0]), ":")
+		pkg := path[:strings.LastIndex(path, "/")+1]
+		pkg = strings.TrimSuffix(pkg, "/")
+		if declaredFamilies[pkg] == nil {
+			declaredFamilies[pkg] = map[string]bool{}
+		}
+		declaredFamilies[pkg][site.Family] = true
+	}
+
+	for _, cap := range m.Capabilities {
+		if baselined[match.Canonical(cap.Pkg)] {
+			usedBaseline[match.Canonical(cap.Pkg)] = true
+
+			continue
+		}
+		var shadowed []string
+		for _, name := range cap.Deep {
+			cn := capability.Name(name)
+			if !capability.Valid(name) {
+				continue // manifest.Validate already reports unknown names
+			}
+			covered := false
+			for _, fam := range capability.FamiliesFor(cn) {
+				if declaredFamilies[cap.Pkg][fam] {
+					covered = true
+					break
+				}
+			}
+			if !covered {
+				shadowed = append(shadowed, fmt.Sprintf("%s (needs one of: %s)", name, strings.Join(capability.FamiliesFor(cn), ", ")))
+			}
+		}
+		if len(shadowed) == 0 {
+			continue
+		}
+		sort.Strings(shadowed)
+		rep.add(Finding{
+			Rule: RuleShadowCapability, Severity: SeverityInfo, ID: cap.Pkg,
+			Message: fmt.Sprintf("reachability engine observes %s in this package, but no declared site covers those families — declare the hidden I/O, or baseline this package deliberately",
+				strings.Join(shadowed, ", ")),
+		})
+	}
 }
 
 // ownerLabel renders an optional baseline owner for finding messages.

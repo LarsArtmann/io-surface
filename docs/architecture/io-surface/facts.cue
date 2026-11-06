@@ -5,9 +5,9 @@
 package io_surface
 
 audit: {
-	commit: "00e2476"
+	commit: "4c60465-dirty"
 	date:   "2026-11-06"
-	claims: 15
+	claims: 20
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -32,8 +32,18 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:165",
-			"cmd/io-surface/commands.go:201",
+			"cmd/io-surface/commands.go:241",
+			"cmd/io-surface/commands.go:277",
+		]
+		family: "file-write"
+		facts: {
+			call: ["os.ReadFile", "os.WriteFile"]
+		}
+	}
+	"cmd/io-surface.runAbsorb": {
+		location: [
+			"cmd/io-surface/commands.go:155",
+			"cmd/io-surface/commands.go:184",
 		]
 		family: "file-write"
 		facts: {
@@ -42,11 +52,30 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:158",
+			"cmd/io-surface/commands.go:234",
 		]
 		family: "file-write"
 		facts: {
 			call: ["os.WriteFile"]
+		}
+	}
+	"internal/absorb.ModulePath": {
+		location: [
+			"internal/absorb/absorb.go:78",
+		]
+		family: "file-read"
+		facts: {
+			call: ["os.ReadFile"]
+		}
+	}
+	"internal/absorb.gitHead": {
+		location: [
+			"internal/absorb/absorb.go:165",
+			"internal/absorb/absorb.go:172",
+		]
+		family: "ipc-subprocess"
+		facts: {
+			call: ["exec.Command"]
 		}
 	}
 	"internal/check.symbolVisible": {

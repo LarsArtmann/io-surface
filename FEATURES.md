@@ -58,7 +58,7 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 | Constraint enforcement at load time                 | 🟢 `FULLY_FUNCTIONAL`     | `manifest.go:130-135`; verified via planted `violations` (birth report §a9) | Failure message is opaque though (TODO 3)                                         |
 | Schema validation (families, disciplines, ID shape) | 🟢 `FULLY_FUNCTIONAL`     | `manifest.go:166-195`                                                       | Unknown family/discipline/malformed ID are hard errors                            |
 | Baseline (grandfathered sites)                      | 🟡 `PARTIALLY_FUNCTIONAL` | `manifest.go:140-154`; `check.go:140-143,187-190`                           | Suppresses findings canonically; no only-shrinks gate, no owner/expiry (TODO 7/8) |
-| 11-rule finding model (incl. lifecycle)             | 🟢 `FULLY_FUNCTIONAL`     | `internal/check/check.go:37-46`; every rule has a test case                 | Rule IDs are a stable contract (future SARIF keys)                                |
+| 14-rule finding model (incl. lifecycle, scope-hint, shadow-capability)             | 🟢 `FULLY_FUNCTIONAL`     | `internal/check/check.go:37-46`; every rule has a test case                 | Rule IDs are a stable contract (future SARIF keys)                                |
 
 ## Renderer (`internal/render`)
 

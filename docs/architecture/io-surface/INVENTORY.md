@@ -12,15 +12,16 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Family           | Sites | Claimed | With rationale |
 | ---------------- | ----: | ------: | -------------: |
-| `file-read`      |     6 |       0 |              0 |
-| `file-write`     |     3 |       0 |              0 |
+| `file-read`      |     7 |       0 |              0 |
+| `file-write`     |     4 |       0 |              0 |
 | `embed`          |     1 |       0 |              0 |
-| `ipc-subprocess` |     1 |       0 |              0 |
+| `ipc-subprocess` |     2 |       0 |              0 |
 
-## `file-read` (6)
+## `file-read` (7)
 
 | Site                                   | Location                            | Resource | Trigger | Discipline |
 | -------------------------------------- | ----------------------------------- | -------- | ------- | ---------- |
+| `internal/absorb.ModulePath`           | `internal/absorb/absorb.go:78`      | —        | —       | —          |
 | `internal/check.symbolVisible`         | `internal/check/location.go:23`     | —        | —       | —          |
 | `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —        | —       | —          |
 | `internal/extract.extractor.parseFile` | `internal/extract/extract.go:276`   | —        | —       | —          |
@@ -28,12 +29,13 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/manifest.Load`               | `internal/manifest/manifest.go:147` | —        | —       | —          |
 | `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:334` | —        | —       | —          |
 
-## `file-write` (3)
+## `file-write` (4)
 
 | Site                       | Location                           | Resource | Trigger | Discipline |
 | -------------------------- | ---------------------------------- | -------- | ------- | ---------- |
-| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:165`   | —        | —       | —          |
-| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:158`   | —        | —       | —          |
+| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:241`   | —        | —       | —          |
+| `cmd/io-surface.runAbsorb` | `cmd/io-surface/commands.go:155`   | —        | —       | —          |
+| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:234`   | —        | —       | —          |
 | `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:56` | —        | —       | —          |
 
 ## `embed` (1)
@@ -42,11 +44,12 @@ CI fails when this block goes stale (`render --doc … --check`).
 | ----------------------------- | ---------------------------------- | -------- | ------- | ---------- |
 | `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:30` | —        | —       | —          |
 
-## `ipc-subprocess` (1)
+## `ipc-subprocess` (2)
 
-| Site                    | Location                            | Resource | Trigger | Discipline |
-| ----------------------- | ----------------------------------- | -------- | ------- | ---------- |
-| `internal/scaffold.git` | `internal/scaffold/scaffold.go:221` | —        | —       | —          |
+| Site                      | Location                            | Resource | Trigger | Discipline |
+| ------------------------- | ----------------------------------- | -------- | ------- | ---------- |
+| `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | —        | —       | —          |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:221` | —        | —       | —          |
 
 ## Deliberately out of scope
 
