@@ -72,6 +72,7 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 | `io-surface extract [--root] [--include-tests]`                                                        | Print the raw extraction as JSON (debugging, counts)                                                                         |
 | `io-surface absorb --capslock REPORT [--check] [--module] [--engine-version]`                          | Fold a pinned Capslock JSON report into `capabilities.cue` (that file only); `--check` reports advisory drift, never exits 1 |
 | `io-surface baseline add <id> --note WHY [--date YYYY-MM-DD]`                                          | Grandfather one undeclared site in `baseline.cue` (surgical write, comments preserved); refuses duplicates                   |
+| `io-surface … --ignore 'zz_generated*,*_templ.go'`                                                     | Skip generated files everywhere (init/check/extract/render/baseline): globs match repo-relative paths and file names         |
 | `io-surface version` / `doctor` / `describe`                                                           | cmdguard-provided: version line, DI/config health, hidden machine-readable CLI contract (`describe --output json`)           |
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.

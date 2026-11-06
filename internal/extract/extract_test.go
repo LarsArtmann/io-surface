@@ -146,3 +146,38 @@ func TestSiteFamily_Precedence(t *testing.T) {
 		})
 	}
 }
+
+// TestExtract_IgnoreGlobs pins the --ignore contract: generated files are
+// skipped by base-name and repo-relative path globs, and an empty pattern
+// list changes nothing.
+func TestExtract_IgnoreGlobs(t *testing.T) {
+	base, err := Extract("../../testdata/extract", Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	if _, has := siteByIDOk(base, "internal/store.GeneratedSave"); !has {
+		t.Fatalf("fixture lost the generated file — the skip test is vacuous")
+	}
+
+	ignored, err := Extract("../../testdata/extract", Options{Ignore: []string{"zz_generated*", "internal/store/gen_*.go"}})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	if _, has := siteByIDOk(ignored, "internal/store.GeneratedSave"); has {
+		t.Error("zz_generated* glob did not skip the generated file")
+	}
+	if len(ignored) != len(base)-1 {
+		t.Errorf("ignored count = %d, want %d (exactly one file skipped)", len(ignored), len(base)-1)
+	}
+}
+
+// siteByIDOk is the non-fatal variant used by conditional assertions.
+func siteByIDOk(sites []*Site, id string) (*Site, bool) {
+	for _, s := range sites {
+		if s.ID == id {
+			return s, true
+		}
+	}
+
+	return nil, false
+}

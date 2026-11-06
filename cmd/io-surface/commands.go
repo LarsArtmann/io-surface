@@ -77,7 +77,7 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 	if vErrs := m.Validate(); len(vErrs) > 0 {
 		rep = check.ValidationReport(m, vErrs)
 	} else {
-		if rep, err = check.Run(root.Root, m, check.Options{Advisory: flags.Advisory, Dirs: parseDirs(root.Dirs)}); err != nil {
+		if rep, err = check.Run(root.Root, m, check.Options{Advisory: flags.Advisory, Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore)}); err != nil {
 			return err
 		}
 	}
@@ -140,7 +140,7 @@ func printReport(rep *check.Report, w io.Writer) {
 }
 
 func runInit(_ context.Context, root *rootFlags, flags initFlags) error {
-	sites, err := extract.Extract(root.Root, extract.Options{Dirs: parseDirs(root.Dirs)})
+	sites, err := extract.Extract(root.Root, extract.Options{Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore)})
 	if err != nil {
 		return err
 	}
@@ -306,8 +306,25 @@ func storedLines(s string) []string {
 	return strings.Split(s, "\n")
 }
 
+// parseGlobs splits the --ignore comma list into non-empty trimmed patterns.
+func parseGlobs(s string) []string {
+	if s == "" {
+		return nil
+	}
+	parts := strings.Split(s, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+
+	return out
+}
+
 func runExtract(_ context.Context, root *rootFlags, flags extractFlags) error {
-	sites, err := extract.Extract(root.Root, extract.Options{IncludeTests: flags.IncludeTests, Dirs: parseDirs(root.Dirs)})
+	sites, err := extract.Extract(root.Root, extract.Options{IncludeTests: flags.IncludeTests, Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore)})
 	if err != nil {
 		return err
 	}
@@ -369,7 +386,7 @@ func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags
 	// Advisory feedback: a baselined ID that does not extract today is an
 	// entry suppressing nothing — the unused-baseline warning waiting to
 	// happen. Tell the operator now, not at the next gate run.
-	sites, err := extract.Extract(root.Root, extract.Options{Dirs: parseDirs(root.Dirs)})
+	sites, err := extract.Extract(root.Root, extract.Options{Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore)})
 	if err != nil {
 		return err
 	}

@@ -66,6 +66,14 @@ func fixtureManifest() *manifest.Manifest {
 				Family:   "stream-copy",
 				Facts:    manifest.Facts{Extractable: true},
 			},
+			// generated file: declared like any other site (repos without --ignore
+			// declare machine-written I/O too); the ignore-glob path is covered
+			// by TestExtract_IgnoreGlobs
+			"internal/store.GeneratedSave": {
+				Location: []string{"internal/store/zz_generated.go:8"},
+				Family:   "file-write",
+				Facts:    manifest.Facts{Extractable: true},
+			},
 			// visible claim, exempt from extraction
 			"internal/store.DocOnly": {
 				Location: []string{"internal/store/store.go:1"},
