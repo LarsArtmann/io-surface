@@ -94,4 +94,11 @@ baseline: [...#BaselineEntry] | *[]
 	id:   string
 	note: string
 	date: string
+	// Who vouches for the suppression (team or handle). Optional: the site,
+	// not a person, is the thing being grandfathered.
+	owner?: string
+	// YYYY-MM-DD. An expired entry FAILS the gate: grandfathering must not
+	// silently outlive its justification — fix the site or re-baseline
+	// deliberately.
+	expires?: string
 }

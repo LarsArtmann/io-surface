@@ -76,6 +76,11 @@ type BaselineEntry struct {
 	ID   string `json:"id"`
 	Note string `json:"note"`
 	Date string `json:"date"`
+	// Owner is who vouches for the suppression (optional; team or handle).
+	Owner string `json:"owner,omitempty"`
+	// Expires is a YYYY-MM-DD date after which the gate fails on the entry:
+	// grandfathering must not silently outlive its justification.
+	Expires string `json:"expires,omitempty"`
 }
 
 // Manifest is a loaded package.

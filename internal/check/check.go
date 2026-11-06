@@ -23,9 +23,11 @@ package check
 
 import (
 	"fmt"
+	"path/filepath"
 	"slices"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -44,6 +46,9 @@ const (
 	RuleExtractionBlind    = "io-surface/extraction-blind"
 	RuleWeakSite           = "io-surface/weak-site"
 	RuleAmbiguousMatch     = "io-surface/ambiguous-match"
+	RuleBaselineUnused     = "io-surface/unused-baseline"
+	RuleBaselineExpired    = "io-surface/baseline-expired"
+	RuleScopeHint          = "io-surface/scope-hint"
 	RuleManifestValidation = "io-surface/manifest-validation"
 )
 
@@ -163,6 +168,7 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	for _, id := range m.BaselineIDs() {
 		baselined[match.Canonical(id)] = true
 	}
+	usedBaseline := map[string]bool{}
 	// Extracted IDs by exact form: the id-form rule needs to know whether the
 	// slash-package variant of a declared ID actually extracts.
 	extractedByID := map[string]bool{}
@@ -220,6 +226,8 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		// 3. Anything still unpaired on the extraction side is undeclared.
 		for _, s := range leftoversExtracted {
 			if baselined[canon] {
+				usedBaseline[canon] = true
+
 				continue
 			}
 			if s.Confidence != extract.ConfidenceResolved {
@@ -319,6 +327,36 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		}
 	}
 
+	// Scope hint: a --dirs narrowing that excludes declared sites produces
+	// findings that look like manifest rot but are really the flag's doing.
+	// Name the cause so the fix is one edit instead of an archaeology dig.
+	if outside := declaredOutside(m, effectiveDirs(opts.Dirs)); outside > 0 {
+		rep.add(Finding{
+			Rule: RuleScopeHint, Severity: SeverityInfo, ID: "--dirs",
+			Message: fmt.Sprintf("%d declared site(s) lie outside the scanned dirs %s — this run cannot see them; widen --dirs or refresh facts.cue", outside, strings.Join(effectiveDirs(opts.Dirs), ", ")),
+		})
+	}
+
+	// Baseline lifecycle: the baseline only shrinks, so an entry that
+	// suppresses nothing today is a stale suppression (warning — it would
+	// silently swallow a future re-offender under the same canonical key),
+	// and an expired entry is a broken contract (error).
+	today := time.Now().UTC().Format("2006-01-02")
+	for _, entry := range m.Baseline {
+		if !usedBaseline[match.Canonical(entry.ID)] {
+			rep.add(Finding{
+				Rule: RuleBaselineUnused, Severity: SeverityWarning, ID: entry.ID,
+				Message: fmt.Sprintf("baseline entry (added %s) suppresses nothing today — remove it: only-shrinks means stale suppressions leave (owner: %s)", entry.Date, ownerLabel(entry.Owner)),
+			})
+		}
+		if entry.Expires != "" && entry.Expires < today {
+			rep.add(Finding{
+				Rule: RuleBaselineExpired, Severity: SeverityError, ID: entry.ID,
+				Message: fmt.Sprintf("baseline entry expired %s — fix the site or re-baseline deliberately (owner: %s)", entry.Expires, ownerLabel(entry.Owner)),
+			})
+		}
+	}
+
 	sort.SliceStable(rep.Findings, func(i, j int) bool {
 		if rep.Findings[i].Severity != rep.Findings[j].Severity {
 			return rep.Findings[i].Severity < rep.Findings[j].Severity
@@ -331,6 +369,52 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	})
 
 	return rep, nil
+}
+
+// ownerLabel renders an optional baseline owner for finding messages.
+func ownerLabel(owner string) string {
+	if owner == "" {
+		return "unowned"
+	}
+
+	return owner
+}
+
+// effectiveDirs resolves the scan scope exactly as the extractor defaults it:
+// an empty --dirs means cmd and internal.
+func effectiveDirs(dirs []string) []string {
+	if len(dirs) == 0 {
+		return []string{"cmd", "internal"}
+	}
+
+	return dirs
+}
+
+// declaredOutside counts declared sites whose first location path does not
+// fall under any of the scanned dirs (path-prefix match on slash form).
+func declaredOutside(m *manifest.Manifest, dirs []string) int {
+	under := func(path string) bool {
+		for _, d := range dirs {
+			d = strings.TrimPrefix(strings.TrimSuffix(filepath.ToSlash(d), "/"), "./")
+			if path == d || strings.HasPrefix(path, d+"/") {
+				return true
+			}
+		}
+
+		return false
+	}
+	count := 0
+	for _, s := range m.Sites {
+		if len(s.Location) == 0 {
+			continue
+		}
+		path, _, _ := strings.Cut(filepath.ToSlash(s.Location[0]), ":")
+		if !under(path) {
+			count++
+		}
+	}
+
+	return count
 }
 
 func (r *Report) add(f Finding) {
