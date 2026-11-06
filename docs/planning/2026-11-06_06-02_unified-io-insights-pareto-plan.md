@@ -63,6 +63,41 @@ capabilities (`CGO`, `UNSAFE_POINTER`, `REFLECT`, `ARBITRARY_EXECUTION`, `RUNTIM
 question Q4 is decided — the taxonomy-freeze invariant (new family = schema version
 bump) forbids a casual edit.
 
+### 3.7 Execution errata — where the shipped design diverged from this plan (2026-11-06, recorded at run completion)
+
+Written after execution so the plan stays an honest record. These are the deltas
+a future reader would otherwise mis-derive from the task table:
+
+1. **`capability-drift` is emitted by `absorb --check`, not by `check`.** The plan's
+   task wording assumed gate-side emission. Hermeticity wins: the hermetic gate
+   never reads engine artifacts, so drift reporting lives where the engine output
+   is (`cmd/io-surface/commands.go`, `internal/absorb`). Advisory, never exits 1.
+2. **Runtime-power vocabulary decision is ROADMAP Q5, not Q4.** Q4 was taken by the
+   binary purge-vs-keep memo (T01, written earlier the same session); the plan's
+   labels drifted. §3.6 above says "Q4" for capabilities — read it as Q5.
+3. **T12/T13/T15 were executed by the parallel 06:33 session** (id-form rule,
+   baseline `owner`/`expires` + unused/expired rules, manifest test suite), not by
+   this plan's lane. T15's literal "only-shrinks count comparison" was deliberately
+   NOT re-implemented: `unused-baseline` (warns when an entry suppresses nothing)
+   plus expiry is the enforced form — a raw count gate would false-positive on
+   legitimate entries awaiting their site.
+4. **Shadow-capability fires on DIRECT reachability only**, not the deep set. Deep
+   includes transitive dependency paths — the linkage noise floor — and the v0.3.4
+   blind-spot run showed 10/11 real direct sinks were already declared, so direct
+   coverage is the meaningful signal.
+5. **T21 was re-based to chores:** `v0.1.0` already existed as a pushed annotated
+   tag, so the "cut v0.1.0" task became tag verification + public-proxy smoke test
+   (TODO #36/#37, both DONE). Next release is v0.1.1 via the go-release skill,
+   owner timing pending.
+6. **T20's scope narrowed:** `syscall.Mmap`/`Munmap`, `bufio` constructors, and
+   `http.ServeContent`/`ServeFile` landed; `os.Stdin/Stdout/Stderr` and
+   `net.ListenConfig` are deferred (TODO #19) — they are variable/type references,
+   not package calls, and need a var-ref/token-tier decision first.
+7. **New invariant discovered by T20 (not in the plan):** a `callFamily` entry is
+   dead code unless its package key is resolvable from an import path — `bufio`
+   shipped unwatched this way. Guarded by `TestPkgOf_CoversEveryWatchedPackage`
+   (`internal/extract/extract_test.go`).
+
 ## 4. Pareto breakdown
 
 ### The 1% that delivers 51% (T01–T04, ≈ 4.5 h of ≈ 28.5 h total)
