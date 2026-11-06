@@ -51,6 +51,7 @@ type renderFlags struct {
 
 type extractFlags struct {
 	IncludeTests bool `flag:"include-tests" help:"include *_test.go files (report only)"`
+	Stats        bool `flag:"stats" help:"print a per-package site histogram instead of JSON (spot outlier packages)"`
 }
 
 type absorbFlags struct {
@@ -330,10 +331,53 @@ func runExtract(_ context.Context, root *rootFlags, flags extractFlags) error {
 	if err != nil {
 		return err
 	}
+	if flags.Stats {
+		return printStats(sites)
+	}
 	enc := json.NewEncoder(stdout)
 	enc.SetIndent("", "  ")
 
 	return enc.Encode(map[string]any{"generator": "io-surface " + version + " (io-surface/v1)", "sites": sites})
+}
+
+// printStats renders the per-package histogram: package, site count, and the
+// resolved/token split — the outlier spotter for large trees.
+func printStats(sites []*extract.Site) error {
+	counts := map[string]int{}
+	resolved := map[string]int{}
+	for _, s := range sites {
+		pkg := s.ID
+		if i := strings.LastIndex(pkg, "."); i > 0 {
+			pkg = pkg[:i]
+		}
+		counts[pkg]++
+		if s.Confidence == extract.ConfidenceResolved {
+			resolved[pkg]++
+		}
+	}
+	pkgs := make([]string, 0, len(counts))
+	for p := range counts {
+		pkgs = append(pkgs, p)
+	}
+	sort.Strings(pkgs)
+	fmt.Fprintf(stdout, "%-6s %-8s %s\n", "sites", "resolved", "package")
+	for _, p := range pkgs {
+		fmt.Fprintf(stdout, "%-6d %-8d %s\n", counts[p], resolved[p], p)
+	}
+	fmt.Fprintf(stdout, "%-6d %-8d TOTAL (%d packages)\n", len(sites), len(sites)-sumTokens(sites), len(pkgs))
+
+	return nil
+}
+
+func sumTokens(sites []*extract.Site) int {
+	n := 0
+	for _, s := range sites {
+		if s.Confidence == extract.ConfidenceToken {
+			n++
+		}
+	}
+
+	return n
 }
 
 // parseDirs splits a comma-separated --dirs value; empty means the default

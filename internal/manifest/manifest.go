@@ -199,7 +199,7 @@ func Load(dir string) (*Manifest, error) {
 	m := &Manifest{Dir: dir}
 	err = value.LookupPath(cue.ParsePath("sites")).Decode(&m.Sites)
 	if err != nil {
-		return nil, fmt.Errorf("decoding sites: %w", err)
+		return nil, fmt.Errorf("decoding sites in %s: %w (facts.cue and claims.cue both contribute to sites — check the file you edited last)", dir, err)
 	}
 	if len(m.Sites) == 0 {
 		return nil, fmt.Errorf("%w: %s declares no sites", ErrEmpty, dir)
@@ -277,27 +277,38 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 	return fmt.Errorf("%w %s", ErrConstraints, b.String())
 }
 
-// violationEntries decodes the violations list, falling back to the top-level
-// conjuncts when the unified value is erroneous: the offending operand still
-// decodes even though the whole value does not.
+// violationEntries recovers the actual violations from a value whose
+// unification failed: one deterministic walk, widest scope first. Each stage
+// stops as soon as entries decode, and every stage dedupes on id+msg so the
+// overlapping shapes a conflict produces (whole-value operands, field
+// operands, per-file conjuncts) cannot double-report one violation.
+//
+// Stage 1 is the plain decoded list (the common, non-conflicting shape).
+// Stage 2 decomposes the FIELD: on "incompatible list lengths" every conjunct
+// still decodes, and the violating one carries the entries. A decode can be
+// partial when the conflict keeps a comprehension binding non-concrete — the
+// msg always survives, the id whenever CUE can resolve it. Stage 3 probes
+// per-file conjuncts of the whole value for a clean violations field, for the
+// shape where the conflict sits inside one file's multiple declarations.
 func violationEntries(value cue.Value) []Violation {
+	seen := map[string]bool{}
+	decode := func(v cue.Value) ([]Violation, bool) {
+		var entries []Violation
+		if err := v.Decode(&entries); err != nil && len(entries) == 0 {
+			return nil, false
+		}
+
+		return entries, len(entries) > 0
+	}
+
 	var out []Violation
 	field := value.LookupPath(violationsPath)
-	if field.Err() == nil {
-		if err := field.Decode(&out); err == nil && len(out) > 0 {
-			return out
-		}
+	if entries, ok := decode(field); ok {
+		return deduped(out, entries, seen)
 	}
-	// The field errs on conflicting conjuncts (the "incompatible list
-	// lengths" shape); decompose the field itself — every conjunct still
-	// decodes, and the violating one carries the entries. A decode can be
-	// partial when the conflict keeps a comprehension binding non-concrete:
-	// keep whatever decoded (the msg always survives; the id survives
-	// whenever CUE can resolve it).
 	if _, operands := field.Expr(); operands != nil {
 		for _, o := range operands {
-			var entries []Violation
-			if err := o.Decode(&entries); err == nil || len(entries) > 0 {
+			if entries, ok := decode(o); ok {
 				out = append(out, entries...)
 			}
 		}
@@ -305,19 +316,30 @@ func violationEntries(value cue.Value) []Violation {
 	if len(out) > 0 {
 		return out
 	}
-	// File-level conjuncts of the whole value: when the conflict sits inside
-	// one file's multiple declarations, that operand is skipped above, so
-	// also probe per-file conjuncts that carry a clean violations field.
 	if _, operands := value.Expr(); operands != nil {
 		for _, o := range operands {
 			sub := o.LookupPath(violationsPath)
 			if sub.Err() != nil {
 				continue
 			}
-			var entries []Violation
-			if err := sub.Decode(&entries); err == nil {
+			if entries, ok := decode(sub); ok {
 				out = append(out, entries...)
 			}
+		}
+	}
+
+	return out
+}
+
+// deduped appends entries that the seen-set has not recorded yet, marking
+// them as it goes. One dedupe, one place — the single source of the
+// id+msg identity constraintError prints.
+func deduped(out, entries []Violation, seen map[string]bool) []Violation {
+	for _, v := range entries {
+		key := v.ID + "|" + v.Msg
+		if !seen[key] {
+			seen[key] = true
+			out = append(out, v)
 		}
 	}
 
