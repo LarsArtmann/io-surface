@@ -25,8 +25,8 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —        | —       | —          |
 | `internal/extract.extractor.parseFile` | `internal/extract/extract.go:276`   | —        | —       | —          |
 | `internal/extract.extractor.walk`      | `internal/extract/extract.go:237`   | —        | —       | —          |
-| `internal/manifest.Load`               | `internal/manifest/manifest.go:116` | —        | —       | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:292` | —        | —       | —          |
+| `internal/manifest.Load`               | `internal/manifest/manifest.go:121` | —        | —       | —          |
+| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:297` | —        | —       | —          |
 
 ## `file-write` (3)
 
