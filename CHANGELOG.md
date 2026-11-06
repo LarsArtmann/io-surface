@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- SARIF output: `check --format sarif` emits SARIF 2.1.0 via the house
+  `go-finding` library (rule IDs and severities pass through unchanged, so
+  GitHub renders them natively); CI uploads the self-hosted SARIF as an
+  artifact. `--format json|text` also joins `--json` (kept as shorthand)
 - `render --doc FILE` embeds the inventory into hand-written markdown between
   `<!-- io-surface:begin -->` / `<!-- io-surface:end -->` markers, rewriting
   only the generated block; `--check` exits 1 when the block is stale. This
