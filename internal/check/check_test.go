@@ -318,8 +318,8 @@ func TestRun_ShadowCapabilityNamesHiddenIO(t *testing.T) {
 	m.Capabilities = []manifest.Capability{
 		// store declares file-read/file-write/embed: FILES is covered, NETWORK is not.
 		{Pkg: "internal/store", Direct: []string{"NETWORK"}, Deep: []string{"FILES", "NETWORK"}},
-		// cmd/app has no declared sites in the fixture: EXEC is a pure shadow.
-		{Pkg: "cmd/app", Deep: []string{"EXEC"}},
+		// cmd/app has no declared sites in the fixture: direct EXEC is a pure shadow.
+		{Pkg: "cmd/app", Direct: []string{"EXEC"}, Deep: []string{"EXEC"}},
 	}
 	rep := runFixture(t, m, Options{})
 
@@ -347,7 +347,10 @@ func TestRun_ShadowCapabilityNamesHiddenIO(t *testing.T) {
 func TestRun_ShadowCapabilityCoveredAndBaselined(t *testing.T) {
 	m := fixtureManifest()
 	m.Capabilities = []manifest.Capability{
-		{Pkg: "internal/store", Deep: []string{"FILES"}},
+		{Pkg: "internal/store", Direct: []string{"FILES"}, Deep: []string{"FILES"}},
+		// Deep-only reachability (stdlib linkage) never shadows: every Go
+		// package transits the dependency graph, so it carries no signal.
+		{Pkg: "internal/store", Deep: []string{"EXEC", "NETWORK"}},
 	}
 	rep := runFixture(t, m, Options{})
 	if got := findingsByRule(rep, RuleShadowCapability); len(got) != 0 {
@@ -356,7 +359,7 @@ func TestRun_ShadowCapabilityCoveredAndBaselined(t *testing.T) {
 
 	// A baseline entry keyed on the package suppresses the shadow and stays
 	// "used" for the only-shrinks machinery.
-	m.Capabilities = []manifest.Capability{{Pkg: "cmd/app", Deep: []string{"EXEC"}}}
+	m.Capabilities = []manifest.Capability{{Pkg: "cmd/app", Direct: []string{"EXEC"}, Deep: []string{"EXEC"}}}
 	m.Baseline = []manifest.BaselineEntry{{ID: "cmd/app", Note: "engine-only transitives, judged fine", Date: "2026-11-06"}}
 	rep = runFixture(t, m, Options{})
 	if got := findingsByRule(rep, RuleShadowCapability); len(got) != 0 {

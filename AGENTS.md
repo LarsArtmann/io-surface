@@ -24,7 +24,9 @@ go run ./cmd/io-surface render --root . # render must not crash (CI checks)
 ```
 
 CI (`.github/workflows/ci.yml`): build → vet → test → gofmt gate → self-check
-→ self-render. That is the whole quality bar. `CONTRIBUTING.md` mentions
+→ facts-freshness (`init --force` + filtered `git diff`) → self-render →
+inventory-doc freshness (`render --doc … --check`) → SARIF emit. That is the
+whole quality bar. `CONTRIBUTING.md` mentions
 `golangci-lint` but there is no `.golangci.yml` and CI does not run it.
 `dprint.json` exists for non-Go files (markdown/yaml/json) but CI does not
 enforce it.
@@ -96,6 +98,9 @@ either `internal/scaffold` (`init`: write snapshot) or `internal/check`
 | `internal/match`    | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`).                                                                                                                                                 |
 | `internal/scaffold` | `init` writer; `schema.cue` is embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not the deployed copies.                                                                                                                             |
 | `internal/render`   | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim).                                                                                                                                                                 |
+| `internal/absorb`   | v1.1: pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `absorb --check` reports advisory drift (`io-surface/capability-drift`), never fails the gate.                                                                                  |
+| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping (`FamiliesFor`), engine edges folded into per-package sets.                                                                                                                    |
+| `internal/emit`     | Findings → go-finding model for consumer formats (SARIF via `--format sarif`); rule IDs and severities map 1:1, confidence 1.0 (deterministic gate).                                                                                              |
 
 ### Where detection rules live
 
@@ -182,6 +187,11 @@ while working here:
   set instead of guessing from the ID shape alone. A declared dotted ID with
   NO extraction at all is NOT flagged; it classifies stale/extraction-blind
   as before.
+- Multiple agent sessions may work this repo concurrently: a gate failure
+  pasted from an earlier run can already be fixed on disk (facts.cue refresh
+  lands via the auto-commit daemon). Re-run
+  `go run ./cmd/io-surface check --root .` yourself before acting on stale
+  output, and never revert in-flight changes you didn't author.
 
 The birth status report
 (`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)

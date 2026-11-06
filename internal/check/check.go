@@ -339,14 +339,21 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		})
 	}
 
-	// Shadow capabilities: the reachability engine says a package can do I/O
-	// in a class the manifest declares no site for. This is the hole neither
-	// engine fills alone: the hermetic extractor cannot see transitive
-	// reachability, and the reachability engine cannot name a call site. The
-	// gate names the package; claims justify it or baseline grandfathers it.
-	// Advisory by contract (info forever unless an enforcement policy says
-	// otherwise): graph facts are noisy — the blind-spot run measured three
-	// false-positive classes in a single small repo.
+	// Shadow capabilities: the reachability engine says a package's OWN code
+	// can do I/O in a class the manifest declares no site for. This is the
+	// hole neither engine fills alone: the hermetic extractor cannot see
+	// transitive reachability, and the reachability engine cannot name a call
+	// site. The gate names the package; claims justify it or baseline
+	// grandfathers it.
+	//
+	// The rule fires on DIRECT capabilities only. Deep (transitive through
+	// dependencies) reaches into every Go package via the stdlib — universal
+	// linkage, not hidden I/O — so shadowing on it would be a permanent noise
+	// floor (verified by the first real run: every package shadowed, zero
+	// signal). Direct edges carry the signal; they also carry the engine's
+	// conflation phantoms, which is exactly why this tier is advisory (info
+	// forever unless an enforcement policy says otherwise) — the blind-spot
+	// run measured three false-positive classes in one small repo.
 	shadowCapabilities(m, baselined, usedBaseline, rep)
 
 	// Baseline lifecycle: the baseline only shrinks, so an entry that
@@ -383,10 +390,10 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	return rep, nil
 }
 
-// shadowCapabilities emits one info per package whose reachability facts name
-// a capability class the package declares no mapped-family site for.
-// Suppression is the ordinary baseline: an entry keyed on the package marks
-// the shadow deliberate and keeps the entry alive for only-shrinks.
+// shadowCapabilities emits one info per package whose DIRECT reachability
+// facts name a capability class the package declares no mapped-family site
+// for. Suppression is the ordinary baseline: an entry keyed on the package
+// marks the shadow deliberate and keeps the entry alive for only-shrinks.
 func shadowCapabilities(m *manifest.Manifest, baselined map[string]bool, usedBaseline map[string]bool, rep *Report) {
 	declaredFamilies := map[string]map[string]bool{}
 	for _, site := range m.Sites {
@@ -409,7 +416,7 @@ func shadowCapabilities(m *manifest.Manifest, baselined map[string]bool, usedBas
 			continue
 		}
 		var shadowed []string
-		for _, name := range cap.Deep {
+		for _, name := range cap.Direct {
 			cn := capability.Name(name)
 			if !capability.Valid(name) {
 				continue // manifest.Validate already reports unknown names
