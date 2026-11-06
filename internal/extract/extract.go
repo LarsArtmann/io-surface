@@ -97,6 +97,11 @@ type Options struct {
 	IncludeTests bool
 	// Dirs limits the walk to these subdirectories (default: cmd, internal).
 	Dirs []string
+	// Ignore skips files whose repo-relative slash path — or base name —
+	// matches any glob (filepath.Match syntax: `*_templ.go`, `zz_generated*`).
+	// Generated code is not authored I/O; declaring it would be inventory
+	// noise the generator rewrites anyway.
+	Ignore []string
 }
 
 // Extract walks root and returns sites ordered by ID.
@@ -112,7 +117,7 @@ func Extract(root string, opts Options) ([]*Site, error) {
 		if err != nil || !info.IsDir() {
 			continue
 		}
-		err = e.walk(path, opts.IncludeTests)
+		err = e.walk(path, opts)
 		if err != nil {
 			return nil, err
 		}
@@ -236,7 +241,7 @@ type extractor struct {
 	sites map[string]*Site
 }
 
-func (e *extractor) walk(dir string, includeTests bool) error {
+func (e *extractor) walk(dir string, opts Options) error {
 	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -252,12 +257,37 @@ func (e *extractor) walk(dir string, includeTests bool) error {
 		if !strings.HasSuffix(path, ".go") {
 			return nil
 		}
-		if strings.HasSuffix(path, "_test.go") && !includeTests {
+		if strings.HasSuffix(path, "_test.go") && !opts.IncludeTests {
+			return nil
+		}
+		if ignored(path, e.root, opts.Ignore) {
 			return nil
 		}
 
 		return e.parseFile(path)
 	})
+}
+
+// ignored reports whether the file matches any --ignore glob, against the
+// repo-relative slash path and the base name (so `zz_generated*` matches at
+// any depth without a leading `**`).
+func ignored(path, root string, patterns []string) bool {
+	rel := path
+	if r, err := filepath.Rel(root, path); err == nil {
+		rel = r
+	}
+	rel = filepath.ToSlash(rel)
+	base := filepath.Base(rel)
+	for _, p := range patterns {
+		if ok, _ := filepath.Match(p, rel); ok {
+			return true
+		}
+		if ok, _ := filepath.Match(p, base); ok {
+			return true
+		}
+	}
+
+	return false
 }
 
 // pkgID computes the manifest symbol prefix for a file path, relative to the
