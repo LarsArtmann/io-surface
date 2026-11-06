@@ -37,6 +37,10 @@ func main() {
 
 // exitCode maps a sentinel to the CLI contract.
 func exitCode(err error) int {
+	if err == nil {
+		return 0
+	}
+
 	if errors.Is(err, errFindings) {
 		return 1
 	}

@@ -45,6 +45,7 @@ func runApp(t *testing.T, args ...string) (string, error) {
 
 	sink := &bytes.Buffer{}
 	stdout = sink
+	app.RootCommand().SetOut(sink)
 	t.Cleanup(func() { stdout = os.Stdout })
 
 	err = app.ExecuteWithArgs(context.Background(), args)
@@ -230,9 +231,8 @@ func TestRunCheck_FormatMatrix(t *testing.T) {
 		{name: "text default", args: nil},
 	}
 	for _, tc := range cases {
+		// No t.Parallel(): the subtests share the package output sink.
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-
 			args := append([]string{"check", "--root", root}, tc.args...)
 			out, err := runApp(t, args...)
 			if err != nil {
