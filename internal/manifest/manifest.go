@@ -129,9 +129,17 @@ func Load(dir string) (*Manifest, error) {
 
 	value := cuecontext.New().BuildInstance(inst)
 	// Constraint enforcement: disciplines.cue makes a non-empty violations
-	// list fail unification, which surfaces here, before any check.
+	// list fail unification when it conflicts with a declared default. The
+	// unified error is opaque ("incompatible list lengths"), so the actual
+	// violation entries are recovered from the conjuncts and reported.
 	if err = value.Err(); err != nil {
-		return nil, fmt.Errorf("manifest constraints failed in %s: %w", dir, err)
+		return nil, constraintError(dir, value, err)
+	}
+	// Explicit emptiness enforcement: a disciplines.cue that only computes
+	// `violations` (no conflicting default anywhere) unifies cleanly, so the
+	// entries must be checked and reported directly.
+	if entries := violationEntries(value); len(entries) > 0 {
+		return nil, constraintError(dir, value, nil)
 	}
 
 	m := &Manifest{Dir: dir}
@@ -154,6 +162,78 @@ func Load(dir string) (*Manifest, error) {
 	}
 
 	return m, nil
+}
+
+// Violation is one constraint failure produced by a disciplines.cue rule.
+// The id/msg shape is the cross-repo convention (see the dnsblockd and
+// gogenfilter manifests); anything undecodable is skipped rather than
+// inventing a schema every repo must adopt.
+type Violation struct {
+	ID  string `json:"id"`
+	Msg string `json:"msg"`
+}
+
+var violationsPath = cue.ParsePath("violations")
+
+// constraintError reports failed manifest constraints. When the underlying
+// failure is a unification conflict the entries live in a non-default
+// conjunct, so violationEntries walks the operands; either way the user sees
+// the actual id/msg violations instead of CUE's "incompatible list lengths".
+func constraintError(dir string, value cue.Value, uniErr error) error {
+	entries := violationEntries(value)
+	if len(entries) == 0 {
+		if uniErr == nil {
+			return nil
+		}
+
+		return fmt.Errorf("%w in %s: %v", ErrConstraints, dir, uniErr)
+	}
+	var b strings.Builder
+	fmt.Fprintf(&b, "in %s", dir)
+	if uniErr != nil {
+		fmt.Fprintf(&b, ": %v", uniErr)
+	}
+	fmt.Fprintf(&b, " — %d constraint violation(s):", len(entries))
+	seen := map[string]bool{}
+	for _, v := range entries {
+		key := v.ID + "|" + v.Msg
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		fmt.Fprintf(&b, "\n  - %s: %s", v.ID, v.Msg)
+	}
+
+	return fmt.Errorf("%w %s", ErrConstraints, b.String())
+}
+
+// violationEntries decodes the violations list, falling back to the top-level
+// conjuncts when the unified value is erroneous: the offending operand still
+// decodes even though the whole value does not.
+func violationEntries(value cue.Value) []Violation {
+	var out []Violation
+	if v := value.LookupPath(violationsPath); v.Err() == nil {
+		if err := v.Decode(&out); err != nil {
+			out = nil
+		}
+	}
+	if len(out) > 0 {
+		return out
+	}
+	if _, operands := value.Expr(); operands != nil {
+		for _, o := range operands {
+			v := o.LookupPath(violationsPath)
+			if v.Err() != nil {
+				continue
+			}
+			var entries []Violation
+			if err := v.Decode(&entries); err == nil {
+				out = append(out, entries...)
+			}
+		}
+	}
+
+	return out
 }
 
 // Validate reports schema-level problems the CUE types cannot express cheaply:
@@ -186,6 +266,9 @@ func (m *Manifest) Validate() []error {
 		if strings.HasPrefix(id, "#") || strings.HasSuffix(id, ".") {
 			errs = append(errs, fmt.Errorf("%s: malformed ID", id))
 		}
+		if comp, bad := dottedSubpackage(id); bad {
+			errs = append(errs, fmt.Errorf("%s: dotted subpackage %q — the extractor emits slash-package paths, so this ID can never pair with an extraction (use %q)", id, comp, slashForm(id)))
+		}
 	}
 	if _, err := os.Stat(filepath.Join(m.Dir, "schema.cue")); err != nil {
 		errs = append(errs, fmt.Errorf("%s: no schema.cue (is this an io-surface package?)", m.Dir))
@@ -202,4 +285,44 @@ func (m *Manifest) CountByFamily() map[string]int {
 	}
 
 	return out
+}
+
+// dottedSubpackage reports the package segment when an ID encodes
+// subpackages with dots (internal/server.sso.View). The extractor always
+// emits slash-package paths (internal/server/sso.View), so a dotted form can
+// never pair with an extraction — the site silently strands as undeclared
+// while its real call site goes unguarded (the dnsblockd adoption lesson).
+// Type.Method chains are fine: only an all-lowercase first remainder
+// component after a slash path reads as a package segment, since types are
+// uppercase and bare embed vars are a single component.
+func dottedSubpackage(id string) (string, bool) {
+	slash := strings.LastIndex(id, "/")
+	rest := id[slash+1:]
+	dot := strings.Index(rest, ".")
+	if dot < 0 {
+		return "", false
+	}
+	components := strings.Split(rest[dot+1:], ".")
+	if len(components) < 2 || components[0] == "" {
+		return "", false
+	}
+	first := components[0]
+	if first != strings.ToLower(first) || first == strings.ToUpper(first) {
+		return "", false
+	}
+
+	return first, true
+}
+
+// slashForm returns the ID with the dotted subpackage rewritten to the
+// slash-package form the extractor emits, for use in validation messages.
+func slashForm(id string) string {
+	slash := strings.LastIndex(id, "/")
+	rest := id[slash+1:]
+	dot := strings.Index(rest, ".")
+	if dot < 0 {
+		return id
+	}
+
+	return id[:slash+1+dot] + "/" + rest[dot+1:]
 }
