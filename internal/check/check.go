@@ -101,6 +101,23 @@ type Report struct {
 // finding).
 func (r *Report) Failing() bool { return r.Stats.Errors > 0 }
 
+// StrictWarnings counts the warnings --strict promotes to failure, honoring
+// the unused-baseline grace flag: the stale-suppression finding still
+// reports, but it stops failing while a team works the baseline down.
+func (r *Report) StrictWarnings(allowUnusedBaseline bool) int {
+	if !allowUnusedBaseline {
+		return r.Stats.Warnings
+	}
+	n := r.Stats.Warnings
+	for _, f := range r.Findings {
+		if f.Rule == RuleBaselineUnused && f.Severity == SeverityWarning {
+			n--
+		}
+	}
+
+	return n
+}
+
 // Options controls the check.
 type Options struct {
 	// Dirs limits extraction (default cmd, internal).
@@ -110,6 +127,15 @@ type Options struct {
 	// Ignore skips files matching these extraction globs (generated code);
 	// kept in lockstep with extract.Options.Ignore.
 	Ignore []string
+	// StrictDirs upgrades the scope-hint (declared sites outside --dirs)
+	// from info to error: a narrowing that blinds the gate to declared sites
+	// fails instead of hinting. The default stays advisory because a narrower
+	// scan is often deliberate (module-scoped runs).
+	StrictDirs bool
+	// AllowUnusedBaseline exempts unused-baseline findings from strict-mode
+	// failure: a stale suppression warns, but teams mid-cleanup can opt out
+	// of the teeth while the baseline shrinks. The finding still reports.
+	AllowUnusedBaseline bool
 }
 
 // bucket is one canonical group: every declared ID and every extracted site
@@ -340,9 +366,15 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	// Scope hint: a --dirs narrowing that excludes declared sites produces
 	// findings that look like manifest rot but are really the flag's doing.
 	// Name the cause so the fix is one edit instead of an archaeology dig.
+	// StrictDirs gives the hint teeth: blinding the gate to declared sites
+	// is then a failure, not a note.
 	if outside := declaredOutside(m, effectiveDirs(opts.Dirs)); outside > 0 {
+		scopeSev := SeverityInfo
+		if opts.StrictDirs {
+			scopeSev = SeverityError
+		}
 		rep.add(Finding{
-			Rule: RuleScopeHint, Severity: SeverityInfo, ID: "--dirs",
+			Rule: RuleScopeHint, Severity: scopeSev, ID: "--dirs",
 			Message: fmt.Sprintf("%d declared site(s) lie outside the scanned dirs %s — this run cannot see them; widen --dirs or refresh facts.cue", outside, strings.Join(effectiveDirs(opts.Dirs), ", ")),
 		})
 	}

@@ -23,12 +23,14 @@ import (
 
 // checkFlags are the flags local to `io-surface check`.
 type checkFlags struct {
-	Manifest string `flag:"manifest" help:"manifest package directory (default <root>/docs/architecture/io-surface)"`
-	JSON     bool   `flag:"json" help:"emit the report as JSON"`
-	Format   string `flag:"format" help:"output format: text, json, or sarif (--json is shorthand for --format json)"`
-	Advisory bool   `flag:"advisory" default:"true" help:"include weak-tier advisory findings"`
-	Strict   bool   `flag:"strict" help:"treat warnings as failures"`
-	Enforce  bool   `flag:"enforce" help:"fail on errors even when the manifest declares enforcement: audit"`
+	Manifest            string `flag:"manifest" help:"manifest package directory (default <root>/docs/architecture/io-surface)"`
+	JSON                bool   `flag:"json" help:"emit the report as JSON"`
+	Format              string `flag:"format" help:"output format: text, json, or sarif (--json is shorthand for --format json)"`
+	Advisory            bool   `flag:"advisory" default:"true" help:"include weak-tier advisory findings"`
+	Strict              bool   `flag:"strict" help:"treat warnings as failures"`
+	Enforce             bool   `flag:"enforce" help:"fail on errors even when the manifest declares enforcement: audit"`
+	StrictDirs          bool   `flag:"strict-dirs" help:"fail when declared sites fall outside --dirs instead of hinting"`
+	AllowUnusedBaseline bool   `flag:"allow-unused-baseline" help:"unused-baseline findings never fail (exempt from --strict) while the baseline shrinks"`
 }
 
 type initFlags struct {
@@ -77,7 +79,7 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 	if vErrs := m.Validate(); len(vErrs) > 0 {
 		rep = check.ValidationReport(m, vErrs)
 	} else {
-		if rep, err = check.Run(root.Root, m, check.Options{Advisory: flags.Advisory, Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore)}); err != nil {
+		if rep, err = check.Run(root.Root, m, check.Options{Advisory: flags.Advisory, Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore), StrictDirs: flags.StrictDirs}); err != nil {
 			return err
 		}
 	}
@@ -105,7 +107,7 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 		printReport(rep, stdout)
 	}
 
-	if rep.Failing() || (flags.Strict && rep.Stats.Warnings > 0) {
+	if rep.Failing() || (flags.Strict && rep.StrictWarnings(flags.AllowUnusedBaseline) > 0) {
 		if m.EnforcementPolicy() == manifest.EnforcementAudit && !flags.Enforce {
 			// Human-facing note: stdout in text mode, stderr in machine
 			// modes (the JSON/SARIF stdout contract must stay parseable).
