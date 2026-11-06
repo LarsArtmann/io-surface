@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -275,5 +276,167 @@ func TestValidate_MissingSchemaCUE(t *testing.T) {
 	errs := m.Validate()
 	if len(errs) != 1 || !strings.Contains(errs[0].Error(), "no schema.cue") {
 		t.Fatalf("want missing-schema error, got %v", errs)
+	}
+}
+
+func TestLoad_CapabilitiesAndAuditDecode(t *testing.T) {
+	dir := writeManifest(t, map[string]string{
+		"schema.cue": schemaBody,
+		"facts.cue": `package io_surface
+
+sites: "internal/store.LoadConfig": {
+	location: ["internal/store/store.go:9"]
+	family:   "file-read"
+}
+version: "io-surface/v1.1"
+capabilities: [
+	{
+		pkg:    "internal/store"
+		direct: ["FILES"]
+		deep:   ["EXEC", "FILES"]
+	},
+]
+capabilityAudit: {
+	engine:  "capslock"
+	version: "v0.3.4"
+	commit:  "abc1234"
+	date:    "2026-11-06"
+}
+`,
+	})
+	m, err := Load(dir)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if m.Version != "io-surface/v1.1" {
+		t.Errorf("version = %q", m.Version)
+	}
+	if len(m.Capabilities) != 1 || m.Capabilities[0].Pkg != "internal/store" {
+		t.Fatalf("capabilities = %+v", m.Capabilities)
+	}
+	if want := []string{"FILES"}; !reflect.DeepEqual(m.Capabilities[0].Direct, want) {
+		t.Errorf("direct = %v, want %v", m.Capabilities[0].Direct, want)
+	}
+	if want := []string{"EXEC", "FILES"}; !reflect.DeepEqual(m.Capabilities[0].Deep, want) {
+		t.Errorf("deep = %v, want %v", m.Capabilities[0].Deep, want)
+	}
+	if m.CapabilityAudit == nil || m.CapabilityAudit.Engine != "capslock" || m.CapabilityAudit.Version != "v0.3.4" {
+		t.Errorf("capabilityAudit = %+v", m.CapabilityAudit)
+	}
+	if m.CapabilityFor("internal/store") == nil || m.CapabilityFor("internal/absent") != nil {
+		t.Error("CapabilityFor lookup broken")
+	}
+}
+
+func TestLoad_V1ManifestHasNoCapabilities(t *testing.T) {
+	dir := writeManifest(t, map[string]string{
+		"schema.cue": schemaBody,
+		"facts.cue": `package io_surface
+
+sites: "internal/store.LoadConfig": {
+	location: ["internal/store/store.go:9"]
+	family:   "file-read"
+}
+`,
+	})
+	m, err := Load(dir)
+	if err != nil {
+		t.Fatalf("Load v1 manifest: %v", err)
+	}
+	if m.Version != "" || m.Capabilities != nil || m.CapabilityAudit != nil {
+		t.Errorf("v1 manifest must decode with no v1.1 sections, got version=%q caps=%v audit=%v",
+			m.Version, m.Capabilities, m.CapabilityAudit)
+	}
+}
+
+func TestLoad_UnknownCapabilityNameFailsAtCUELevel(t *testing.T) {
+	dir := writeManifest(t, map[string]string{
+		"schema.cue": `package io_surface
+
+sites: {[string]: _}
+
+#CapabilityName: "FILES" | "NETWORK" | "EXEC"
+
+capabilities: [...{pkg!: string, direct!: [...#CapabilityName], deep!: [...#CapabilityName]}] | *[]
+`,
+		"facts.cue": `package io_surface
+
+sites: "internal/store.LoadConfig": {
+	location: ["internal/store/store.go:9"]
+	family:   "file-read"
+}
+capabilities: [{pkg: "internal/store", direct: ["CGO"], deep: ["CGO"]}]
+`,
+	})
+	_, err := Load(dir)
+	if err == nil {
+		t.Fatal("an unmapped capability name must fail the closed enum")
+	}
+	if !errors.Is(err, ErrConstraints) {
+		t.Fatalf("want ErrConstraints, got %v", err)
+	}
+}
+
+func TestValidate_CapabilityInvariants(t *testing.T) {
+	tests := []struct {
+		name  string
+		caps  []Capability
+		check func(*testing.T, []error)
+	}{
+		{
+			name: "unknown name",
+			caps: []Capability{{Pkg: "internal/store", Direct: []string{"FILES"}, Deep: []string{"FILES", "CGO"}}},
+			check: func(t *testing.T, errs []error) {
+				if len(errs) != 1 || !strings.Contains(errs[0].Error(), `unknown capability "CGO"`) {
+					t.Fatalf("want unknown-capability error, got %v", errs)
+				}
+			},
+		},
+		{
+			name: "direct missing from deep",
+			caps: []Capability{{Pkg: "internal/store", Direct: []string{"NETWORK"}, Deep: []string{"FILES"}}},
+			check: func(t *testing.T, errs []error) {
+				if len(errs) != 1 || !strings.Contains(errs[0].Error(), `direct "NETWORK" missing from deep`) {
+					t.Fatalf("want deep-superset error, got %v", errs)
+				}
+			},
+		},
+		{
+			name: "duplicate pkg",
+			caps: []Capability{
+				{Pkg: "internal/store", Direct: []string{"FILES"}, Deep: []string{"FILES"}},
+				{Pkg: "internal/store", Direct: []string{"EXEC"}, Deep: []string{"EXEC"}},
+			},
+			check: func(t *testing.T, errs []error) {
+				if len(errs) != 1 || !strings.Contains(errs[0].Error(), `duplicate pkg "internal/store"`) {
+					t.Fatalf("want duplicate-pkg error, got %v", errs)
+				}
+			},
+		},
+		{
+			name: "empty pkg",
+			caps: []Capability{{Pkg: "", Deep: []string{"FILES"}}},
+			check: func(t *testing.T, errs []error) {
+				if len(errs) != 1 || !strings.Contains(errs[0].Error(), "empty pkg") {
+					t.Fatalf("want empty-pkg error, got %v", errs)
+				}
+			},
+		},
+		{
+			name: "clean set",
+			caps: []Capability{{Pkg: "internal/store", Direct: []string{"FILES"}, Deep: []string{"EXEC", "FILES"}}},
+			check: func(t *testing.T, errs []error) {
+				if len(errs) != 0 {
+					t.Fatalf("valid capabilities must pass, got %v", errs)
+				}
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := validateFixture(t, map[string]Site{"a.B": {Family: "env"}})
+			m.Capabilities = tt.caps
+			tt.check(t, m.Validate())
+		})
 	}
 }
