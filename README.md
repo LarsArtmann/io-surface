@@ -246,7 +246,7 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
-`v0.1.0` — extractor, bidirectional gate, scaffolder and renderer, with the CUE
+`v0.2.0` — extractor, bidirectional gate, scaffolder and renderer, with the CUE
 contract. Proven against two real repos: a hand-ported 131-site manifest (dnsblockd)
 and a from-scratch 126-site pilot (InboxClean), plus self-hosting.
 
