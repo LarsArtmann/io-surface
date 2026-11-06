@@ -126,6 +126,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   edit. The hardcoded table shrinks to the built-in default vocabulary that
   keeps first `init` scaffolds useful; seam callers now also record the
   wrapper name in their `via` fact instead of leaving it empty
+- `--strict-dirs`: the scope-hint gains teeth on demand — a `--dirs`
+  narrowing that blinds the gate to declared sites then FAILS (error) instead
+  of hinting (info); default stays advisory because narrower scans are often
+  deliberate
+- `--allow-unused-baseline`: grace flag exempting unused-baseline findings
+  from `--strict` failure (they still report) while a team works the baseline
+  down — the escape hatch that makes the future unused-baseline promotion
+  survivable
+- Permanent id-form false-positive guard: the shared fixture gains a method
+  on an UNEXPORTED type (`internal/store.ttl.Sweep`) whose dotted ID is
+  legal, so the id-form rule's package-dot-only scope can no longer regress
+  silently
 
 ### Fixed
 
