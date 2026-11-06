@@ -288,9 +288,6 @@ func (m *Manifest) Validate() []error {
 		if strings.HasPrefix(id, "#") || strings.HasSuffix(id, ".") {
 			errs = append(errs, fmt.Errorf("%s: malformed ID", id))
 		}
-		if comp, bad := dottedSubpackage(id); bad {
-			errs = append(errs, fmt.Errorf("%s: dotted subpackage %q — the extractor emits slash-package paths, so this ID can never pair with an extraction (use %q)", id, comp, slashForm(id)))
-		}
 	}
 	if _, err := os.Stat(filepath.Join(m.Dir, "schema.cue")); err != nil {
 		errs = append(errs, fmt.Errorf("%s: no schema.cue (is this an io-surface package?)", m.Dir))
@@ -307,44 +304,4 @@ func (m *Manifest) CountByFamily() map[string]int {
 	}
 
 	return out
-}
-
-// dottedSubpackage reports the package segment when an ID encodes
-// subpackages with dots (internal/server.sso.View). The extractor always
-// emits slash-package paths (internal/server/sso.View), so a dotted form can
-// never pair with an extraction — the site silently strands as undeclared
-// while its real call site goes unguarded (the dnsblockd adoption lesson).
-// Type.Method chains are fine: only an all-lowercase first remainder
-// component after a slash path reads as a package segment, since types are
-// uppercase and bare embed vars are a single component.
-func dottedSubpackage(id string) (string, bool) {
-	slash := strings.LastIndex(id, "/")
-	rest := id[slash+1:]
-	dot := strings.Index(rest, ".")
-	if dot < 0 {
-		return "", false
-	}
-	components := strings.Split(rest[dot+1:], ".")
-	if len(components) < 2 || components[0] == "" {
-		return "", false
-	}
-	first := components[0]
-	if first != strings.ToLower(first) || first == strings.ToUpper(first) {
-		return "", false
-	}
-
-	return first, true
-}
-
-// slashForm returns the ID with the dotted subpackage rewritten to the
-// slash-package form the extractor emits, for use in validation messages.
-func slashForm(id string) string {
-	slash := strings.LastIndex(id, "/")
-	rest := id[slash+1:]
-	dot := strings.Index(rest, ".")
-	if dot < 0 {
-		return id
-	}
-
-	return id[:slash+1+dot] + "/" + rest[dot+1:]
 }

@@ -38,6 +38,7 @@ const (
 	RuleUndeclared         = "io-surface/undeclared-site"
 	RuleStaleClaim         = "io-surface/stale-claim"
 	RuleIDDrift            = "io-surface/id-drift"
+	RuleIDForm             = "io-surface/id-form"
 	RuleLocationDrift      = "io-surface/location-drift"
 	RuleMissingLocation    = "io-surface/missing-location"
 	RuleExtractionBlind    = "io-surface/extraction-blind"
@@ -162,6 +163,12 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	for _, id := range m.BaselineIDs() {
 		baselined[match.Canonical(id)] = true
 	}
+	// Extracted IDs by exact form: the id-form rule needs to know whether the
+	// slash-package variant of a declared ID actually extracts.
+	extractedByID := map[string]bool{}
+	for _, s := range sites {
+		extractedByID[s.ID] = true
+	}
 
 	for _, canon := range sortedKeys(buckets) {
 		b := buckets[canon]
@@ -231,6 +238,21 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		for _, id := range leftoversDeclared {
 			site := m.Sites[id]
 			if !site.Facts.Extractable {
+				continue
+			}
+			// A dotted-subpackage ID can never pair: the extractor always
+			// emits slash-package paths. Confirmed against the extracted set
+			// so the unexported-type dotted form (internal/extract.extractor.
+			// parseFile — "extractor" IS a type) stays legal. This is an
+			// error, not drift: the declaration guards nothing while the
+			// real call site goes unguarded (dnsblockd adoption lesson).
+			if variant, ok := match.SlashVariant(id); ok && extractedByID[variant] {
+				rep.add(Finding{
+					Rule:     RuleIDForm, Severity: SeverityError, ID: id, Family: site.Family,
+					Location: firstLocation(site.Location),
+					Message:  fmt.Sprintf("declared with a dotted subpackage; the extractor emits %q — the dotted form can never pair with an extraction", variant),
+				})
+
 				continue
 			}
 			if len(site.Location) == 0 {

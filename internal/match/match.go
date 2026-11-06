@@ -102,3 +102,40 @@ func Symbol(id string) string {
 
 	return tail
 }
+
+// SlashVariant rewrites a dotted-subpackage ID (internal/server.sso.Manager)
+// into the slash-package form the extractor emits (internal/server/sso.Manager).
+//
+// The dotted form is the classic hand-authoring mistake: a subpackage is
+// written with a dot where the directory separator belongs, so the ID can
+// never pair with an extraction. The lexical test is deliberately narrow —
+// only an all-lowercase first remainder component after the last slash reads
+// as a package segment, because a type component is capitalized (internal/
+// extract.extractor.parseFile is a legal unexported-type method) and a bare
+// embed var is a single component (internal/server.openAPISpec). The caller
+// must still confirm the variant against the extracted set: the lexical test
+// alone cannot distinguish a dotted subpackage from an unexported type.
+func SlashVariant(id string) (string, bool) {
+	id = stripAspect(id)
+	slash := strings.LastIndex(id, "/")
+	if slash < 0 {
+		// No package path: dotted forms here are area.topic shapes, which
+		// are legal and carry no subpackage to rewrite.
+		return "", false
+	}
+	rest := id[slash+1:]
+	dot := strings.Index(rest, ".")
+	if dot < 0 {
+		return "", false
+	}
+	components := strings.Split(rest[dot+1:], ".")
+	if len(components) < 2 || components[0] == "" {
+		return "", false
+	}
+	first := components[0]
+	if first != strings.ToLower(first) || first == strings.ToUpper(first) {
+		return "", false
+	}
+
+	return id[:slash+1+dot] + "/" + rest[dot+1:], true
+}
