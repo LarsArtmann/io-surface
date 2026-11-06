@@ -37,7 +37,7 @@ func main() {
 	case "init":
 		err = runInit(os.Args[2:])
 	case "render":
-		err = runRender(os.Args[2:])
+		err = runRender(os.Args[2:], os.Stdout)
 	case "extract":
 		err = runExtract(os.Args[2:])
 	case "version", "-v", "--version":
@@ -205,11 +205,13 @@ func countFamilies(sites []*extract.Site) int {
 	return len(seen)
 }
 
-func runRender(args []string) error {
+func runRender(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("render", flag.ExitOnError)
 	root := fs.String("root", ".", "repository root")
 	man := fs.String("manifest", "", "manifest package directory")
 	out := fs.String("out", "", "write to FILE instead of stdout")
+	doc := fs.String("doc", "", "apply the inventory into FILE between the io-surface markers (in place, prose preserved)")
+	check := fs.Bool("check", false, "with --doc: report drift instead of rewriting (exit 1 when the block is stale)")
 	err := fs.Parse(args)
 	if err != nil {
 		return err
@@ -219,14 +221,71 @@ func runRender(args []string) error {
 	if err != nil {
 		return err
 	}
-	doc := render.Markdown(m)
+
+	if *doc != "" {
+		return applyDoc(*doc, m, *check)
+	}
+
+	docStr := render.Markdown(m)
 	if *out == "" {
-		fmt.Print(doc)
+		fmt.Fprint(stdout, docStr)
 
 		return nil
 	}
 
-	return os.WriteFile(*out, []byte(doc), 0o644)
+	return os.WriteFile(*out, []byte(docStr), 0o644)
+}
+
+// applyDoc is the doc-embedding path: rewrite the block in place, or verify
+// it when checking. Drift names the divergence so the author knows WHAT went
+// stale, and the fix hint names the exact command.
+func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if checkOnly {
+		stored, fresh, err := render.CheckDoc(string(data), m)
+		if err != nil {
+			return err
+		}
+		if stored == fresh {
+			return nil
+		}
+		storedLines, freshLines := storedLines(stored), storedLines(fresh)
+		fmt.Fprintf(os.Stderr, "io-surface: generated block in %s is stale\n", path)
+		for i := range max(len(storedLines), len(freshLines)) {
+			var w, g string
+			if i < len(storedLines) {
+				w = storedLines[i]
+			}
+			if i < len(freshLines) {
+				g = freshLines[i]
+			}
+			if w != g {
+				fmt.Fprintf(os.Stderr, "  line %d:\n  stored: %s\n  fresh:  %s\n", i+1, w, g)
+				break
+			}
+		}
+		fmt.Fprintf(os.Stderr, "io-surface: fix with `io-surface render --doc %s`\n", path)
+
+		return errFindings
+	}
+	updated, err := render.ApplyToDoc(string(data), m)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(path, []byte(updated), 0o644)
+}
+
+func storedLines(s string) []string {
+	s = strings.TrimSuffix(s, "\n")
+	if s == "" {
+		return nil
+	}
+
+	return strings.Split(s, "\n")
 }
 
 func runExtract(args []string) error {
