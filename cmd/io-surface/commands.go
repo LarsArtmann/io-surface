@@ -7,9 +7,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
+	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/emit"
 	"github.com/larsartmann/io-surface/internal/extract"
@@ -40,6 +42,14 @@ type renderFlags struct {
 
 type extractFlags struct {
 	IncludeTests bool `flag:"include-tests" help:"include *_test.go files (report only)"`
+}
+
+type absorbFlags struct {
+	Manifest      string `flag:"manifest" help:"manifest package directory (default <root>/docs/architecture/io-surface)"`
+	Capslock      string `flag:"capslock" required:"true" help:"path to the pinned Capslock JSON report"`
+	Check         bool   `flag:"check" help:"compare a fresh report against the committed capabilities instead of writing (advisory output, never fails)"`
+	Module        string `flag:"module" help:"override the module path (default: parsed from go.mod)"`
+	EngineVersion string `flag:"engine-version" help:"engine version recorded in the capability audit"`
 }
 
 // stdout is the command output sink. It is a package variable so the
@@ -136,6 +146,72 @@ func countFamilies(sites []*extract.Site) int {
 	}
 
 	return len(seen)
+}
+
+// runAbsorb ingests a pinned Capslock JSON report. Default mode replaces
+// capabilities.cue (and ONLY that file — claims, baseline and facts are
+// never machine-written); --check reports advisory drift instead.
+func runAbsorb(_ context.Context, root *rootFlags, flags absorbFlags) error {
+	report, err := os.ReadFile(flags.Capslock)
+	if err != nil {
+		return err
+	}
+	res, err := absorb.Run(root.Root, report, absorb.Options{ModulePath: flags.Module})
+	if err != nil {
+		return err
+	}
+	audit := absorb.ResolveAudit(root.Root, absorb.Audit{Version: flags.EngineVersion})
+	dropped := totalDropped(res)
+
+	dir := manifestDir(root.Root, flags.Manifest)
+	m, err := manifest.Load(dir)
+	if err != nil {
+		return err
+	}
+
+	if flags.Check {
+		for _, line := range absorb.Drift(m, res) {
+			fmt.Fprintf(stdout, "%-7s %-32s %s\n", "info", absorb.RuleCapabilityDrift, line)
+		}
+		fmt.Fprintf(stdout, "io-surface: %d packages with capability facts, %d unmapped edges dropped — %d drift (advisory; capabilities never fail the gate)\n",
+			res.Pkgs, dropped, len(absorb.Drift(m, res)))
+		printDropped(stdout, res)
+
+		return nil
+	}
+
+	path := filepath.Join(dir, "capabilities.cue")
+	if err = os.WriteFile(path, absorb.CUE(res, audit), 0o644); err != nil {
+		return err
+	}
+	fmt.Fprintf(stdout, "io-surface: wrote %s (%d packages, audit %s@%s of %s, %d unmapped edges dropped)\n",
+		path, res.Pkgs, audit.Engine, audit.Version, audit.Commit, dropped)
+	printDropped(stdout, res)
+
+	return nil
+}
+
+func totalDropped(res *absorb.Result) int {
+	total := 0
+	for _, n := range res.Dropped {
+		total += n
+	}
+
+	return total
+}
+
+// printDropped makes unmapped capability names LOUD: they mean the engine's
+// vocabulary moved (probably a schema-version bump), never a silent skip.
+func printDropped(w io.Writer, res *absorb.Result) {
+	if len(res.Dropped) == 0 {
+		return
+	}
+	names := make([]string, 0, len(res.Dropped))
+	for name, count := range res.Dropped {
+		names = append(names, fmt.Sprintf("%s×%d", name, count))
+	}
+	sort.Strings(names)
+	fmt.Fprintf(w, "io-surface: dropped unmapped capabilities (out-of-scope per ROADMAP Q5, or newer engine): %s\n", strings.Join(names, ", "))
 }
 
 func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
