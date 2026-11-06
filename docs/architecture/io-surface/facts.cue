@@ -32,7 +32,7 @@ scope: {
 sites: {
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/main.go:228",
+			"cmd/io-surface/main.go:229",
 		]
 		family: "file-write"
 		facts: {

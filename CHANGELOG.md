@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- `check --json` now emits a machine-parseable report on stdout for EVERY gate
+  outcome, including manifest-validation failures (new rule
+  `io-surface/manifest-validation`); previously that path printed text to
+  stderr with empty stdout, breaking JSON consumers
 - `init --force` refreshes ONLY `facts.cue`: `claims.cue`, `baseline.cue` and
   `schema.cue` survive once present, so human judgment can no longer be
   clobbered by a facts regeneration (guarded by a plant-a-claim test)
