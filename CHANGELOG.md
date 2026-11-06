@@ -110,6 +110,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Direct test suite for `internal/manifest` (decode edge cases, sentinel
   errors, planted constraint violations through both the conflict and the
   explicit path) and `auditCommit` git-repo tests for the scaffold
+- `io-surface baseline add <id> --note WHY [--date YYYY-MM-DD]`: grandfather
+  an undeclared site without hand-editing CUE. The surgical write is the
+  machine's only sanctioned insertion into a judgment file (comments and
+  formatting preserved); it refuses duplicates and noteless entries and warns
+  when the ID does not extract today (an entry suppressing nothing)
 
 ### Fixed
 
