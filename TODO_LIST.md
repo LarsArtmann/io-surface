@@ -102,6 +102,6 @@
   - Long-term / unrefined ideas live in ROADMAP.md, not here.
 -->
 
-| 64 | Split the oversized core files to fleet-default 350 lines (extract tables/pairing/handlers) | 🔴 `TODO` | Low | 2h | `.buildflow.yml` pins max_file_size 650 as a documented temporary exception (7 files at 446-615 lines); the split is the real fix |
+| 64 | Split the oversized core files to fleet-default 350 lines (extract tables/pairing/handlers) | 🔴 `TODO` | Low | 2h | STARTED 2026-11-06: detection tables split to `internal/extract/tables.go` (extract.go 657→449); remaining: check.go pairing split + test-file topical splits |
 
 | 63 | Wire cmdguard-lint into CI once the lint module ships without a go.mod replace | 🔵 `BLOCKED` | Low | 30min | `go run github.com/larsartmann/cmdguard/lint/cmd/cmdguard-lint@v0.1.0` fails: the module's go.mod carries replace directives (buildflow/file-or-fix verified 2026-11-06); fix belongs in the cmdguard repo's release flow, then the CI step is one `go run` line |
