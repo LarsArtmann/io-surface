@@ -6,6 +6,7 @@ require (
 	cuelang.org/go v0.17.1
 	github.com/larsartmann/cmdguard/v4 v4.2.0
 	github.com/larsartmann/go-finding v1.15.1
+	github.com/larsartmann/go-finding/toolsdk v1.16.0
 )
 
 require (
@@ -40,7 +41,6 @@ require (
 	github.com/larsartmann/go-atomic-write v0.6.0 // indirect
 	github.com/larsartmann/go-branded-id v0.7.0 // indirect
 	github.com/larsartmann/go-error-family v0.12.0 // indirect
-	github.com/larsartmann/go-finding/toolsdk v1.16.0 // indirect
 	github.com/larsartmann/go-ndjson v0.0.1 // indirect
 	github.com/larsartmann/go-output v0.38.4 // indirect
 	github.com/larsartmann/go-output/d2 v0.38.4 // indirect

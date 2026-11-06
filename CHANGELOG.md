@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.2.0] - 2026-11-06
+
 ### Changed
 
 - The CLI is now built with **cmdguard v4** (`github.com/larsartmann/cmdguard/v4`):
