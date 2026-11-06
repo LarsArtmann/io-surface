@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"fmt"
 	"os"
@@ -603,7 +603,7 @@ func TestExtractStats(t *testing.T) {
 		t.Fatalf("extract JSON: %v", err)
 	}
 	var total int
-	for _, line := range strings.Split(out, "\n") {
+	for line := range strings.SplitSeq(out, "\n") {
 		if strings.Contains(line, "TOTAL") {
 			fmt.Sscanf(line, "%d", &total)
 		}

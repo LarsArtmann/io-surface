@@ -1,7 +1,7 @@
 package emit
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"testing"
 
 	"github.com/larsartmann/io-surface/internal/absorb"
