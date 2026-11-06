@@ -59,6 +59,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   landed post-birth); replaced with the standard MIT text, matching the
   birth-session intent and the house pattern for public tools
 
+### Removed
+
+- A 35 MB compiled binary (`cmd/io-surface/io-surface`) that the auto-commit
+  daemon had committed twice into history is now untracked and gitignored
+  (`/cmd/io-surface/io-surface`, `/bin/`; rebuild-proven: a fresh build no
+  longer appears as a pending change). Purging the ~67 MB of historical blobs
+  vs. keeping them is an owner decision (ROADMAP Q4); tagged `v0.1.0` predates
+  the blobs and is unaffected.
+
 ## [0.1.0] - 2026-11-05
 
 Initial release: the I/O surface manifest gate (io-surface/v1).

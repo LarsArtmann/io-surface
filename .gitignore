@@ -58,3 +58,5 @@ go.work.sum
 # <<< buildflow-managed (.gitignore) <<<
 # Build artifacts
 /io-surface
+/cmd/io-surface/io-surface
+/bin/

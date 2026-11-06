@@ -58,6 +58,18 @@ stop calling the inventory complete.
 - **Q3 — may the weak (heuristic) tier ever fail a build, or is it advisory
   forever?** Opt-in `--strict-weak` per repo is the compromise candidate; this
   is a false-positive-budget policy call. (Birth report §g-Q3)
+- **Q4 — purge the ~67 MB binary blobs from git history, or keep them?** The
+  auto-commit daemon committed a compiled `cmd/io-surface/io-surface` twice
+  (blobs of 35,180,278 and 35,181,139 bytes, commits `05874f3` / `e15bf62`,
+  2026-11-06 05:10/05:13). The forward leak is closed: untracked + gitignored
+  (`/cmd/io-surface/io-surface`, `/bin/`), rebuild-proven. Tagged `v0.1.0`
+  predates the blobs, so tagged module zips are clean; but `@latest`/`@master`
+  resolves to HEAD, and a tracked 35 MB file ships in every proxy zip of
+  master. **Purge:** `git filter-repo --invert-paths --path
+  cmd/io-surface/io-surface` — rewrites every SHA from `05874f3` onward,
+  requires force-push to both remotes and fresh clones everywhere; status
+  reports citing those SHAs go stale. **Keep:** ~67 MB one-time clone cost,
+  zero SHA breakage, but every zip of master carries the binary forever.
 
 ## Non-goals
 
