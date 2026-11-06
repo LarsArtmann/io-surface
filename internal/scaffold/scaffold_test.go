@@ -2,6 +2,7 @@ package scaffold
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -173,5 +174,50 @@ func TestWrite_ForceRefreshesFactsOnly(t *testing.T) {
 	}
 	if !strings.Contains(string(facts), "\"2026-11-07\"") {
 		t.Error("facts.cue was not refreshed by --force")
+	}
+}
+
+// TestAuditCommit_WorkingTreeFallback pins the no-git path: a plain temp dir
+// has no repository, so the audit provenance falls back to the literal that
+// keeps scaffolded manifests valid anywhere.
+func TestAuditCommit_WorkingTreeFallback(t *testing.T) {
+	if got := auditCommit(t.TempDir()); got != "working-tree" {
+		t.Fatalf("want working-tree fallback, got %q", got)
+	}
+}
+
+// TestAuditCommit_HeadAndDirty pins the real-repo path: a committed tree
+// yields the short HEAD hash, and uncommitted changes append -dirty.
+func TestAuditCommit_HeadAndDirty(t *testing.T) {
+	gitBin, err := exec.LookPath("git")
+	if err != nil {
+		t.Skip("git not available")
+	}
+	run := func(dir string, args ...string) string {
+		cmd := exec.Command(gitBin, args...)
+		cmd.Dir = dir
+		cmd.Env = append(os.Environ(), "GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@t", "GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@t")
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("git %v: %v\n%s", args, err, out)
+		}
+
+		return string(out)
+	}
+	dir := t.TempDir()
+	run(dir, "init", "-q", "-b", "main")
+	if got := auditCommit(dir); got != "working-tree" {
+		t.Fatalf("repo without commits must fall back, got %q", got)
+	}
+	os.WriteFile(filepath.Join(dir, "seed.txt"), []byte("x"), 0o644)
+	run(dir, "add", ".")
+	run(dir, "commit", "-q", "-m", "seed")
+	head := strings.TrimSpace(run(dir, "rev-parse", "--short", "HEAD"))
+	if got := auditCommit(dir); got != head {
+		t.Fatalf("want clean-repo hash %q, got %q", head, got)
+	}
+	os.WriteFile(filepath.Join(dir, "extra.txt"), []byte("y"), 0o644)
+	if got := auditCommit(dir); got != head+"-dirty" {
+		t.Fatalf("want dirty marker %q, got %q", head+"-dirty", got)
 	}
 }
