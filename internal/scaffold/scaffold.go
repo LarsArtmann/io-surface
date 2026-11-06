@@ -38,10 +38,11 @@ const Dir = "docs/architecture/io-surface"
 // feeds the audit provenance line.
 func Files(root string, sites []*extract.Site, date string) map[string][]byte {
 	return map[string][]byte{
-		"schema.cue":   schemaCUE,
-		"facts.cue":    factsCUE(sites, date, auditCommit(root)),
-		"claims.cue":   claimsCUE(),
-		"baseline.cue": baselineCUE(),
+		"schema.cue":       schemaCUE,
+		"facts.cue":        factsCUE(sites, date, auditCommit(root)),
+		"claims.cue":       claimsCUE(),
+		"baseline.cue":     baselineCUE(),
+		"capabilities.cue": capabilitiesCUE(),
 	}
 }
 
@@ -176,6 +177,21 @@ func baselineCUE() []byte {
 package io_surface
 
 baseline: []
+`)
+}
+
+// capabilitiesCUE renders the empty capability-facts file. It is the one file
+// `absorb` owns: reachability facts are mechanical (engine-derived), so they
+// live apart from the human-owned claims and baseline.
+func capabilitiesCUE() []byte {
+	return []byte(`// capabilities.cue — reachability facts observed by an external engine.
+//
+// Written ONLY by ` + "`io-surface absorb`" + ` (from pinned Capslock output);
+// never hand-edit locations, and never let another tool touch this file.
+// Advisory tier: capability findings never fail the gate by themselves.
+package io_surface
+
+capabilities: []
 `)
 }
 
