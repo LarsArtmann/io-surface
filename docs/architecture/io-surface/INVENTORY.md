@@ -25,8 +25,8 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —        | —       | —          |
 | `internal/extract.extractor.parseFile` | `internal/extract/extract.go:276`   | —        | —       | —          |
 | `internal/extract.extractor.walk`      | `internal/extract/extract.go:237`   | —        | —       | —          |
-| `internal/manifest.Load`               | `internal/manifest/manifest.go:121` | —        | —       | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:297` | —        | —       | —          |
+| `internal/manifest.Load`               | `internal/manifest/manifest.go:147` | —        | —       | —          |
+| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:334` | —        | —       | —          |
 
 ## `file-write` (3)
 
@@ -34,7 +34,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | -------------------------- | ---------------------------------- | -------- | ------- | ---------- |
 | `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:165`   | —        | —       | —          |
 | `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:158`   | —        | —       | —          |
-| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:55` | —        | —       | —          |
+| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:56` | —        | —       | —          |
 
 ## `embed` (1)
 
@@ -46,7 +46,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                    | Location                            | Resource | Trigger | Discipline |
 | ----------------------- | ----------------------------------- | -------- | ------- | ---------- |
-| `internal/scaffold.git` | `internal/scaffold/scaffold.go:205` | —        | —       | —          |
+| `internal/scaffold.git` | `internal/scaffold/scaffold.go:221` | —        | —       | —          |
 
 ## Deliberately out of scope
 
