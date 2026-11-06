@@ -6,6 +6,7 @@ package extract
 // editing these maps plus a testdata fixture row, never control flow.
 
 import (
+	"maps"
 	"os"
 	"path/filepath"
 )
@@ -66,12 +67,8 @@ type Options struct {
 // Extract walks root and returns sites ordered by ID.
 func Extract(root string, opts Options) ([]*Site, error) {
 	seams := make(map[string]string, len(seamIdent)+len(opts.Seams))
-	for ident, fam := range seamIdent {
-		seams[ident] = fam
-	}
-	for ident, fam := range opts.Seams {
-		seams[ident] = fam
-	}
+	maps.Copy(seams, seamIdent)
+	maps.Copy(seams, opts.Seams)
 	e := &extractor{root: root, sites: map[string]*Site{}, seams: seams, seamDecls: map[string]map[string]string{}}
 	dirs := opts.Dirs
 	if len(dirs) == 0 {
