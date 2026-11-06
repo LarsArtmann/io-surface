@@ -7,6 +7,7 @@ stayed open. Newest first. A report is history — it is never updated to stay
 
 | Report                                                                              | One-line summary                                                                               |
 | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `2026-11-06_21-30_unified-gate-execution-whole-todo-run-and-self-review.md`         | Whole-TODO run: v0.2.0 shipped, provider fleet-live, self-review with tag-audit finding        |
 | `2026-11-06_14-25_fleet-io-surface-distribution.md`                                 | First fleet run through the BuildFlow provider; 7/8 Go repos clean, InboxClean 3 real findings |
 | `2026-11-06_08-21_unified-capabilities-shipped-t20-inflight.md`                     | Capabilities end-to-end shipped and dogfooded; T20 (extractor families) in flight              |
 | `2026-11-06_07-59_gate-failure-triage-and-ci-bar-verification.md`                   | Gate failure triage and what the CI bar actually verifies                                      |
