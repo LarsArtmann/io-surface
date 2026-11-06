@@ -26,8 +26,8 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —                           | —                                 | —          |
 | `internal/extract.extractor.parseFile` | `internal/extract/extract.go:279`   | —                           | —                                 | —          |
 | `internal/extract.extractor.walk`      | `internal/extract/extract.go:240`   | —                           | —                                 | —          |
-| `internal/manifest.Load`               | `internal/manifest/manifest.go:147` | —                           | —                                 | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:334` | —                           | —                                 | —          |
+| `internal/manifest.Load`               | `internal/manifest/manifest.go:170` | —                           | —                                 | —          |
+| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:358` | —                           | —                                 | —          |
 
 ### Judgments
 
@@ -37,9 +37,9 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                       | Location                           | Resource                                   | Trigger                       | Discipline |
 | -------------------------- | ---------------------------------- | ------------------------------------------ | ----------------------------- | ---------- |
-| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:241`   | —                                          | —                             | —          |
-| `cmd/io-surface.runAbsorb` | `cmd/io-surface/commands.go:155`   | Capslock JSON report passed via --capslock | every `io-surface absorb` run | bounded    |
-| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:234`   | —                                          | —                             | —          |
+| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:255`   | —                                          | —                             | —          |
+| `cmd/io-surface.runAbsorb` | `cmd/io-surface/commands.go:169`   | Capslock JSON report passed via --capslock | every `io-surface absorb` run | bounded    |
+| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:248`   | —                                          | —                             | —          |
 | `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:56` | —                                          | —                             | —          |
 
 ### Judgments
@@ -57,7 +57,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | Site                      | Location                            | Resource                                        | Trigger                                           | Discipline |
 | ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- |
 | `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          |
-| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:221` | —                                               | —                                                 | —          |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:223` | —                                               | —                                                 | —          |
 
 ### Judgments
 
