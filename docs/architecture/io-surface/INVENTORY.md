@@ -10,11 +10,12 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 ## Taxonomy at a glance
 
-| Family       | Sites | Claimed | With rationale |
-| ------------ | ----: | ------: | -------------: |
-| `file-read`  |     6 |       0 |              0 |
-| `file-write` |     3 |       0 |              0 |
-| `embed`      |     1 |       0 |              0 |
+| Family           | Sites | Claimed | With rationale |
+| ---------------- | ----: | ------: | -------------: |
+| `file-read`      |     6 |       0 |              0 |
+| `file-write`     |     3 |       0 |              0 |
+| `embed`          |     1 |       0 |              0 |
+| `ipc-subprocess` |     1 |       0 |              0 |
 
 ## `file-read` (6)
 
@@ -25,7 +26,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/extract.extractor.parseFile` | `internal/extract/extract.go:276`   | —        | —       | —          |
 | `internal/extract.extractor.walk`      | `internal/extract/extract.go:237`   | —        | —       | —          |
 | `internal/manifest.Load`               | `internal/manifest/manifest.go:116` | —        | —       | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:190` | —        | —       | —          |
+| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:295` | —        | —       | —          |
 
 ## `file-write` (3)
 
@@ -33,13 +34,19 @@ CI fails when this block goes stale (`render --doc … --check`).
 | -------------------------- | ---------------------------------- | -------- | ------- | ---------- |
 | `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:165`   | —        | —       | —          |
 | `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:158`   | —        | —       | —          |
-| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:53` | —        | —       | —          |
+| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:55` | —        | —       | —          |
 
 ## `embed` (1)
 
 | Site                          | Location                           | Resource | Trigger | Discipline |
 | ----------------------------- | ---------------------------------- | -------- | ------- | ---------- |
-| `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:29` | —        | —       | —          |
+| `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:30` | —        | —       | —          |
+
+## `ipc-subprocess` (1)
+
+| Site                    | Location                            | Resource | Trigger | Discipline |
+| ----------------------- | ----------------------------------- | -------- | ------- | ---------- |
+| `internal/scaffold.git` | `internal/scaffold/scaffold.go:205` | —        | —       | —          |
 
 ## Deliberately out of scope
 
