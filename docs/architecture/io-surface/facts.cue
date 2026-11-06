@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "410ce52-dirty"
+	commit: "5a6c289-dirty"
 	date:   "2026-11-06"
 	claims: 20
 	method: "io-surface extract (AST, stdlib-only)"

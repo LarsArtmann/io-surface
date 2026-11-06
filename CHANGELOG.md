@@ -22,6 +22,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Unified I/O insights (io-surface/v1.1, advisory):** the manifest gains a
+  `capabilities` section — per-package reachability sets (`direct` through the
+  package's own code, `deep` including transitive dependency paths) observed by
+  a pinned external engine (Google Capslock), plus a `capabilityAudit`
+  provenance block and an optional manifest `version` field. The closed
+  vocabulary (`FILES`/`NETWORK`/`EXEC`) and the capability→families mapping
+  live in exactly one place (`internal/capability`); runtime-power
+  capabilities stay out-of-scope (ROADMAP Q5). New `io-surface absorb`
+  command: folds a Capslock JSON report into per-package sets and writes
+  `capabilities.cue` — that file ONLY (claims, baseline and facts are never
+  machine-written); `--check` reports advisory drift
+  (`io-surface/capability-drift`) and never exits 1. New gate rule
+  `io-surface/shadow-capability` (info): a package whose reachability facts
+  name an I/O class no declared site covers. The hermetic gate never runs the
+  engine — capabilities enter only through `absorb`. Evidence for the design:
+  the v0.3.4 blind-spot run (`docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md`)
+  — 10/11 real direct sinks were already declared; Capslock false-positive
+  classes are why the tier is advisory.
 - SARIF output: `check --format sarif` emits SARIF 2.1.0 via the house
   `go-finding` library (rule IDs and severities pass through unchanged, so
   GitHub renders them natively); CI uploads the self-hosted SARIF as an
