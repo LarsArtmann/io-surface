@@ -124,6 +124,19 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   enums in `internal/scaffold/schema.cue`, the `Families`/`Disciplines` vars in
   `internal/manifest/manifest.go`, and README prose. A new family is a schema
   version bump, not a casual edit.
+- The capability vocabulary exists in TWO places that must not drift: the
+  `#CapabilityName` CUE enum in `internal/scaffold/schema.cue` and the
+  closed enum + capability→families mapping in `internal/capability`. The Go
+  package is the single-source mapping — rules and absorb derive from it.
+  New capability names = schema version bump + ROADMAP Q5 decision.
+- `capabilities.cue` is written ONLY by `absorb`; the hermetic gate never
+  runs the reachability engine (check reads the manifest, never engine
+  artifacts — `capability-drift` is emitted by `absorb --check`, not by
+  `check`). Capslock in CI is installed with the repo's own Go toolchain:
+  a version-skewed analyzer fails to type-check the target's stdlib.
+  Schema copies (`internal/scaffold/schema.cue` ↔
+  `docs/architecture/io-surface/schema.cue`) must stay byte-identical;
+  `init --force` never refreshes them, so a schema change updates both by hand.
 - Rule constants in `internal/check/check.go` (`RuleUndeclared`, …) are a
   stable contract — they become SARIF ruleIds and suppression keys; renaming
   one is a breaking change.
