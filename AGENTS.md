@@ -87,7 +87,7 @@ either `internal/scaffold` (`init`: write snapshot) or `internal/check`
 
 | Package             | Role                                                                                                                                                                                                  |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cmd/io-surface`    | Thin CLI. Exit codes: 0 clean, 1 gate findings, 2 usage/internal (via `errFindings` sentinel). Version const lives here.                                                                              |
+| `cmd/io-surface`    | cmdguard-wired CLI: `NewApp` + batteries, typed flag structs (`commands.go`), handlers keep the exact output contract. Exit codes: 0 clean, 1 gate findings (`errFindings`), 2 usage/internal (`exitCode` in `main.go`). Version const lives here. |
 | `internal/extract`  | Hermetic AST walker (`go/parser` + `ast.Inspect`, deliberately NO `go/packages`, no network) so it runs in a Nix sandbox with `GOPROXY=off`.                                                          |
 | `internal/manifest` | Loads the CUE package in-process (no `cue` binary needed). `Load` doubles as constraint enforcement: a non-empty `violations` list fails CUE unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`. |
 | `internal/check`    | The bidirectional gate. 8 rules; buckets declared IDs and extracted sites by canonical group; pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`).                                     |
@@ -146,9 +146,11 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
 - `internal/scaffold`'s test is the round-trip proof: copy fixture → extract →
   scaffold → `manifest.Load` → `check.Run` → `render.Markdown`, and the check
   must be green (green-by-construction guarantee).
-- **No direct tests** exist for `cmd/io-surface`, `internal/manifest`, and
-  `internal/render` (0% direct coverage; only exercised via scaffold's test) —
-  known gap, tracked in TODO_LIST.
+- `cmd/io-surface` has direct e2e tests (`main_test.go`): every test drives
+  the real cmdguard execution via `runApp` (flag structs, parsing, handlers)
+  with a swappable `stdout` sink, plus the `exitCode` 0/1/2 table. **No direct
+  tests** exist for `internal/manifest` and `internal/render` (only exercised
+  via scaffold's test) — known gap, tracked in TODO_LIST.
 - Table-driven stdlib tests, no external test framework, no mocks (the tool is
   hermetic; keep it that way).
 

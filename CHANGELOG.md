@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The CLI is now built with **cmdguard v4** (`github.com/larsartmann/cmdguard/v4`):
+  commands and flags are typed structs, help and errors render through
+  cmdguard/fang (actionable hints, typo suggestions), and the auto-registered
+  `version`, `doctor`, and hidden `describe` commands join the surface. The
+  user-facing contract is unchanged: same commands, same flags, same exit
+  codes (`0` clean / `1` gate findings / `2` usage or internal), same
+  text/JSON/SARIF output bytes; `io-surface version` still prints
+  `io-surface <version>`. New: `io-surface doctor` (DI/config health, trivially
+  green) and `io-surface describe --output json` (machine-readable CLI
+  contract).
+
 ### Added
 
 - SARIF output: `check --format sarif` emits SARIF 2.1.0 via the house
