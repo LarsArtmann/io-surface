@@ -35,14 +35,15 @@ import (
 // Rule identifiers. These are stable: they become SARIF ruleIds and
 // suppression keys, so renaming one is a breaking change.
 const (
-	RuleUndeclared      = "io-surface/undeclared-site"
-	RuleStaleClaim      = "io-surface/stale-claim"
-	RuleIDDrift         = "io-surface/id-drift"
-	RuleLocationDrift   = "io-surface/location-drift"
-	RuleMissingLocation = "io-surface/missing-location"
-	RuleExtractionBlind = "io-surface/extraction-blind"
-	RuleWeakSite        = "io-surface/weak-site"
-	RuleAmbiguousMatch  = "io-surface/ambiguous-match"
+	RuleUndeclared         = "io-surface/undeclared-site"
+	RuleStaleClaim         = "io-surface/stale-claim"
+	RuleIDDrift            = "io-surface/id-drift"
+	RuleLocationDrift      = "io-surface/location-drift"
+	RuleMissingLocation    = "io-surface/missing-location"
+	RuleExtractionBlind    = "io-surface/extraction-blind"
+	RuleWeakSite           = "io-surface/weak-site"
+	RuleAmbiguousMatch     = "io-surface/ambiguous-match"
+	RuleManifestValidation = "io-surface/manifest-validation"
 )
 
 // Severity of a finding.
@@ -100,6 +101,26 @@ type Options struct {
 type bucket struct {
 	declared  []string
 	extracted []*extract.Site
+}
+
+// ValidationReport builds the report for a manifest that failed Validate.
+// Extraction is skipped on purpose: an invalid manifest must not be gated,
+// it must be fixed — but the caller still gets a full report so machine
+// consumers (CI, SARIF) see one uniform shape for every gate outcome.
+func ValidationReport(m *manifest.Manifest, errs []error) *Report {
+	rep := &Report{}
+	rep.Stats.Declared = len(m.Sites)
+	for _, e := range errs {
+		rep.add(Finding{
+			Rule:     RuleManifestValidation,
+			Severity: SeverityError,
+			ID:       "manifest",
+			Location: m.Dir,
+			Message:  e.Error(),
+		})
+	}
+
+	return rep
 }
 
 // Run extracts the tree under root and compares it against the manifest.

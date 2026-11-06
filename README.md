@@ -69,6 +69,11 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
 
+With `--json`, every gate outcome — clean, findings, or a manifest that fails
+validation (rule `io-surface/manifest-validation`) — is a machine-parseable
+report on stdout: `{"stats": {...}, "findings": [...]}`. Usage/internal
+errors (exit 2) are not gate results and print to stderr.
+
 ## Findings
 
 | Rule               | Severity  | Meaning                                                                                                            |
