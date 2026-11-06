@@ -114,12 +114,19 @@ func newApp() (*v4.CLI[rootFlags], error) {
 				return err
 			}
 
-			baselineCmd, err := v4.NewCommand("baseline", baselineAddFlags{}, runBaselineAdd,
-				v4.WithShort("Grandfather one undeclared site: baseline add <id> --note \"why\""),
+			baselineAddCmd, err := v4.NewCommand("add", baselineAddFlags{}, runBaselineAdd,
+				v4.WithShort("Grandfather one undeclared site: add <id> --note \"why\""),
 				v4.WithLong("Appends {id, note, date} to baseline.cue — the machine's only sanctioned write into a judgment file, "+
 					"surgical insertion with comments preserved. Refuses duplicates and empty notes; warns when the ID does not extract today. "+
 					"The baseline only shrinks: every entry needs a reason and a date."),
 				v4.WithExample("io-surface baseline add cmd/tool.LegacyPath --note \"removed next quarter\" --date 2026-12-01"),
+			)
+			if err != nil {
+				return err
+			}
+			baselineCmd, err := v4.NewParentCommand[rootFlags, baselineAddFlags]("baseline", "Grandfather undeclared sites (the baseline only shrinks).", baselineAddFlags{},
+				v4.WithShort("Grandfather undeclared sites"),
+				v4.WithSubcommands(baselineAddCmd),
 			)
 			if err != nil {
 				return err

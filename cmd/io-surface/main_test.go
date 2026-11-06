@@ -446,3 +446,73 @@ func TestRunAbsorb_MissingCapslockFlag(t *testing.T) {
 		t.Errorf("usage error exit class = %d, want 2", exitCode(err))
 	}
 }
+
+// TestRunBaselineAdd pins the #22 contract end to end: the command appends a
+// note+date entry to baseline.cue (the machine's only sanctioned judgment-file
+// write), the suppressed site drops out of the gate, duplicates are refused,
+// and a noteless call is a usage error — the baseline only shrinks because
+// every entry must carry its reason.
+func TestRunBaselineAdd(t *testing.T) {
+	root := t.TempDir()
+	scaffoldFixture(t, root)
+
+	// Plant an undeclared resolved site to grandfather.
+	late := filepath.Join(root, "internal", "store", "late.go")
+	if err := os.WriteFile(late, []byte("package store\n\nimport \"os\"\n\nfunc Late() ([]byte, error) {\n\treturn os.ReadFile(\"late.bin\")\n}\n"), 0o644); err != nil {
+		t.Fatalf("plant undeclared site: %v", err)
+	}
+
+	t.Run("noteless call is a usage error", func(t *testing.T) {
+		if _, err := runApp(t, "baseline", "add", "--root", root, "internal/store.Late"); err == nil {
+			t.Fatal("--note is required")
+		}
+	})
+
+	t.Run("appends and suppresses", func(t *testing.T) {
+		out, err := runApp(t, "baseline", "add", "--root", root, "internal/store.Late", "--note", "tracked in T-next", "--date", "2026-12-01")
+		if err != nil {
+			t.Fatalf("baseline add: %v", err)
+		}
+		if !strings.Contains(out, "internal/store.Late") {
+			t.Errorf("confirmation lost the ID: %s", out)
+		}
+		raw, rErr := os.ReadFile(filepath.Join(root, scaffold.Dir, "baseline.cue"))
+		if rErr != nil {
+			t.Fatalf("read baseline: %v", rErr)
+		}
+		text := string(raw)
+		for _, want := range []string{"internal/store.Late", "tracked in T-next", "2026-12-01"} {
+			if !strings.Contains(text, want) {
+				t.Errorf("baseline.cue lost %q", want)
+			}
+		}
+		if !strings.Contains(text, "// baseline.cue — grandfathered") {
+			t.Error("the surgical write must preserve the file's comments")
+		}
+
+		// The gate is green again: the entry suppresses the site.
+		if _, err := runApp(t, "check", "--root", root); err != nil {
+			t.Errorf("check after baselining = %v, want clean", err)
+		}
+	})
+
+	t.Run("duplicate is refused", func(t *testing.T) {
+		_, err := runApp(t, "baseline", "add", "--root", root, "internal/store.Late", "--note", "again")
+		if err == nil {
+			t.Fatal("duplicate entry must fail")
+		}
+		if !strings.Contains(err.Error(), "already baselined") {
+			t.Errorf("error should name the duplicate: %v", err)
+		}
+	})
+
+	t.Run("unknown ID warns but lands", func(t *testing.T) {
+		out, err := runApp(t, "baseline", "add", "--root", root, "ghostpkg.Missing", "--note", "future site")
+		if err != nil {
+			t.Fatalf("unknown ID must still land: %v", err)
+		}
+		if !strings.Contains(out, "suppresses nothing") {
+			t.Errorf("missing advisory warning: %s", out)
+		}
+	})
+}
