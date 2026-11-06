@@ -1,5 +1,6 @@
-// Package manifest loads an io-surface/v1 CUE manifest package: schema, facts,
-// claims, disciplines, baseline, scope.
+// Package manifest loads an io-surface CUE manifest package (io-surface/v1
+// and v1.1): schema, facts, claims, disciplines, baseline, scope, and — since
+// v1.1 — the engine-derived capabilities section.
 //
 // The load is in-process (cuelang.org/go), so the checker needs no `cue` binary
 // at runtime and stays hermetic in a sandbox. Loading doubles as constraint
@@ -15,6 +16,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/larsartmann/io-surface/internal/capability"
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
@@ -90,6 +92,30 @@ type Manifest struct {
 	Scope    Scope
 	Sites    map[string]Site
 	Baseline []BaselineEntry
+	// Version is the declared contract version ("" in v1 manifests).
+	Version string
+	// Capabilities are the v1.1 reachability facts (nil when absent).
+	Capabilities []Capability
+	// CapabilityAudit is the provenance of the last absorb run (nil when the
+	// manifest carries no capabilities yet).
+	CapabilityAudit *CapabilityAudit
+}
+
+// Capability is one package's reachability set observed by the external
+// engine. Deep is always a superset of Direct: deep includes transitive
+// dependency paths, direct only the package's own code.
+type Capability struct {
+	Pkg    string   `json:"pkg"`
+	Direct []string `json:"direct"`
+	Deep   []string `json:"deep"`
+}
+
+// CapabilityAudit records which engine run produced the capabilities.
+type CapabilityAudit struct {
+	Engine  string `json:"engine"`
+	Version string `json:"version"`
+	Commit  string `json:"commit"`
+	Date    string `json:"date"`
 }
 
 // ids returns the declared site IDs, sorted.
@@ -164,6 +190,17 @@ func Load(dir string) (*Manifest, error) {
 	}
 	if err = value.LookupPath(cue.ParsePath("baseline")).Decode(&m.Baseline); err != nil {
 		m.Baseline = nil
+	}
+	// v1.1 sections are optional: a v1 manifest loads unchanged.
+	_ = value.LookupPath(cue.ParsePath("version")).Decode(&m.Version)
+	if err = value.LookupPath(cue.ParsePath("capabilities")).Decode(&m.Capabilities); err != nil {
+		m.Capabilities = nil
+	}
+	var capAudit CapabilityAudit
+	if err = value.LookupPath(cue.ParsePath("capabilityAudit")).Decode(&capAudit); err != nil {
+		m.CapabilityAudit = nil
+	} else {
+		m.CapabilityAudit = &capAudit
 	}
 
 	return m, nil
@@ -298,7 +335,54 @@ func (m *Manifest) Validate() []error {
 		errs = append(errs, fmt.Errorf("%s: no schema.cue (is this an io-surface package?)", m.Dir))
 	}
 
+	errs = append(errs, m.validateCapabilities()...)
+
 	return errs
+}
+
+// validateCapabilities enforces the v1.1 invariants Go must hold even when an
+// older schema.cue (without the closed enum) would let bad data unify: names
+// inside the closed vocabulary, deep ⊇ direct, and one entry per package.
+func (m *Manifest) validateCapabilities() []error {
+	var errs []error
+	seen := map[string]bool{}
+	for _, c := range m.Capabilities {
+		if c.Pkg == "" {
+			errs = append(errs, fmt.Errorf("capabilities: empty pkg"))
+		}
+		if seen[c.Pkg] {
+			errs = append(errs, fmt.Errorf("capabilities: duplicate pkg %q", c.Pkg))
+		}
+		seen[c.Pkg] = true
+		deep := map[string]bool{}
+		for _, n := range c.Deep {
+			if !capability.Valid(n) {
+				errs = append(errs, fmt.Errorf("capabilities %s: unknown capability %q", c.Pkg, n))
+			}
+			deep[n] = true
+		}
+		for _, n := range c.Direct {
+			if !deep[n] {
+				errs = append(errs, fmt.Errorf("capabilities %s: direct %q missing from deep", c.Pkg, n))
+			}
+			if !capability.Valid(n) {
+				errs = append(errs, fmt.Errorf("capabilities %s: unknown capability %q", c.Pkg, n))
+			}
+		}
+	}
+
+	return errs
+}
+
+// CapabilityFor returns the reachability set for pkg, or nil.
+func (m *Manifest) CapabilityFor(pkg string) *Capability {
+	for i := range m.Capabilities {
+		if m.Capabilities[i].Pkg == pkg {
+			return &m.Capabilities[i]
+		}
+	}
+
+	return nil
 }
 
 // CountByFamily returns site counts per family (declared view).
