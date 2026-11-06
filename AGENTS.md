@@ -3,8 +3,10 @@
 `io-surface` is the I/O surface manifest gate: a Go CLI that extracts every I/O
 call site from a Go tree via a stdlib-only AST walk, compares it against a CUE
 manifest, and fails the build on I/O nobody documented. Single Go module
-(`go 1.27`), one external dependency (`cuelang.org/go`), no `flake.nix`
-(deliberately withheld — status report §g-Q2), no Makefile/justfile.
+(`go 1.27`), three direct dependencies (`cuelang.org/go` for the manifest,
+`cmdguard/v4` for the CLI, `go-finding` for SARIF — the gate core
+`internal/extract` itself stays stdlib-only), no `flake.nix` (deliberately
+withheld — status report §g-Q2), no Makefile/justfile.
 
 `README.md` documents the tool for users. This file documents the repo for
 agents working ON the tool.
