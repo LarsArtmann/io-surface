@@ -16,10 +16,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/larsartmann/io-surface/internal/capability"
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
+	"github.com/larsartmann/io-surface/internal/capability"
 )
 
 // Families is the io-surface/v1 taxonomy. A site has exactly one.
