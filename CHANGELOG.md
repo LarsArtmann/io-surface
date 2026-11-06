@@ -17,8 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   codes (`0` clean / `1` gate findings / `2` usage or internal), same
   text/JSON/SARIF output bytes; `io-surface version` still prints
   `io-surface <version>`. New: `io-surface doctor` (DI/config health, trivially
-  green) and `io-surface describe --output json` (machine-readable CLI
-  contract).
+  green) and `io-surface describe` (machine-readable CLI
+  contract, JSON).
 
 ### Added
 

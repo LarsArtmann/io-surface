@@ -102,16 +102,16 @@ func displayWidth(s string) int {
 func runeWidth(r rune) int {
 	switch {
 	case r >= 0x1100 && r <= 0x115F, // Hangul Jamo
-		r >= 0x2E80 && r <= 0x303E, // CJK radicals, Kangxi, CJK symbols
-		r >= 0x3041 && r <= 0x33FF, // Hiragana through CJK compatibility
-		r >= 0x3400 && r <= 0x4DBF, // CJK extension A
-		r >= 0x4E00 && r <= 0x9FFF, // CJK unified ideographs
-		r >= 0xA000 && r <= 0xA4CF, // Yi syllables and radicals
-		r >= 0xAC00 && r <= 0xD7A3, // Hangul syllables
-		r >= 0xF900 && r <= 0xFAFF, // CJK compatibility ideographs
-		r >= 0xFE30 && r <= 0xFE4F, // CJK compatibility forms
-		r >= 0xFF00 && r <= 0xFF60, // fullwidth forms
-		r >= 0xFFE0 && r <= 0xFFE6, // fullwidth signs
+		r >= 0x2E80 && r <= 0x303E,   // CJK radicals, Kangxi, CJK symbols
+		r >= 0x3041 && r <= 0x33FF,   // Hiragana through CJK compatibility
+		r >= 0x3400 && r <= 0x4DBF,   // CJK extension A
+		r >= 0x4E00 && r <= 0x9FFF,   // CJK unified ideographs
+		r >= 0xA000 && r <= 0xA4CF,   // Yi syllables and radicals
+		r >= 0xAC00 && r <= 0xD7A3,   // Hangul syllables
+		r >= 0xF900 && r <= 0xFAFF,   // CJK compatibility ideographs
+		r >= 0xFE30 && r <= 0xFE4F,   // CJK compatibility forms
+		r >= 0xFF00 && r <= 0xFF60,   // fullwidth forms
+		r >= 0xFFE0 && r <= 0xFFE6,   // fullwidth signs
 		r >= 0x20000 && r <= 0x3FFFD: // extensions B and beyond
 		return 2
 	default:
