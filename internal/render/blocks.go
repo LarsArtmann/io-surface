@@ -34,7 +34,7 @@ func ApplyToDoc(doc string, m *manifest.Manifest) (string, error) {
 		return "", err
 	}
 
-	return doc[:start] + BeginMarker + "\n" + Block(m) + doc[end:], nil
+	return doc[:start] + BeginMarker + "\n\n" + Block(m) + doc[end:], nil
 }
 
 // CheckDoc reports whether the generated block in doc matches a fresh render

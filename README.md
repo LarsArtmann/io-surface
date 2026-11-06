@@ -41,6 +41,9 @@ go install github.com/larsartmann/io-surface/cmd/io-surface@latest
 
 No `cue` binary is needed at runtime: the manifest is loaded in-process with
 `cuelang.org/go`. `cue` is only for hand-editing CUE (the `cue fmt` habit).
+The CLI itself is built with [cmdguard](https://github.com/LarsArtmann/cmdguard)
+(typed flags, styled help and errors, hint-rendered failures); the AST walk
+that powers the gate stays stdlib-only and hermetic.
 
 ## 60-second adoption
 
@@ -67,6 +70,7 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 | `io-surface render [--root] [--out FILE]`                                                              | Render the inventory markdown from the manifest (claims-aware)                                           |
 | `io-surface render --doc FILE [--check]`                                                               | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                    |
 | `io-surface extract [--root] [--include-tests]`                                                        | Print the raw extraction as JSON (debugging, counts)                                                     |
+| `io-surface version` / `doctor` / `describe`                                                           | cmdguard-provided: version line, DI/config health, hidden machine-readable CLI contract (`describe --output json`) |
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
 

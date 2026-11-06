@@ -10,6 +10,7 @@ package render
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -35,8 +36,10 @@ func Markdown(m *manifest.Manifest) string {
 func sections(m *manifest.Manifest) string {
 	var b strings.Builder
 	b.WriteString("## Taxonomy at a glance\n\n")
-	b.WriteString("| Family | Sites | Claimed | With rationale |\n")
-	b.WriteString("| --- | ---: | ---: | ---: |\n")
+	tax := newTable(
+		[]string{"Family", "Sites", "Claimed", "With rationale"},
+		[]bool{false, true, true, true},
+	)
 	counts := m.CountByFamily()
 	claimed := map[string]int{}
 	rationale := map[string]int{}
@@ -53,8 +56,9 @@ func sections(m *manifest.Manifest) string {
 		if n == 0 {
 			continue
 		}
-		fmt.Fprintf(&b, "| `%s` | %d | %d | %d |\n", fam, n, claimed[fam], rationale[fam])
+		tax.row("`"+fam+"`", strconv.Itoa(n), strconv.Itoa(claimed[fam]), strconv.Itoa(rationale[fam]))
 	}
+	b.WriteString(tax.render())
 	b.WriteString("\n")
 
 	byFamily := map[string][]string{}
@@ -68,8 +72,10 @@ func sections(m *manifest.Manifest) string {
 		}
 		sort.Strings(ids)
 		fmt.Fprintf(&b, "## `%s` (%d)\n\n", fam, len(ids))
-		b.WriteString("| Site | Location | Resource | Trigger | Discipline |\n")
-		b.WriteString("| --- | --- | --- | --- | --- |\n")
+		sites := newTable(
+			[]string{"Site", "Location", "Resource", "Trigger", "Discipline"},
+			make([]bool, 5),
+		)
 		for _, id := range ids {
 			s := m.Sites[id]
 			loc := ""
@@ -80,9 +86,9 @@ func sections(m *manifest.Manifest) string {
 			if len(s.Claims.Discipline) > 0 {
 				disc = strings.Join(s.Claims.Discipline, ", ")
 			}
-			fmt.Fprintf(&b, "| `%s` | %s | %s | %s | %s |\n",
-				id, loc, cell(s.Claims.Resource), cell(s.Claims.Trigger), cell(disc))
+			sites.row("`"+id+"`", loc, cell(s.Claims.Resource), cell(s.Claims.Trigger), cell(disc))
 		}
+		b.WriteString(sites.render())
 		b.WriteString("\n")
 
 		withProse := []string{}

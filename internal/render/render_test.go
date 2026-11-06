@@ -14,6 +14,39 @@ import (
 // update regenerates golden files: go test ./internal/render -update
 var update = flag.Bool("update", false, "rewrite golden files")
 
+// regenInventory refreshes the repo's own inventory doc from the real
+// manifest: go test ./internal/render -regen-inventory
+var regenInventory = flag.Bool("regen-inventory", false, "rewrite docs/architecture/io-surface/INVENTORY.md from the manifest")
+
+// TestRegenInventory is the maintenance entry point for the embedded
+// inventory block; without the flag it is a no-op so the suite stays hermetic.
+func TestRegenInventory(t *testing.T) {
+	if !*regenInventory {
+		t.Skip("inventory regen only runs with -regen-inventory")
+	}
+	dir := filepath.Join("..", "..", "docs", "architecture", "io-surface")
+	m, err := manifest.Load(dir)
+	if err != nil {
+		t.Fatalf("load manifest: %v", err)
+	}
+	docPath := filepath.Join(dir, "INVENTORY.md")
+	raw, err := os.ReadFile(docPath)
+	if err != nil {
+		t.Fatalf("read %s: %v", docPath, err)
+	}
+	applied, err := ApplyToDoc(string(raw), m)
+	if err != nil {
+		t.Fatalf("apply to doc: %v", err)
+	}
+	if err := os.WriteFile(docPath, []byte(applied), 0o644); err != nil {
+		t.Fatalf("write %s: %v", docPath, err)
+	}
+	stored, fresh, err := CheckDoc(applied, m)
+	if err != nil || stored != fresh {
+		t.Fatalf("regen did not converge (err=%v)", err)
+	}
+}
+
 // fixtureManifest covers every renderer branch: three populated families (one
 // with full claims prose, one with an exception judgment, one bare), an empty
 // family (embed — must be skipped), and a scope OUT list.

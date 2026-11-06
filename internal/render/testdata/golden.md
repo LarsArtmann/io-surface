@@ -7,17 +7,17 @@
 
 ## Taxonomy at a glance
 
-| Family | Sites | Claimed | With rationale |
-| --- | ---: | ---: | ---: |
-| `file-read` | 1 | 1 | 1 |
-| `file-write` | 1 | 1 | 0 |
-| `database` | 1 | 1 | 0 |
-| `outbound` | 1 | 0 | 0 |
+| Family       | Sites | Claimed | With rationale |
+| ------------ | ----: | ------: | -------------: |
+| `file-read`  |     1 |       1 |              1 |
+| `file-write` |     1 |       1 |              0 |
+| `database`   |     1 |       1 |              0 |
+| `outbound`   |     1 |       0 |              0 |
 
 ## `file-read` (1)
 
-| Site | Location | Resource | Trigger | Discipline |
-| --- | --- | --- | --- | --- |
+| Site                        | Location                    | Resource            | Trigger       | Discipline           |
+| --------------------------- | --------------------------- | ------------------- | ------------- | -------------------- |
 | `internal/store.LoadConfig` | `internal/store/store.go:9` | service config file | process start | read-only, no-secret |
 
 ### Judgments
@@ -26,9 +26,9 @@
 
 ## `file-write` (1)
 
-| Site | Location | Resource | Trigger | Discipline |
-| --- | --- | --- | --- | --- |
-| `internal/store.Save` | `internal/store/store.go:31` | state file | explicit user command | — |
+| Site                  | Location                     | Resource   | Trigger               | Discipline |
+| --------------------- | ---------------------------- | ---------- | --------------------- | ---------- |
+| `internal/store.Save` | `internal/store/store.go:31` | state file | explicit user command | —          |
 
 ### Judgments
 
@@ -36,15 +36,15 @@
 
 ## `database` (1)
 
-| Site | Location | Resource | Trigger | Discipline |
-| --- | --- | --- | --- | --- |
+| Site             | Location             | Resource          | Trigger     | Discipline |
+| ---------------- | -------------------- | ----------------- | ----------- | ---------- |
 | `cmd/app.openDB` | `cmd/app/main.go:24` | local sqlite file | command run | local-only |
 
 ## `outbound` (1)
 
-| Site | Location | Resource | Trigger | Discipline |
-| --- | --- | --- | --- | --- |
-| `cmd/app.fetch` | `cmd/app/main.go:18` | — | — | — |
+| Site            | Location             | Resource | Trigger | Discipline |
+| --------------- | -------------------- | -------- | ------- | ---------- |
+| `cmd/app.fetch` | `cmd/app/main.go:18` | —        | —       | —          |
 
 ## Deliberately out of scope
 
