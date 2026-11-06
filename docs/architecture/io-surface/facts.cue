@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "3b97901-dirty"
+	commit: "6aee67c-dirty"
 	date:   "2026-11-06"
 	claims: 22
 	method: "io-surface extract (AST, stdlib-only)"
@@ -34,8 +34,8 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:263",
 			"cmd/io-surface/commands.go:299",
+			"cmd/io-surface/commands.go:335",
 		]
 		family: "file-write"
 		facts: {
@@ -44,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:177",
-			"cmd/io-surface/commands.go:206",
+			"cmd/io-surface/commands.go:213",
+			"cmd/io-surface/commands.go:242",
 		]
 		family: "file-write"
 		facts: {
@@ -54,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:256",
+			"cmd/io-surface/commands.go:292",
 		]
 		family: "file-write"
 		facts: {
@@ -100,7 +100,7 @@ sites: {
 	}
 	"internal/extract.extractor.parseFile": {
 		location: [
-			"internal/extract/extract.go:324",
+			"internal/extract/extract.go:328",
 		]
 		family: "file-read"
 		facts: {
@@ -109,7 +109,7 @@ sites: {
 	}
 	"internal/extract.extractor.walk": {
 		location: [
-			"internal/extract/extract.go:260",
+			"internal/extract/extract.go:264",
 		]
 		family: "file-read"
 		facts: {
@@ -137,7 +137,7 @@ sites: {
 	}
 	"internal/manifest.Manifest.Validate": {
 		location: [
-			"internal/manifest/manifest.go:358",
+			"internal/manifest/manifest.go:380",
 		]
 		family: "file-read"
 		facts: {

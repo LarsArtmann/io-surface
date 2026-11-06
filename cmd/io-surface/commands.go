@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"runtime/debug"
+
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
@@ -35,6 +37,39 @@ type checkFlags struct {
 
 type initFlags struct {
 	Force bool `flag:"force" help:"refresh facts.cue in an existing manifest (never touches claims/baseline/schema)"`
+}
+
+type versionFlags struct {
+	JSON bool `flag:"json" help:"emit {version, commit, date} as JSON"`
+}
+
+// runVersion keeps the one-line plain output byte-identical (TestExecute_
+// VersionAndUnknownCommand pins it) and adds the --json provenance shape;
+// the consumer command wins over cmdguard's auto-registered one.
+func runVersion(_ context.Context, _ *rootFlags, flags versionFlags) error {
+	if !flags.JSON {
+		fmt.Fprintln(stdout, "io-surface "+version)
+
+		return nil
+	}
+	commit, date := "unknown", "unknown"
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, s := range info.Settings {
+			switch s.Key {
+			case "vcs.revision":
+				if s.Value != "" {
+					commit = s.Value
+				}
+			case "vcs.time":
+				if s.Value != "" {
+					date = s.Value
+				}
+			}
+		}
+	}
+	enc := json.NewEncoder(stdout)
+
+	return enc.Encode(map[string]string{"version": version, "commit": commit, "date": date})
 }
 
 type baselineAddFlags struct {

@@ -138,6 +138,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   on an UNEXPORTED type (`internal/store.ttl.Sweep`) whose dotted ID is
   legal, so the id-form rule's package-dot-only scope can no longer regress
   silently
+- Ambiguous `.Do` token: the method-name heuristic records a `.Do` call
+  site but claims NO family — http.Client.Do, task runners and DB helpers
+  share the name, so the manifest's family is the claim (was: hardcoded
+  `outbound`)
+- `extract --stats`: per-package histogram (sites, resolved/token split,
+  TOTAL) to spot outlier packages in large trees
+- `version --json`: {version, commit, date} from the build info (VCS-stamped
+  builds carry the real values); the plain one-liner is unchanged
+- `baseline add`, `--strict-dirs` and `--allow-unused-baseline` flags,
+  `manifest.Load` decode errors anchored to the manifest directory, a
+  single-dedupe rewrite of the constraint-violation recovery, describe-
+  contract and displayWidth unit tests, and the describe contract now lists
+  `baseline add` as a nested subcommand path
 
 ### Fixed
 
