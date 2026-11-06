@@ -27,6 +27,7 @@ type checkFlags struct {
 	Format   string `flag:"format" help:"output format: text, json, or sarif (--json is shorthand for --format json)"`
 	Advisory bool   `flag:"advisory" default:"true" help:"include weak-tier advisory findings"`
 	Strict   bool   `flag:"strict" help:"treat warnings as failures"`
+	Enforce  bool   `flag:"enforce" help:"fail on errors even when the manifest declares enforcement: audit"`
 }
 
 type initFlags struct {
@@ -99,6 +100,13 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 	}
 
 	if rep.Failing() || (flags.Strict && rep.Stats.Warnings > 0) {
+		if m.EnforcementPolicy() == manifest.EnforcementAudit && !flags.Enforce {
+			fmt.Fprintf(stdout, "io-surface: enforcement: audit — %d error(s) reported but not failing (the manifest records the policy; override with --enforce)\n",
+				rep.Stats.Errors)
+
+			return nil
+		}
+
 		return errFindings
 	}
 

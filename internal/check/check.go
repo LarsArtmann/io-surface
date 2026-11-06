@@ -90,6 +90,11 @@ type Stats struct {
 type Report struct {
 	Stats    Stats     `json:"stats"`
 	Findings []Finding `json:"findings"`
+	// Enforcement is the manifest's recorded gate policy (D4): "gate" or
+	// "audit". Machine consumers read the policy from the report itself, so
+	// an audit-mode run is visible in CI logs and SARIF/JSON output without
+	// re-reading the manifest.
+	Enforcement string `json:"enforcement"`
 }
 
 // Failing reports whether the report blocks a merge (any error-severity
@@ -116,7 +121,7 @@ type bucket struct {
 // it must be fixed — but the caller still gets a full report so machine
 // consumers (CI, SARIF) see one uniform shape for every gate outcome.
 func ValidationReport(m *manifest.Manifest, errs []error) *Report {
-	rep := &Report{}
+	rep := &Report{Enforcement: m.EnforcementPolicy()}
 	rep.Stats.Declared = len(m.Sites)
 	for _, e := range errs {
 		rep.add(Finding{
@@ -138,7 +143,7 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		return nil, fmt.Errorf("extracting %s: %w", root, err)
 	}
 
-	rep := &Report{}
+	rep := &Report{Enforcement: m.EnforcementPolicy()}
 	rep.Stats.Declared = len(m.Sites)
 	rep.Stats.Baselined = len(m.Baseline)
 	rep.Stats.Extracted = len(sites)
