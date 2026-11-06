@@ -62,9 +62,10 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 
 | Command                                                                   | What it does                                                       |
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `io-surface init [--root DIR] [--force]`                                  | Extract the tree and write the CUE package (green by construction) |
+| `io-surface init [--root DIR] [--force]`                                  | Extract the tree and write the CUE package (green by construction; `--force` refreshes `facts.cue` only) |
 | `io-surface check [--root] [--manifest] [--json] [--advisory] [--strict]` | The bidirectional gate (exit 1 on error findings)                  |
 | `io-surface render [--root] [--out FILE]`                                 | Render the inventory markdown from the manifest (claims-aware)     |
+| `io-surface render --doc FILE [--check]`                                  | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift |
 | `io-surface extract [--root] [--include-tests]`                           | Print the raw extraction as JSON (debugging, counts)               |
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
@@ -73,6 +74,28 @@ With `--json`, every gate outcome — clean, findings, or a manifest that fails
 validation (rule `io-surface/manifest-validation`) — is a machine-parseable
 report on stdout: `{"stats": {...}, "findings": [...]}`. Usage/internal
 errors (exit 2) are not gate results and print to stderr.
+
+### Embedding the inventory in a hand-written doc
+
+Wrap any markdown in the `io-surface` markers and the renderer owns only the
+generated section — your prose is never touched:
+
+```markdown
+# Our I/O policy
+
+Hand-written context, review notes, exceptions.
+
+<!-- io-surface:begin -->
+<!-- io-surface:end -->
+```
+
+```bash
+io-surface render --doc docs/architecture/IO.md         # rewrite the block
+io-surface render --doc docs/architecture/IO.md --check # exit 1 when stale
+```
+
+Put the `--check` form in CI and the published inventory can never silently
+go stale; regenerate with the plain form after manifest edits.
 
 ## Findings
 
@@ -169,10 +192,15 @@ of being guessed at.
 contract. Proven against two real repos: a hand-ported 131-site manifest (dnsblockd)
 and a from-scratch 126-site pilot (InboxClean), plus self-hosting.
 
-Next, in order: wire it into the pilot repos as a Nix/BuildFlow check, then a
-facts renderer with BEGIN/END generated blocks, then SARIF emission and the systemd
-hardening generator (the highest-value consumer: `ReadWritePaths` derived from the
-`file-write` family).
+Next, in order: wire it into the pilot repos as a Nix/BuildFlow check, then
+SARIF emission and the systemd hardening generator (the highest-value consumer:
+`ReadWritePaths` derived from the `file-write` family).
+
+Shipped since the tag: `--json` holds for every gate outcome (validation
+failures included), `init --force` can no longer clobber `claims.cue`/
+`baseline.cue`, and the renderer embeds into hand-written docs via BEGIN/END
+markers with a `--check` drift gate — this repository's own inventory doc is
+gated by it in CI.
 
 ## Development
 

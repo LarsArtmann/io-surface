@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `render --doc FILE` embeds the inventory into hand-written markdown between
+  `<!-- io-surface:begin -->` / `<!-- io-surface:end -->` markers, rewriting
+  only the generated block; `--check` exits 1 when the block is stale. This
+  repository's `docs/architecture/io-surface/INVENTORY.md` is gated by it in
+  CI, next to a new facts-freshness gate (`init --force` + diff)
+- Golden test for the renderer (`-update` regenerates), determinism and
+  empty-manifest tests, and first direct tests for the CLI (JSON contract,
+  doc embedding, drift)
 - `path/filepath` extraction (`Walk`/`WalkDir`/`Glob` → `file-read`, resolved
   tier): directory traversal and globbing are now visible I/O. The
   self-dogfood audit found the extractor's own `filepath.Walk` invisible to
