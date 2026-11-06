@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -29,6 +31,52 @@ func scaffoldFixture(t *testing.T, root string) {
 	}
 }
 
+// runApp drives a real cmdguard execution against the wired CLI and returns
+// what the command wrote to the output sink. Every CLI test goes through
+// this seam: flag structs, cmdguard parsing, and the handler all run — only
+// the bytes land in a buffer instead of the terminal.
+func runApp(t *testing.T, args ...string) (string, error) {
+	t.Helper()
+
+	app, err := newApp()
+	if err != nil {
+		t.Fatalf("newApp: %v", err)
+	}
+
+	sink := &bytes.Buffer{}
+	stdout = sink
+	t.Cleanup(func() { stdout = os.Stdout })
+
+	err = app.ExecuteWithArgs(context.Background(), args)
+
+	return sink.String(), err
+}
+
+func TestExitCode(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name string
+		err  error
+		want int
+	}{
+		{"clean", nil, 0},
+		{"findings", errFindings, 1},
+		{"wrapped findings", fmt.Errorf("checking: %w", errFindings), 1},
+		{"usage", errors.New("unknown command"), 2},
+		{"internal", os.ErrNotExist, 2},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			if got := exitCode(tc.err); got != tc.want {
+				t.Errorf("exitCode(%v) = %d, want %d", tc.err, got, tc.want)
+			}
+		})
+	}
+}
+
 // TestRunCheck_ValidationFailureEmitsJSON is the machine-contract proof: a
 // manifest that fails validation must produce a parseable JSON report on
 // stdout (rule io-surface/manifest-validation, error severity, exit 1) —
@@ -40,15 +88,14 @@ func TestRunCheck_ValidationFailureEmitsJSON(t *testing.T) {
 		t.Fatalf("remove schema.cue: %v", err)
 	}
 
-	var out bytes.Buffer
-	err := runCheck([]string{"--root", root, "--json"}, &out)
+	out, err := runApp(t, "check", "--root", root, "--json")
 	if !errors.Is(err, errFindings) {
-		t.Fatalf("runCheck err = %v, want errFindings", err)
+		t.Fatalf("check err = %v, want errFindings", err)
 	}
 
 	var rep check.Report
-	if uErr := json.Unmarshal(out.Bytes(), &rep); uErr != nil {
-		t.Fatalf("stdout is not a JSON report: %v\nstdout: %s", uErr, out.String())
+	if uErr := json.Unmarshal([]byte(out), &rep); uErr != nil {
+		t.Fatalf("stdout is not a JSON report: %v\nstdout: %s", uErr, out)
 	}
 	if rep.Stats.Errors == 0 {
 		t.Errorf("stats.errors = 0, want >= 1 (findings: %+v)", rep.Findings)
@@ -70,13 +117,13 @@ func TestRunCheck_CleanEmitsJSON(t *testing.T) {
 	root := t.TempDir()
 	scaffoldFixture(t, root)
 
-	var out bytes.Buffer
-	if err := runCheck([]string{"--root", root, "--json"}, &out); err != nil {
-		t.Fatalf("runCheck on green-by-construction fixture: %v", err)
+	out, err := runApp(t, "check", "--root", root, "--json")
+	if err != nil {
+		t.Fatalf("check on green-by-construction fixture: %v", err)
 	}
 	var rep check.Report
-	if err := json.Unmarshal(out.Bytes(), &rep); err != nil {
-		t.Fatalf("stdout is not a JSON report: %v\nstdout: %s", err, out.String())
+	if err := json.Unmarshal([]byte(out), &rep); err != nil {
+		t.Fatalf("stdout is not a JSON report: %v\nstdout: %s", err, out)
 	}
 	if rep.Stats.Errors != 0 || rep.Stats.Declared == 0 {
 		t.Errorf("unexpected clean stats: %+v", rep.Stats)
@@ -89,12 +136,12 @@ func TestRunCheck_TextModeStillPrints(t *testing.T) {
 	root := t.TempDir()
 	scaffoldFixture(t, root)
 
-	var out bytes.Buffer
-	if err := runCheck([]string{"--root", root}, &out); err != nil {
-		t.Fatalf("runCheck: %v", err)
+	out, err := runApp(t, "check", "--root", root)
+	if err != nil {
+		t.Fatalf("check: %v", err)
 	}
-	if !bytes.Contains(out.Bytes(), []byte("io-surface: ")) {
-		t.Errorf("text report missing summary line:\n%s", out.String())
+	if !bytes.Contains([]byte(out), []byte("io-surface: ")) {
+		t.Errorf("text report missing summary line:\n%s", out)
 	}
 }
 
@@ -119,9 +166,8 @@ func TestRunRender_DocAppliesInPlace(t *testing.T) {
 		t.Fatalf("write doc: %v", err)
 	}
 
-	var out bytes.Buffer
-	if err := runRender([]string{"--root", root, "--doc", docPath}, &out); err != nil {
-		t.Fatalf("runRender --doc: %v", err)
+	if _, err := runApp(t, "render", "--root", root, "--doc", docPath); err != nil {
+		t.Fatalf("render --doc: %v", err)
 	}
 	got, _ := os.ReadFile(docPath)
 	if bytes.Contains(got, []byte("stale generated content")) {
@@ -144,12 +190,11 @@ func TestRunRender_CheckFreshAndStale(t *testing.T) {
 	if err := os.WriteFile(docPath, []byte(renderDocProse), 0o644); err != nil {
 		t.Fatalf("write doc: %v", err)
 	}
-	var out bytes.Buffer
-	if err := runRender([]string{"--root", root, "--doc", docPath}, &out); err != nil {
+	if _, err := runApp(t, "render", "--root", root, "--doc", docPath); err != nil {
 		t.Fatalf("apply: %v", err)
 	}
 
-	if err := runRender([]string{"--root", root, "--doc", docPath, "--check"}, &out); err != nil {
+	if _, err := runApp(t, "render", "--root", root, "--doc", docPath, "--check"); err != nil {
 		t.Fatalf("--check on fresh doc: %v", err)
 	}
 
@@ -161,7 +206,7 @@ func TestRunRender_CheckFreshAndStale(t *testing.T) {
 	if err := os.WriteFile(docPath, stale, 0o644); err != nil {
 		t.Fatalf("write stale doc: %v", err)
 	}
-	err = runRender([]string{"--root", root, "--doc", docPath, "--check"}, &out)
+	_, err = runApp(t, "render", "--root", root, "--doc", docPath, "--check")
 	if !errors.Is(err, errFindings) {
 		t.Fatalf("--check on stale doc err = %v, want errFindings", err)
 	}
@@ -174,43 +219,72 @@ func TestRunCheck_FormatMatrix(t *testing.T) {
 	scaffoldFixture(t, root)
 
 	cases := []struct {
+		name    string
 		args    []string
 		isJSON  bool
 		isSARIF bool
 	}{
-		{args: []string{"--root", root, "--json"}, isJSON: true},
-		{args: []string{"--root", root, "--format", "json"}, isJSON: true},
-		{args: []string{"--root", root, "--format", "sarif"}, isSARIF: true},
-		{args: []string{"--root", root}},
+		{name: "json flag", args: []string{"--json"}, isJSON: true},
+		{name: "format json", args: []string{"--format", "json"}, isJSON: true},
+		{name: "format sarif", args: []string{"--format", "sarif"}, isSARIF: true},
+		{name: "text default", args: nil},
 	}
 	for _, tc := range cases {
-		var out bytes.Buffer
-		if err := runCheck(tc.args, &out); err != nil {
-			t.Fatalf("runCheck %v: %v", tc.args, err)
-		}
-		switch {
-		case tc.isJSON:
-			var rep check.Report
-			if err := json.Unmarshal(out.Bytes(), &rep); err != nil {
-				t.Fatalf("--json path not JSON: %v\n%s", err, out.String())
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			args := append([]string{"check", "--root", root}, tc.args...)
+			out, err := runApp(t, args...)
+			if err != nil {
+				t.Fatalf("check %v: %v", tc.args, err)
 			}
-		case tc.isSARIF:
-			var doc struct {
-				Version string `json:"version"`
-				Runs    []struct {
-					Results []any `json:"results"`
-				} `json:"runs"`
+			switch {
+			case tc.isJSON:
+				var rep check.Report
+				if err := json.Unmarshal([]byte(out), &rep); err != nil {
+					t.Fatalf("--json path not JSON: %v\n%s", err, out)
+				}
+			case tc.isSARIF:
+				var doc struct {
+					Version string `json:"version"`
+					Runs    []struct {
+						Results []any `json:"results"`
+					} `json:"runs"`
+				}
+				if err := json.Unmarshal([]byte(out), &doc); err != nil {
+					t.Fatalf("sarif path not JSON: %v\n%s", err, out)
+				}
+				if len(doc.Runs) != 1 {
+					t.Fatalf("sarif runs = %d", len(doc.Runs))
+				}
+			default:
+				if !bytes.Contains([]byte(out), []byte("io-surface: ")) {
+					t.Errorf("text path lost summary:\n%s", out)
+				}
 			}
-			if err := json.Unmarshal(out.Bytes(), &doc); err != nil {
-				t.Fatalf("sarif path not JSON: %v\n%s", err, out.String())
-			}
-			if len(doc.Runs) != 1 {
-				t.Fatalf("sarif runs = %d", len(doc.Runs))
-			}
-		default:
-			if !bytes.Contains(out.Bytes(), []byte("io-surface: ")) {
-				t.Errorf("text path lost summary:\n%s", out.String())
-			}
-		}
+		})
+	}
+}
+
+// TestExecute_VersionAndUnknownCommand pin the two trivial surface facts:
+// the version command prints the same line it always has, and an unknown
+// command is a usage error (exit-code class 2), not a gate finding.
+func TestExecute_VersionAndUnknownCommand(t *testing.T) {
+	t.Parallel()
+
+	out, err := runApp(t, "version")
+	if err != nil {
+		t.Fatalf("version: %v", err)
+	}
+	if out != "io-surface "+version+"\n" {
+		t.Errorf("version output = %q, want %q", out, "io-surface "+version+"\n")
+	}
+
+	_, err = runApp(t, "definitely-not-a-command")
+	if err == nil {
+		t.Fatal("unknown command must fail")
+	}
+	if exitCode(err) != 2 {
+		t.Errorf("unknown command exit class = %d, want 2", exitCode(err))
 	}
 }
