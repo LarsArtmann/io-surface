@@ -52,17 +52,17 @@ func fixtureManifest() *manifest.Manifest {
 			},
 			// new-family sites (mmap / bufio / ServeContent), paired exactly
 			"internal/store.MmapFile": {
-				Location: []string{"internal/store/mapped.go:15"},
+				Location: []string{"internal/store/mapped.go:13", "internal/store/mapped.go:19"},
 				Family:   "file-read",
 				Facts:    manifest.Facts{Extractable: true},
 			},
 			"internal/store.Buffered": {
-				Location: []string{"internal/store/mapped.go:27"},
+				Location: []string{"internal/store/mapped.go:25"},
 				Family:   "stream-copy",
 				Facts:    manifest.Facts{Extractable: true},
 			},
 			"cmd/app.serve": {
-				Location: []string{"cmd/app/main.go:16"},
+				Location: []string{"cmd/app/main.go:19"},
 				Family:   "stream-copy",
 				Facts:    manifest.Facts{Extractable: true},
 			},

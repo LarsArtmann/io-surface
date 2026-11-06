@@ -22,6 +22,7 @@ package capability
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -163,8 +164,8 @@ func Sets(modulePath string, edges []Edge) Result {
 		for n := range a.deep {
 			set.Deep = append(set.Deep, n)
 		}
-		sort.Slice(set.Direct, func(i, j int) bool { return set.Direct[i] < set.Direct[j] })
-		sort.Slice(set.Deep, func(i, j int) bool { return set.Deep[i] < set.Deep[j] })
+		slices.Sort(set.Direct)
+		slices.Sort(set.Deep)
 		out = append(out, set)
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].Pkg < out[j].Pkg })
