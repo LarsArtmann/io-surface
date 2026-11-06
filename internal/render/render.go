@@ -24,7 +24,16 @@ func Markdown(m *manifest.Manifest) string {
 	b.WriteString("> edit `facts.cue` (regenerate) or `claims.cue` (judgment) and re-render.\n")
 	fmt.Fprintf(&b, ">\n> Audited %s at `%s` — %d sites, %d location claims.\n\n",
 		m.Audit.Date, m.Audit.Commit, len(m.Sites), m.Audit.Claims)
+	b.WriteString(sections(m))
 
+	return b.String()
+}
+
+// sections is the generated body shared by Markdown (full document) and Block
+// (embedded between doc markers): taxonomy summary, per-family tables with
+// judgments, and the scope OUT list.
+func sections(m *manifest.Manifest) string {
+	var b strings.Builder
 	b.WriteString("## Taxonomy at a glance\n\n")
 	b.WriteString("| Family | Sites | Claimed | With rationale |\n")
 	b.WriteString("| --- | ---: | ---: | ---: |\n")
