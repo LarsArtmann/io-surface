@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
 	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/emit"
@@ -32,6 +33,11 @@ type checkFlags struct {
 
 type initFlags struct {
 	Force bool `flag:"force" help:"refresh facts.cue in an existing manifest (never touches claims/baseline/schema)"`
+}
+
+type baselineAddFlags struct {
+	Note string `flag:"note" required:"true" help:"why this site stays undeclared (a baseline entry without a reason is how the baseline stops shrinking)"`
+	Date string `flag:"date" help:"entry date YYYY-MM-DD (default: today)"`
 }
 
 type renderFlags struct {
@@ -336,4 +342,48 @@ func manifestDir(root, flagValue string) string {
 	}
 
 	return filepath.Join(root, scaffold.Dir)
+}
+
+// runBaselineAdd grandfathers one undeclared site: `io-surface baseline add
+// <id> --note "why" [--date YYYY-MM-DD]`. It is the machine's only sanctioned
+// write into baseline.cue (surgical insertion, comments preserved), replacing
+// hand-edited CUE. The command exits 0 on success and prints the resulting
+// gate status so the operator sees the effect immediately.
+func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags) error {
+	args := v4.ArgsFromContext(ctx)
+	if len(args) != 1 {
+		return fmt.Errorf("baseline add takes exactly one site ID argument (usage: io-surface baseline add <pkg.Func> --note \"why\")")
+	}
+	id := args[0]
+
+	dir := manifestDir(root.Root, "")
+	if _, err := manifest.Load(dir); err != nil {
+		return err
+	}
+	if err := manifest.AppendBaseline(dir, id, flags.Note, flags.Date); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(stdout, "io-surface: baselined %s (note: %s, date: %s)\n", id, flags.Note, flags.Date)
+
+	// Advisory feedback: a baselined ID that does not extract today is an
+	// entry suppressing nothing — the unused-baseline warning waiting to
+	// happen. Tell the operator now, not at the next gate run.
+	sites, err := extract.Extract(root.Root, extract.Options{Dirs: parseDirs(root.Dirs)})
+	if err != nil {
+		return err
+	}
+	found := false
+	for _, s := range sites {
+		if s.ID == id {
+			found = true
+
+			break
+		}
+	}
+	if !found {
+		fmt.Fprintf(stdout, "io-surface: warning: %s does not extract from this tree today; the entry suppresses nothing until the site reappears\n", id)
+	}
+
+	return nil
 }
