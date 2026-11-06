@@ -402,3 +402,27 @@ func TestRun_ShadowCapabilityUnknownNameIsSkipped(t *testing.T) {
 		t.Fatalf("unknown names are manifest.Validate's job, got %v", got)
 	}
 }
+
+// TestRun_ManifestDerivedSeamPairs pins the end-to-end #20 outcome: a caller
+// of a repo-specific wrapper pairs green once the manifest declares it with
+// facts.via — no extractor edit, no hardcoded table row.
+func TestRun_ManifestDerivedSeamPairs(t *testing.T) {
+	m := fixtureManifest()
+	m.Sites["internal/store.genWrite"] = manifest.Site{
+		Location: []string{"internal/store/gen_seam.go:8"},
+		Family:   "file-write",
+		Facts:    manifest.Facts{Extractable: true},
+	}
+	m.Sites["internal/store.callGenWrite"] = manifest.Site{
+		Location: []string{"internal/store/gen_seam.go:12"},
+		Family:   "file-write",
+		Facts:    manifest.Facts{Via: "genWrite"},
+	}
+
+	rep := runFixture(t, m, Options{Advisory: false})
+	for _, f := range rep.Findings {
+		if f.ID == "internal/store.callGenWrite" && f.Rule != RuleLocationDrift {
+			t.Errorf("seam caller reported as %s (%s), want only benign location-drift", f.Rule, f.Severity)
+		}
+	}
+}

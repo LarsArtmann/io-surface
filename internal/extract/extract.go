@@ -102,11 +102,25 @@ type Options struct {
 	// Generated code is not authored I/O; declaring it would be inventory
 	// noise the generator rewrites anyway.
 	Ignore []string
+	// Seams extends the built-in wrapper vocabulary with manifest-derived
+	// seams: ident → family learned from declared sites' facts.via values.
+	// check.Run builds it from the manifest, so a repo teaches the extractor
+	// its own wrapper names (dnsblockd's writeMapping) without an extractor
+	// edit; init keeps the built-in table so first scaffolds still see the
+	// common wrappers.
+	Seams map[string]string
 }
 
 // Extract walks root and returns sites ordered by ID.
 func Extract(root string, opts Options) ([]*Site, error) {
-	e := &extractor{root: root, sites: map[string]*Site{}}
+	seams := make(map[string]string, len(seamIdent)+len(opts.Seams))
+	for ident, fam := range seamIdent {
+		seams[ident] = fam
+	}
+	for ident, fam := range opts.Seams {
+		seams[ident] = fam
+	}
+	e := &extractor{root: root, sites: map[string]*Site{}, seams: seams}
 	dirs := opts.Dirs
 	if len(dirs) == 0 {
 		dirs = []string{"cmd", "internal"}
@@ -239,6 +253,7 @@ type extractor struct {
 	root  string
 	fset  token.FileSet
 	sites map[string]*Site
+	seams map[string]string
 }
 
 func (e *extractor) walk(dir string, opts Options) error {
@@ -382,7 +397,7 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 			call, ok := node.Fun.(*ast.SelectorExpr)
 			if !ok {
 				if ident, ok := node.Fun.(*ast.Ident); ok {
-					if fam, isSeam := seamIdent[ident.Name]; isSeam {
+					if fam, isSeam := e.seams[ident.Name]; isSeam {
 						e.record(id, node, testinfra, ident.Name, fam, ConfidenceToken, "")
 					}
 				}
