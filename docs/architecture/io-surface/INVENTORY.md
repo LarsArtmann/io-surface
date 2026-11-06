@@ -37,9 +37,9 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                               | Location                                 | Resource                                   | Trigger                             | Discipline |
 | ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- |
-| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:261`         | —                                          | —                                   | —          |
-| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:175`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    |
-| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:254`         | —                                          | —                                   | —          |
+| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:263`         | —                                          | —                                   | —          |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:177`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:256`         | —                                          | —                                   | —          |
 | `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:39` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          |
 | `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:56`       | —                                          | —                                   | —          |
 
