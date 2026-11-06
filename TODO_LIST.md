@@ -101,3 +101,4 @@
   - Cite evidence (file:line) so the next person can verify without re-deriving.
   - Long-term / unrefined ideas live in ROADMAP.md, not here.
 -->
+| 63 | Wire cmdguard-lint into CI once the lint module ships without a go.mod replace | 🔵 `BLOCKED` | Low    | 30min  | `go run github.com/larsartmann/cmdguard/lint/cmd/cmdguard-lint@v0.1.0` fails: the module's go.mod carries replace directives (buildflow/file-or-fix verified 2026-11-06); fix belongs in the cmdguard repo's release flow, then the CI step is one `go run` line |

@@ -25,12 +25,6 @@ jobs:
       - name: Vet
         run: go vet ./...
 
-      # Dogfood the house CLI wrapper's linter: the commands/flags here are
-      # cmdguard-structured, so its rules apply to this repo like any other.
-      - name: cmdguard-lint
-        run: |
-          go run github.com/larsartmann/cmdguard/v4/cmd/cmdguard-lint@v4.2.0 ./cmd/... || true
-
       - name: Test
         run: go test -race ./...
 
