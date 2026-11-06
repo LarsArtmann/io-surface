@@ -115,6 +115,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   machine's only sanctioned insertion into a judgment file (comments and
   formatting preserved); it refuses duplicates and noteless entries and warns
   when the ID does not extract today (an entry suppressing nothing)
+- `--ignore` globs (root flag, honored by init/check/extract/render/
+  baseline add): skip generated code (`*_templ.go`, `zz_generated*`) — globs
+  match repo-relative paths and bare file names, so one pattern covers any
+  depth. Generated I/O is not authored I/O; declaring it would be inventory
+  noise the generator rewrites anyway
 
 ### Fixed
 
