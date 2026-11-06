@@ -46,6 +46,38 @@ stop calling the inventory complete.
 - Extract `--stats` face for outlier packages; confidence distribution visible
   in every report
 
+### 4. Unified I/O insights: sites (hermetic) × reachability (Capslock)
+
+Decision record for the io-surface × Capslock unification (plan:
+`docs/planning/2026-11-06_06-02_unified-io-insights-pareto-plan.md`; evidence:
+`docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md`). io-surface
+answers **where** I/O sits — per-call-site, hermetic, error-tier. Capslock
+answers **what is reachable** — SSA callgraph through dependencies, transitive,
+noisy. The unified project keeps ONE manifest with TWO fact classes: `sites`
+(where, declared, gateable) and `capabilities` (pkg → reachable capability set,
+advisory). Claims justify both — including I/O that hides behind wrappers, the
+hole neither engine fills alone.
+
+Landing sequence: pinned external capslock binary (CI-only + local dev shells,
+never imported) → `io-surface absorb` ingests its JSON → manifest gains a
+closed-enum `capabilities` section (schema v1.1) → advisory rules
+`shadow-capability` (capability with zero declared sites, not baselined) and
+`capability-drift` (absorbed set ≠ committed set) → GitHub-only CI job keeps
+the facts fresh. Every graph-tier finding starts info/warning and never exits 1;
+promotion to gate goes through an explicit `enforcement` policy decision.
+
+Deliberately NOT this theme: embedding capslock's analyzer (unstable internal
+API, heavyweight deps would break hermeticity), and a dashboard (render stays
+markdown). The first blind-spot run validated the shape: 10/11 real direct
+sinks were already declared by the hermetic extractor; the false-positive
+classes observed (phantom NETWORK edges from SSA conflation) are exactly why
+the capability tier must be advisory.
+
+Note the boundary with Theme 3: `--precise` would add *in-tree type facts* to
+the hermetic extractor; Capslock adds *transitive reachability including
+dependencies* from an external engine. Different economics, different trust
+tiers, different tools — neither subsumes the other.
+
 ## Open questions (owner decisions, not tasks)
 
 - **Q1 — which repo gets the first _blocking_ gate?** dnsblockd has the richest
@@ -70,6 +102,15 @@ stop calling the inventory complete.
   requires force-push to both remotes and fresh clones everywhere; status
   reports citing those SHAs go stale. **Keep:** ~67 MB one-time clone cost,
   zero SHA breakage, but every zip of master carries the binary forever.
+- **Q5 — do Capslock's runtime-power capabilities ever become first-class
+  vocabulary, or stay out-of-scope forever?** The blind-spot run showed
+  REFLECT / RUNTIME / SYSTEM_CALLS / UNSAFE_POINTER / OPERATING_SYSTEM /
+  READ_SYSTEM_STATE / MODIFY_SYSTEM_STATE reach into every package
+  transitively — noise as per-site disciplines, but real information as
+  package-level reachability. Deciding "new discipline = schema version bump"
+  (taxonomy freeze applies) vs "permanently out-of-scope" gates whether
+  `absorb` stores or drops them. First-class would also answer MODIFY/READ
+ _SYSTEM_STATE for systemd-hardening consumers (Theme 2).
 
 ## Non-goals
 
