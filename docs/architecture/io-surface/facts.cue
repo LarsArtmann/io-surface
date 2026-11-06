@@ -32,8 +32,8 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/main.go:261",
-			"cmd/io-surface/main.go:297",
+			"cmd/io-surface/commands.go:165",
+			"cmd/io-surface/commands.go:201",
 		]
 		family: "file-write"
 		facts: {
@@ -42,7 +42,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/main.go:254",
+			"cmd/io-surface/commands.go:158",
 		]
 		family: "file-write"
 		facts: {
