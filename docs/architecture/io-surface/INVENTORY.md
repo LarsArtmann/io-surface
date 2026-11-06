@@ -24,10 +24,10 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/absorb.ModulePath`           | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo | every absorb run without --module | —          |
 | `internal/check.symbolVisible`         | `internal/check/location.go:23`     | —                           | —                                 | —          |
 | `internal/extract.Extract`             | `internal/extract/extract.go:130`   | —                           | —                                 | —          |
-| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:324`   | —                           | —                                 | —          |
-| `internal/extract.extractor.walk`      | `internal/extract/extract.go:260`   | —                           | —                                 | —          |
+| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:328`   | —                           | —                                 | —          |
+| `internal/extract.extractor.walk`      | `internal/extract/extract.go:264`   | —                           | —                                 | —          |
 | `internal/manifest.Load`               | `internal/manifest/manifest.go:170` | —                           | —                                 | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:358` | —                           | —                                 | —          |
+| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:380` | —                           | —                                 | —          |
 
 ### Judgments
 
@@ -37,9 +37,9 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                               | Location                                 | Resource                                   | Trigger                             | Discipline |
 | ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- |
-| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:263`         | —                                          | —                                   | —          |
-| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:177`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    |
-| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:256`         | —                                          | —                                   | —          |
+| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:299`         | —                                          | —                                   | —          |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:213`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:292`         | —                                          | —                                   | —          |
 | `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:39` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          |
 | `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:56`       | —                                          | —                                   | —          |
 

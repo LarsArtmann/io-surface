@@ -125,6 +125,15 @@ func newApp() (*v4.CLI[rootFlags], error) {
 			if err != nil {
 				return err
 			}
+			versionCmd, err := v4.NewCommand("version", versionFlags{}, runVersion,
+				v4.WithShort("Print the version (--json adds commit and build date)"),
+				v4.WithLong("Prints `io-surface <version>` like always; --json emits {version, commit, date} from the build info, so scripts and badges get the full provenance without shelling out to go version."),
+				v4.WithExample("io-surface version --json"),
+			)
+			if err != nil {
+				return err
+			}
+
 			baselineCmd, err := v4.NewParentCommand[rootFlags, baselineAddFlags]("baseline", "Grandfather undeclared sites (the baseline only shrinks).", baselineAddFlags{},
 				v4.WithShort("Grandfather undeclared sites"),
 				v4.WithSubcommands(baselineAddCmd),
@@ -133,7 +142,7 @@ func newApp() (*v4.CLI[rootFlags], error) {
 				return err
 			}
 
-			return v4.AddCommands(app, checkCmd, initCmd, renderCmd, extractCmd, absorbCmd, baselineCmd)
+			return v4.AddCommands(app, checkCmd, initCmd, renderCmd, extractCmd, absorbCmd, baselineCmd, versionCmd)
 		},
 		v4.WithCLIVersion(version),
 		v4.WithBatteries(),
