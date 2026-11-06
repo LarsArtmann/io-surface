@@ -63,15 +63,15 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 
 ## Commands
 
-| Command                                                                                                | What it does                                                                                                       |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `io-surface init [--root DIR] [--force]`                                                               | Extract the tree and write the CUE package (green by construction; `--force` refreshes `facts.cue` only)           |
-| `io-surface check [--root] [--manifest] [--json] [--format text\|json\|sarif] [--advisory] [--strict]` | The bidirectional gate (exit 1 on error findings); `--format sarif` emits SARIF 2.1.0                              |
-| `io-surface render [--root] [--out FILE]`                                                              | Render the inventory markdown from the manifest (claims-aware)                                                     |
-| `io-surface render --doc FILE [--check]`                                                               | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                              |
-| `io-surface extract [--root] [--include-tests]`                                                        | Print the raw extraction as JSON (debugging, counts)                                                               |
+| Command                                                                                                | What it does                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `io-surface init [--root DIR] [--force]`                                                               | Extract the tree and write the CUE package (green by construction; `--force` refreshes `facts.cue` only)                     |
+| `io-surface check [--root] [--manifest] [--json] [--format text\|json\|sarif] [--advisory] [--strict]` | The bidirectional gate (exit 1 on error findings); `--format sarif` emits SARIF 2.1.0                                        |
+| `io-surface render [--root] [--out FILE]`                                                              | Render the inventory markdown from the manifest (claims-aware)                                                               |
+| `io-surface render --doc FILE [--check]`                                                               | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                        |
+| `io-surface extract [--root] [--include-tests]`                                                        | Print the raw extraction as JSON (debugging, counts)                                                                         |
 | `io-surface absorb --capslock REPORT [--check] [--module] [--engine-version]`                          | Fold a pinned Capslock JSON report into `capabilities.cue` (that file only); `--check` reports advisory drift, never exits 1 |
-| `io-surface version` / `doctor` / `describe`                                                           | cmdguard-provided: version line, DI/config health, hidden machine-readable CLI contract (`describe --output json`) |
+| `io-surface version` / `doctor` / `describe`                                                           | cmdguard-provided: version line, DI/config health, hidden machine-readable CLI contract (`describe --output json`)           |
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
 

@@ -48,6 +48,7 @@
 ## Self-review answers (asked directly)
 
 **What did you forget?**
+
 1. **Routing discoveries into `TODO_LIST.md`.** The errcheck findings, the
    CONTRIBUTING/golangci drift, the dprint non-enforcement — I reported them
    in chat and now in this report, but never landed them in the repo's
@@ -61,6 +62,7 @@
    owned in-flight edits to it; I did not re-verify my three edits afterwards.
 
 **What could you have done better?**
+
 1. **Ground-truth first.** I grepped manifest internals and built a false
    "INVENTORY contradicts facts.cue" narrative around a single read of a file
    that was actively being rewritten. Running `check` (30 seconds) before
@@ -74,6 +76,7 @@
    confusion in (2).
 
 **What could you still improve?**
+
 1. **Concurrency awareness as default.** This repo runs multiple agent
    sessions + an auto-commit daemon. Any file read is potentially stale; any
    pasted output is potentially already fixed. This should be a checked habit,
@@ -215,53 +218,53 @@ strongest honest framing:
 Impact: Critical/High/Medium/Low · Effort: S <30min, M 30min–2h, L >2h ·
 Category: Bug/Feature/Quality/Cleanup/Documentation/Process
 
-| #  | Task                                                                                                                         | Impact   | Effort | Category      |
-| -- | ---------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
-| 1  | Run docs-health HARVEST: route section (f) below into TODO_LIST.md / ROADMAP.md                                              | Critical | S      | Process       |
+| #  | Task                                                                                                                          | Impact   | Effort | Category      |
+| -- | ----------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
+| 1  | Run docs-health HARVEST: route section (f) below into TODO_LIST.md / ROADMAP.md                                               | Critical | S      | Process       |
 | 2  | Push both remotes (`origin` + `github`) per AGENTS.md publish rule — 410ce52, 5a6c289, daemon commits are local-only          | Critical | S      | Process       |
-| 3  | After the other session finishes: one final full CI-bar run on the settled tree, then push                                   | Critical | S      | Process       |
-| 4  | Verify remote GitHub CI green after push (local replication ≠ remote run)                                                    | High     | S      | Process       |
+| 3  | After the other session finishes: one final full CI-bar run on the settled tree, then push                                    | Critical | S      | Process       |
+| 4  | Verify remote GitHub CI green after push (local replication ≠ remote run)                                                     | High     | S      | Process       |
 | 5  | Investigate claims pairing: facts audit says `claims: 20` but INVENTORY rendered `Claimed 0` for all sites — reconcile        | High     | M      | Bug           |
-| 6  | Review the 2 baseline entries added late-session: what they suppress, whether claim prose should own them instead            | High     | S      | Quality       |
-| 7  | Verify README documents the `absorb` subcommand (flags, Capslock pinning, --check mode)                                      | High     | S      | Documentation |
+| 6  | Review the 2 baseline entries added late-session: what they suppress, whether claim prose should own them instead             | High     | S      | Quality       |
+| 7  | Verify README documents the `absorb` subcommand (flags, Capslock pinning, --check mode)                                       | High     | S      | Documentation |
 | 8  | Verify CHANGELOG.md has entries for absorb + capabilities v1.1 + shadow-capability (file was mid-edit this session)           | High     | S      | Documentation |
-| 9  | Confirm `cmd/io-surface/main_test.go` e2e-covers runAbsorb both modes (write + --check drift)                                | High     | S      | Quality       |
-| 10 | Confirm `check_test.go` covers shadowCapabilities (covered/uncovered paths, baseline suppression, unknown-name skip)         | High     | S      | Quality       |
-| 11 | Verify TODO_LIST.md is current post-concurrent-session (it may already own several items below — de-duplicate at harvest)    | High     | S      | Documentation |
-| 12 | Verify my 3 AGENTS.md edits survived the other session's concurrent AGENTS.md edits (re-diff now)                            | Medium   | S      | Documentation |
-| 13 | Extend AGENTS.md data-flow line to the absorb (Capslock→capabilities.cue) and emit (findings→SARIF) legs                     | Medium   | S      | Documentation |
-| 14 | Re-verify AGENTS.md header "three direct dependencies" against current go.mod                                                | Medium   | S      | Documentation |
-| 15 | Verify FEATURES.md inventories v1.1 capabilities, absorb command, shadow-capability rule                                     | Medium   | S      | Documentation |
-| 16 | Decide Forgejo push mirror (Settings → Mirrors → GitHub) — blocked on Forgejo API token not on this machine                  | High     | S+tok  | Process       |
-| 17 | Decide Forgejo repo visibility (public like gogenfilter, or keep private) — same token blocker                               | Low      | S+tok  | Process       |
-| 18 | Fix or nolint the 5 errcheck findings in cmd/io-surface/commands.go:90,114,115,117,229 (after #19 decides the policy)        | Medium   | S      | Quality       |
+| 9  | Confirm `cmd/io-surface/main_test.go` e2e-covers runAbsorb both modes (write + --check drift)                                 | High     | S      | Quality       |
+| 10 | Confirm `check_test.go` covers shadowCapabilities (covered/uncovered paths, baseline suppression, unknown-name skip)          | High     | S      | Quality       |
+| 11 | Verify TODO_LIST.md is current post-concurrent-session (it may already own several items below — de-duplicate at harvest)     | High     | S      | Documentation |
+| 12 | Verify my 3 AGENTS.md edits survived the other session's concurrent AGENTS.md edits (re-diff now)                             | Medium   | S      | Documentation |
+| 13 | Extend AGENTS.md data-flow line to the absorb (Capslock→capabilities.cue) and emit (findings→SARIF) legs                      | Medium   | S      | Documentation |
+| 14 | Re-verify AGENTS.md header "three direct dependencies" against current go.mod                                                 | Medium   | S      | Documentation |
+| 15 | Verify FEATURES.md inventories v1.1 capabilities, absorb command, shadow-capability rule                                      | Medium   | S      | Documentation |
+| 16 | Decide Forgejo push mirror (Settings → Mirrors → GitHub) — blocked on Forgejo API token not on this machine                   | High     | S+tok  | Process       |
+| 17 | Decide Forgejo repo visibility (public like gogenfilter, or keep private) — same token blocker                                | Low      | S+tok  | Process       |
+| 18 | Fix or nolint the 5 errcheck findings in cmd/io-surface/commands.go:90,114,115,117,229 (after #19 decides the policy)         | Medium   | S      | Quality       |
 | 19 | Decide golangci-lint policy: add `.golangci.yml` + CI step, or correct CONTRIBUTING.md to stop mentioning it                  | Medium   | M      | Process       |
-| 20 | Decide dprint enforcement for non-Go files (config exists, CI ignores it)                                                    | Low      | S      | Process       |
-| 21 | Verify `internal/emit` maps the new rules (shadow-capability) with correct severity/ruleId — add emit test if missing        | Medium   | S      | Quality       |
-| 22 | Validate emitted SARIF content once (parse /tmp/io-surface-verify.sarif or regenerate; ruleIds, severities, positions)       | Medium   | S      | Quality       |
+| 20 | Decide dprint enforcement for non-Go files (config exists, CI ignores it)                                                     | Low      | S      | Process       |
+| 21 | Verify `internal/emit` maps the new rules (shadow-capability) with correct severity/ruleId — add emit test if missing         | Medium   | S      | Quality       |
+| 22 | Validate emitted SARIF content once (parse /tmp/io-surface-verify.sarif or regenerate; ruleIds, severities, positions)        | Medium   | S      | Quality       |
 | 23 | Add a read-only facts-freshness mode (`init --check` or `check --facts-fresh`) so CI verifies without mutating the tree       | Medium   | M      | Feature       |
 | 24 | Make `capabilities.cue` writes atomic (temp+rename) to avoid torn manifest dirs on crash mid-absorb                           | Medium   | S      | Quality       |
 | 25 | De-duplicate the `absorb.Drift` double call in `runAbsorb` (compute once, reuse for lines + count)                            | Low      | S      | Cleanup       |
 | 26 | Decide whether CI should run `absorb --check` against a pinned fixture (capability-drift advisory currently never runs in CI) | Medium   | M      | Process       |
-| 27 | Add golden/round-trip test for `absorb.CUE` byte contract if absorb_test.go lacks one                                        | Medium   | M      | Quality       |
-| 28 | Verify absorb tests are hermetic (no network/git needed in sandbox) — assert explicitly                                      | Medium   | S      | Quality       |
-| 29 | Reconcile INVENTORY/claims/facts once all concurrent edits land; re-run full bar                                             | High     | S      | Quality       |
-| 30 | Verify internal/manifest + internal/render direct-test gap is still tracked in TODO_LIST (AGENTS.md says it is)              | Medium   | S      | Quality       |
+| 27 | Add golden/round-trip test for `absorb.CUE` byte contract if absorb_test.go lacks one                                         | Medium   | M      | Quality       |
+| 28 | Verify absorb tests are hermetic (no network/git needed in sandbox) — assert explicitly                                       | Medium   | S      | Quality       |
+| 29 | Reconcile INVENTORY/claims/facts once all concurrent edits land; re-run full bar                                              | High     | S      | Quality       |
+| 30 | Verify internal/manifest + internal/render direct-test gap is still tracked in TODO_LIST (AGENTS.md says it is)               | Medium   | S      | Quality       |
 | 31 | Size and schedule the internal/manifest + internal/render direct tests (known gap; only scaffold-roundtrip covers them)       | Medium   | M      | Quality       |
-| 32 | Confirm baseline canonical-key hiding + id-form dotted-ID sharp edges are owned in TODO_LIST (not just AGENTS.md prose)      | Low      | S      | Quality       |
-| 33 | Decide git tagging/release flow for the module (version const exists in main.go; no release process documented here)         | Low      | M      | Process       |
-| 34 | After push: verify `go install github.com/larsartmann/io-surface@latest` resolves via the proxy                              | Medium   | S      | Quality       |
-| 35 | Document in CONTRIBUTING that Forgejo does not run CI (GitHub-only)                                                          | Low      | S      | Documentation |
-| 36 | Evaluate a daemon-side gate hook: block (or auto-verify) commits that leave the self-check red                               | Medium   | M      | Process       |
-| 37 | Establish a concurrency protocol for multi-agent sessions in this repo (announce, ground-truth-first, who closes out)        | Medium   | S      | Process       |
-| 38 | Run a dependency sweep for cuelang/cmdguard/go-finding (buildflow update owns it)                                            | Low      | S      | Process       |
-| 39 | Annotate stale status reports (docs-health ANNOTATE) once this one's items are resolved                                      | Low      | S      | Documentation |
-| 40 | Verify SARIF artifact renders on GitHub (clean run = empty results list; still proves the path)                              | Low      | S      | Quality       |
-| 41 | Check ROADMAP.md §g open questions (incl. deliberate no-flake.nix) still reflect reality                                     | Low      | S      | Documentation |
-| 42 | Clear gopls stale state (restart) and note recurrence behavior if it re-stales mid-edit                                      | Low      | S      | Cleanup       |
-| 43 | Consider `--out` flag for `check --format sarif` instead of stdout-redirect (only if it earns its keep — YAGNI check)        | Low      | S      | Feature       |
-| 44 | Verify README quickstart still matches actual commands after v1.1 additions                                                  | Medium   | S      | Documentation |
-| 45 | Post-concurrency sanity: confirm no session left uncommitted garbage outside their intended files (git status audit)         | Medium   | S      | Cleanup       |
+| 32 | Confirm baseline canonical-key hiding + id-form dotted-ID sharp edges are owned in TODO_LIST (not just AGENTS.md prose)       | Low      | S      | Quality       |
+| 33 | Decide git tagging/release flow for the module (version const exists in main.go; no release process documented here)          | Low      | M      | Process       |
+| 34 | After push: verify `go install github.com/larsartmann/io-surface@latest` resolves via the proxy                               | Medium   | S      | Quality       |
+| 35 | Document in CONTRIBUTING that Forgejo does not run CI (GitHub-only)                                                           | Low      | S      | Documentation |
+| 36 | Evaluate a daemon-side gate hook: block (or auto-verify) commits that leave the self-check red                                | Medium   | M      | Process       |
+| 37 | Establish a concurrency protocol for multi-agent sessions in this repo (announce, ground-truth-first, who closes out)         | Medium   | S      | Process       |
+| 38 | Run a dependency sweep for cuelang/cmdguard/go-finding (buildflow update owns it)                                             | Low      | S      | Process       |
+| 39 | Annotate stale status reports (docs-health ANNOTATE) once this one's items are resolved                                       | Low      | S      | Documentation |
+| 40 | Verify SARIF artifact renders on GitHub (clean run = empty results list; still proves the path)                               | Low      | S      | Quality       |
+| 41 | Check ROADMAP.md §g open questions (incl. deliberate no-flake.nix) still reflect reality                                      | Low      | S      | Documentation |
+| 42 | Clear gopls stale state (restart) and note recurrence behavior if it re-stales mid-edit                                       | Low      | S      | Cleanup       |
+| 43 | Consider `--out` flag for `check --format sarif` instead of stdout-redirect (only if it earns its keep — YAGNI check)         | Low      | S      | Feature       |
+| 44 | Verify README quickstart still matches actual commands after v1.1 additions                                                   | Medium   | S      | Documentation |
+| 45 | Post-concurrency sanity: confirm no session left uncommitted garbage outside their intended files (git status audit)          | Medium   | S      | Cleanup       |
 
 Honesty note: items 1–14, 18, 21–25, 29, 31–32, 42, 45 come from direct
 observation this session; 15–17, 19–20, 26–28, 30, 33–41, 43–44 are decisions
@@ -278,7 +281,7 @@ not new research — per the session constraint they were not re-verified today.
    and do you want my AGENTS.md/AGENTS-adjacent edits to wait for it?
 2. **Push policy:** everything from this session window is local-only.
    AGENTS.md mandates `git push origin master && git push github master` per
-   publish, but pushing mid-flight work from the *other* session could
+   publish, but pushing mid-flight work from the _other_ session could
    publish its half-done state. Do you want me to push now, wait for that
    session to finish, or do you push manually?
 3. **Forgejo token:** the push mirror and the public-visibility flip are
@@ -288,5 +291,5 @@ not new research — per the session constraint they were not re-verified today.
 
 ---
 
-*Per status-report skill: section (f) is HARVEST input for TODO_LIST.md /
-ROADMAP.md — item 1. Point-in-time snapshot; goes stale by design.*
+_Per status-report skill: section (f) is HARVEST input for TODO_LIST.md /
+ROADMAP.md — item 1. Point-in-time snapshot; goes stale by design._

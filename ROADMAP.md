@@ -73,9 +73,9 @@ sinks were already declared by the hermetic extractor; the false-positive
 classes observed (phantom NETWORK edges from SSA conflation) are exactly why
 the capability tier must be advisory.
 
-Note the boundary with Theme 3: `--precise` would add *in-tree type facts* to
-the hermetic extractor; Capslock adds *transitive reachability including
-dependencies* from an external engine. Different economics, different trust
+Note the boundary with Theme 3: `--precise` would add _in-tree type facts_ to
+the hermetic extractor; Capslock adds _transitive reachability including
+dependencies_ from an external engine. Different economics, different trust
 tiers, different tools — neither subsumes the other.
 
 ## Open questions (owner decisions, not tasks)
@@ -110,7 +110,7 @@ tiers, different tools — neither subsumes the other.
   package-level reachability. Deciding "new discipline = schema version bump"
   (taxonomy freeze applies) vs "permanently out-of-scope" gates whether
   `absorb` stores or drops them. First-class would also answer MODIFY/READ
- _SYSTEM_STATE for systemd-hardening consumers (Theme 2).
+  _SYSTEM_STATE for systemd-hardening consumers (Theme 2).
 
 ## Non-goals
 

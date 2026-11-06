@@ -14,7 +14,7 @@ SSA callgraph capabilities reveal I/O that io-surface's hermetic extractor misse
   (`proxy.golang.org/github.com/google/capslock/@v/v0.3.4.zip`) into `/tmp/bin`.
 - **Toolchain skew lesson:** the default build (go1.26.8) failed to type-check this
   repo's go1.27.0 stdlib (`unknown field rfd in struct literal of type splicePipe`).
-  Rebuilding the analyzer with the *target's* toolchain
+  Rebuilding the analyzer with the _target's_ toolchain
   (`GOTOOLCHAIN=go1.27.0 GOEXPERIMENT=none go build`) fixed it. CI wiring (plan T09)
   must build capslock with the repo's Go version, or skew noise will look like
   findings.
@@ -26,19 +26,19 @@ SSA callgraph capabilities reveal I/O that io-surface's hermetic extractor misse
 
 ## Direct capabilities in first-party code — every sink paired against the manifest
 
-| Sink (verbatim from run)                       | Site                          | Declared in facts.cue?                        | Verdict |
-| ---------------------------------------------- | ----------------------------- | --------------------------------------------- | ------- |
-| `os.ReadFile`                                  | `cmd/io-surface/commands.go:165` | yes (`cmd/io-surface.applyDoc`, file-write) | covered |
-| `os.WriteFile`                                 | `cmd/io-surface/commands.go:158` | yes (`cmd/io-surface.runRender`)            | covered |
-| `os.ReadFile`                                  | `internal/check/location.go:23`  | yes (`internal/check.symbolVisible`)        | covered |
-| `os.Stat`                                      | `internal/extract/extract.go:111` | yes (`internal/extract.Extract`)            | covered |
-| `os.ReadFile`                                  | `internal/extract/extract.go:276` | yes (`…extractor.parseFile`)                | covered |
-| `os.Stat`                                      | `internal/manifest/manifest.go:121` | yes (`internal/manifest.Load`)            | covered |
-| `os.Stat`                                      | `internal/manifest/manifest.go:297` | yes (`…Manifest.Validate`)                | covered |
-| `os.MkdirAll`/`os.Stat`/`os.WriteFile`         | `internal/scaffold/scaffold.go:55-74` | yes (`internal/scaffold.Write`)          | covered |
-| `os/exec.Command`                              | `internal/scaffold/scaffold.go:205` | yes (`internal/scaffold.git`, ipc-subprocess) | covered |
-| `filepath.Walk` → internal `os.Lstat`          | stdlib `path/filepath` internals | yes (`…extractor.walk` declares `filepath.Walk`) | covered — see complementarity |
-| **`stdout.Write` (`(*os.File).Write`)**        | **`cmd/io-surface/commands.go:77`** | **no**                                  | **real gap → TODO #49** (stdout/stderr scope decision) |
+| Sink (verbatim from run)                | Site                                  | Declared in facts.cue?                           | Verdict                                                |
+| --------------------------------------- | ------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
+| `os.ReadFile`                           | `cmd/io-surface/commands.go:165`      | yes (`cmd/io-surface.applyDoc`, file-write)      | covered                                                |
+| `os.WriteFile`                          | `cmd/io-surface/commands.go:158`      | yes (`cmd/io-surface.runRender`)                 | covered                                                |
+| `os.ReadFile`                           | `internal/check/location.go:23`       | yes (`internal/check.symbolVisible`)             | covered                                                |
+| `os.Stat`                               | `internal/extract/extract.go:111`     | yes (`internal/extract.Extract`)                 | covered                                                |
+| `os.ReadFile`                           | `internal/extract/extract.go:276`     | yes (`…extractor.parseFile`)                     | covered                                                |
+| `os.Stat`                               | `internal/manifest/manifest.go:121`   | yes (`internal/manifest.Load`)                   | covered                                                |
+| `os.Stat`                               | `internal/manifest/manifest.go:297`   | yes (`…Manifest.Validate`)                       | covered                                                |
+| `os.MkdirAll`/`os.Stat`/`os.WriteFile`  | `internal/scaffold/scaffold.go:55-74` | yes (`internal/scaffold.Write`)                  | covered                                                |
+| `os/exec.Command`                       | `internal/scaffold/scaffold.go:205`   | yes (`internal/scaffold.git`, ipc-subprocess)    | covered                                                |
+| `filepath.Walk` → internal `os.Lstat`   | stdlib `path/filepath` internals      | yes (`…extractor.walk` declares `filepath.Walk`) | covered — see complementarity                          |
+| **`stdout.Write` (`(*os.File).Write`)** | **`cmd/io-surface/commands.go:77`**   | **no**                                           | **real gap → TODO #49** (stdout/stderr scope decision) |
 
 **Score: 10 of 11 real direct sinks are declared.** The extractor's call tables
 caught every file/subprocess sink Capslock found in first-party code. The one
@@ -48,7 +48,7 @@ undeclared sink is stdout — a scope-boundary decision, not a missed table entr
 ## Capslock false-positive classes observed (evidence for absorb's advisory tier)
 
 1. **Phantom NETWORK via SSA range-func conflation.** `internal/extract` — the
-   *hermetic* package — reported 4 DIRECT NETWORK edges, all with this chain shape:
+   _hermetic_ package — reported 4 DIRECT NETWORK edges, all with this chain shape:
    `parseFile → go/parser.ParseFile → go/build/constraint.parsePlusBuildExpr →
    strings.FieldsSeq$1 → net/http.ParseCookie$1 @ iter.go:96`. Anonymous
    range-over-func closures from unrelated stdlib packages are conflated; there is
@@ -87,6 +87,6 @@ undeclared sink is stdout — a scope-boundary decision, not a missed table entr
    (plan guardrail 2) and absorb must tier unmapped/suspicious names loudly (M34).
 3. **`--ignore`/noise budget needed:** UNANALYZED and transitive runtime-power
    edges dominate edge counts (236 edges, ~90% transitive/stdlib). The absorb
-   contract should store per-package capability *sets* (pkg → caps), not edges.
+   contract should store per-package capability _sets_ (pkg → caps), not edges.
 4. **CI recipe:** build capslock pinned AND toolchain-matched (see Method), upload
    the JSON artifact, absorb, advisory-gate (plan T09).
