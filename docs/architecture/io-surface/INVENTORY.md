@@ -12,31 +12,39 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Family           | Sites | Claimed | With rationale |
 | ---------------- | ----: | ------: | -------------: |
-| `file-read`      |     7 |       0 |              0 |
-| `file-write`     |     4 |       0 |              0 |
+| `file-read`      |     7 |       1 |              1 |
+| `file-write`     |     4 |       1 |              1 |
 | `embed`          |     1 |       0 |              0 |
-| `ipc-subprocess` |     2 |       0 |              0 |
+| `ipc-subprocess` |     2 |       1 |              1 |
 
 ## `file-read` (7)
 
-| Site                                   | Location                            | Resource | Trigger | Discipline |
-| -------------------------------------- | ----------------------------------- | -------- | ------- | ---------- |
-| `internal/absorb.ModulePath`           | `internal/absorb/absorb.go:78`      | —        | —       | —          |
-| `internal/check.symbolVisible`         | `internal/check/location.go:23`     | —        | —       | —          |
-| `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —        | —       | —          |
-| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:276`   | —        | —       | —          |
-| `internal/extract.extractor.walk`      | `internal/extract/extract.go:237`   | —        | —       | —          |
-| `internal/manifest.Load`               | `internal/manifest/manifest.go:147` | —        | —       | —          |
-| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:334` | —        | —       | —          |
+| Site                                   | Location                            | Resource                    | Trigger                           | Discipline |
+| -------------------------------------- | ----------------------------------- | --------------------------- | --------------------------------- | ---------- |
+| `internal/absorb.ModulePath`           | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo | every absorb run without --module | —          |
+| `internal/check.symbolVisible`         | `internal/check/location.go:23`     | —                           | —                                 | —          |
+| `internal/extract.Extract`             | `internal/extract/extract.go:111`   | —                           | —                                 | —          |
+| `internal/extract.extractor.parseFile` | `internal/extract/extract.go:276`   | —                           | —                                 | —          |
+| `internal/extract.extractor.walk`      | `internal/extract/extract.go:237`   | —                           | —                                 | —          |
+| `internal/manifest.Load`               | `internal/manifest/manifest.go:147` | —                           | —                                 | —          |
+| `internal/manifest.Manifest.Validate`  | `internal/manifest/manifest.go:334` | —                           | —                                 | —          |
+
+### Judgments
+
+- **`internal/absorb.ModulePath`** — a single small read to resolve the first-party package prefix; --module exists for manifests analyzed outside their repo
 
 ## `file-write` (4)
 
-| Site                       | Location                           | Resource | Trigger | Discipline |
-| -------------------------- | ---------------------------------- | -------- | ------- | ---------- |
-| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:241`   | —        | —       | —          |
-| `cmd/io-surface.runAbsorb` | `cmd/io-surface/commands.go:155`   | —        | —       | —          |
-| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:234`   | —        | —       | —          |
-| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:56` | —        | —       | —          |
+| Site                       | Location                           | Resource                                   | Trigger                       | Discipline |
+| -------------------------- | ---------------------------------- | ------------------------------------------ | ----------------------------- | ---------- |
+| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:241`   | —                                          | —                             | —          |
+| `cmd/io-surface.runAbsorb` | `cmd/io-surface/commands.go:155`   | Capslock JSON report passed via --capslock | every `io-surface absorb` run | bounded    |
+| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:234`   | —                                          | —                             | —          |
+| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:56` | —                                          | —                             | —          |
+
+### Judgments
+
+- **`cmd/io-surface.runAbsorb`** — the operator names the artifact; the engine output is decoded in memory with no streaming copy, so an oversized report fails loudly at decode rather than silently truncating
 
 ## `embed` (1)
 
@@ -46,10 +54,14 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 ## `ipc-subprocess` (2)
 
-| Site                      | Location                            | Resource | Trigger | Discipline |
-| ------------------------- | ----------------------------------- | -------- | ------- | ---------- |
-| `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | —        | —       | —          |
-| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:221` | —        | —       | —          |
+| Site                      | Location                            | Resource                                        | Trigger                                           | Discipline |
+| ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- |
+| `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:221` | —                                               | —                                                 | —          |
+
+### Judgments
+
+- **`internal/absorb.gitHead`** — provenance only: the capability audit must name the revision the engine actually analyzed; falls back to the literal working-tree outside git so sandboxed runs stay valid
 
 ## Deliberately out of scope
 
