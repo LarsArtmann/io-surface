@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"example.com/fixture/internal/store"
 )
 
 func fetch() (*http.Response, error) {
@@ -17,4 +19,8 @@ func openDB(dsn string) (*sql.DB, error) {
 
 func serve(w http.ResponseWriter, r *http.Request, f *os.File) {
 	http.ServeContent(w, r, "data.bin", time.Time{}, f)
+}
+
+func mirror(w http.ResponseWriter, path string) error {
+	return store.genWrite(path)
 }

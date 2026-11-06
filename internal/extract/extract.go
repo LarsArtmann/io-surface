@@ -120,10 +120,23 @@ func Extract(root string, opts Options) ([]*Site, error) {
 	for ident, fam := range opts.Seams {
 		seams[ident] = fam
 	}
-	e := &extractor{root: root, sites: map[string]*Site{}, seams: seams}
+	e := &extractor{root: root, sites: map[string]*Site{}, seams: seams, seamDecls: map[string]map[string]string{}}
 	dirs := opts.Dirs
 	if len(dirs) == 0 {
 		dirs = []string{"cmd", "internal"}
+	}
+	// Two passes: pass A indexes which dirs declare seam idents (the
+	// caller may sit in a file walked BEFORE the declaring file, so the
+	// index must be complete before any scanFunc resolves). Pass B scans.
+	for _, dir := range dirs {
+		path := filepath.Join(root, dir)
+		info, err := os.Stat(path)
+		if err != nil || !info.IsDir() {
+			continue
+		}
+		if err = e.walk(path, opts, true); err != nil {
+			return nil, err
+		}
 	}
 	for _, dir := range dirs {
 		path := filepath.Join(root, dir)
@@ -131,8 +144,7 @@ func Extract(root string, opts Options) ([]*Site, error) {
 		if err != nil || !info.IsDir() {
 			continue
 		}
-		err = e.walk(path, opts)
-		if err != nil {
+		if err = e.walk(path, opts, false); err != nil {
 			return nil, err
 		}
 	}
@@ -258,9 +270,24 @@ type extractor struct {
 	fset  token.FileSet
 	sites map[string]*Site
 	seams map[string]string
+	// seamDecls maps package dir -> seam ident, collected in pass A of the
+	// walk (every FuncDecl named in the seam vocabulary). Pass B resolves
+	// cross-package calls `pkg.Seam` by suffix-matching the caller's import
+	// path against the declaring dirs — the hermetic substitute for type
+	// resolution (no go/packages).
+	seamDecls map[string]map[string]string
+	// currentImports is the alias list of the file being parsed (per-file,
+	// unlike the watched-package imports map).
+	currentImports []importAlias
 }
 
-func (e *extractor) walk(dir string, opts Options) error {
+// importAlias pairs a file's local package alias with its full import path.
+type importAlias struct {
+	local string
+	path  string
+}
+
+func (e *extractor) walk(dir string, opts Options, collectOnly bool) error {
 	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -280,6 +307,12 @@ func (e *extractor) walk(dir string, opts Options) error {
 			return nil
 		}
 		if ignored(path, e.root, opts.Ignore) {
+			return nil
+		}
+
+		if collectOnly {
+			e.collectSeamDecl(path)
+
 			return nil
 		}
 
@@ -324,6 +357,76 @@ func pkgID(root, path string) string {
 	return filepath.ToSlash(dir)
 }
 
+// collectSeamDecl records, for the seam vocabulary only, which package dirs
+// declare them: pass A of the two-pass walk. Cheap (parse only when the file
+// could declare a watched ident — decided by a substring prefilter).
+func (e *extractor) collectSeamDecl(path string) {
+	watched := make([]string, 0, len(e.seams))
+	for ident := range e.seams {
+		watched = append(watched, ident)
+	}
+	src, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+	containsAny := false
+	for _, ident := range watched {
+		if strings.Contains(string(src), "func "+ident+"(") {
+			containsAny = true
+
+			break
+		}
+	}
+	if !containsAny {
+		return
+	}
+	file, err := goparser.ParseFile(&e.fset, path, src, goparser.SkipObjectResolution)
+	if err != nil {
+		return
+	}
+	pkg := pkgID(e.root, path)
+	for _, decl := range file.Decls {
+		fn, ok := decl.(*ast.FuncDecl)
+		if !ok || fn.Recv != nil {
+			continue
+		}
+		if fam, watchedIdent := e.seams[fn.Name.Name]; watchedIdent {
+			if e.seamDecls[pkg] == nil {
+				e.seamDecls[pkg] = map[string]string{}
+			}
+			e.seamDecls[pkg][fn.Name.Name] = fam
+		}
+	}
+}
+
+// resolveCrossPkgSeam matches a caller's `local.Seam` call against the seam
+// declaration index: the import that `local` aliases must suffix-match a
+// declaring dir (longest match wins, mirroring how Go import paths nest).
+// Returns "" when local is a watched stdlib package or no seam matches.
+func (e *extractor) resolveCrossPkgSeam(local, ident string) string {
+	for _, imp := range e.currentImports {
+		if imp.local != local {
+			continue
+		}
+		best, bestLen := "", 0
+		for dir, idents := range e.seamDecls {
+			fam, ok := idents[ident]
+			if !ok {
+				continue
+			}
+			if strings.HasSuffix(imp.path, "/"+dir) || imp.path == dir && dir != "" {
+				if len(dir) > bestLen {
+					best, bestLen = fam, len(dir)
+				}
+			}
+		}
+
+		return best
+	}
+
+	return ""
+}
+
 func (e *extractor) parseFile(path string) error {
 	src, err := os.ReadFile(path)
 	if err != nil {
@@ -338,8 +441,16 @@ func (e *extractor) parseFile(path string) error {
 	testinfra := strings.Contains(filepath.ToSlash(path), "/testutil/")
 
 	imports := map[string]string{}
+	e.currentImports = e.currentImports[:0]
 	for _, imp := range file.Imports {
 		ipath := strings.Trim(imp.Path.Value, `"`)
+		localName := filepath.Base(ipath)
+		if imp.Name != nil {
+			localName = imp.Name.Name
+		}
+		if localName != "_" && localName != "." {
+			e.currentImports = append(e.currentImports, importAlias{local: localName, path: ipath})
+		}
 		key, ok := pkgOf[ipath]
 		if !ok {
 			for frag, k := range importSubstring {
@@ -415,6 +526,10 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 
 						return true
 					}
+				} else if fam := e.resolveCrossPkgSeam(xIdent.Name, call.Sel.Name); fam != "" {
+					e.record(id, node, testinfra, xIdent.Name+"."+call.Sel.Name, fam, ConfidenceToken, call.Sel.Name)
+
+					return true
 				}
 			}
 			if fam, isToken := methodToken[call.Sel.Name]; isToken {
