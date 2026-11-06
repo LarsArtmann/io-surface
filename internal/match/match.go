@@ -139,3 +139,16 @@ func SlashVariant(id string) (string, bool) {
 
 	return id[:slash+1+dot] + "/" + rest[dot+1:], true
 }
+
+// DottedVariant is the inverse of SlashVariant: it merges the last package
+// separator into a dot, yielding the hand-authored form a dotted-subpackage
+// declaration carries. The checker uses it to recognize that an undeclared
+// extraction and a dotted declaration are one root cause, not two.
+func DottedVariant(id string) (string, bool) {
+	i := strings.LastIndex(id, "/")
+	if i < 0 {
+		return "", false
+	}
+
+	return id[:i] + "." + id[i+1:], true
+}

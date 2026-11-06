@@ -169,6 +169,12 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	for _, s := range sites {
 		extractedByID[s.ID] = true
 	}
+	// Declared IDs by exact form: an extraction whose dotted variant is
+	// declared is the id-form finding's root cause, not a second one.
+	declaredByID := map[string]bool{}
+	for _, id := range m.IDs() {
+		declaredByID[id] = true
+	}
 
 	for _, canon := range sortedKeys(buckets) {
 		b := buckets[canon]
@@ -227,6 +233,12 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 
 				continue
 			}
+			// The site whose dotted variant is declared is already covered by
+			// the id-form error on the declaration; reporting undeclared too
+			// would double-count one authoring mistake.
+			if dotted, ok := match.DottedVariant(s.ID); ok && declaredByID[dotted] {
+				continue
+			}
 			rep.add(Finding{
 				Rule: RuleUndeclared, Severity: SeverityError, ID: s.ID, Family: s.Family(),
 				Location: firstLocation(s.Locations),
@@ -248,7 +260,7 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 			// real call site goes unguarded (dnsblockd adoption lesson).
 			if variant, ok := match.SlashVariant(id); ok && extractedByID[variant] {
 				rep.add(Finding{
-					Rule:     RuleIDForm, Severity: SeverityError, ID: id, Family: site.Family,
+					Rule: RuleIDForm, Severity: SeverityError, ID: id, Family: site.Family,
 					Location: firstLocation(site.Location),
 					Message:  fmt.Sprintf("declared with a dotted subpackage; the extractor emits %q — the dotted form can never pair with an extraction", variant),
 				})

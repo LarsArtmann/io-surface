@@ -1,6 +1,9 @@
 package check
 
 import (
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -188,5 +191,51 @@ func TestRun_LocationDriftIsInfoOnly(t *testing.T) {
 	}
 	if drift[0].Severity != SeverityInfo {
 		t.Errorf("location-drift severity = %q, want info (line numbers are derived)", drift[0].Severity)
+	}
+}
+
+// TestRun_DottedSubpackageIDIsAnError pins the dnsblockd adoption lesson: a
+// hand-authored ID that encodes a subpackage with a dot (internal/store.cache
+// for package internal/store/cache) can never pair with the extractor's
+// slash-package form. The gate reports one id-form error naming the correct
+// form — and does NOT double-report the extraction as a second undeclared
+// site, because that is one authoring mistake, not two.
+func TestRun_DottedSubpackageIDIsAnError(t *testing.T) {
+	root := t.TempDir()
+	src := filepath.Join(root, "internal", "store", "cache", "cache.go")
+	if err := os.MkdirAll(filepath.Dir(src), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	code := "package cache\n\nimport \"os\"\n\nfunc Load() ([]byte, error) {\n\treturn os.ReadFile(\"cache.bin\")\n}\n"
+	if err := os.WriteFile(src, []byte(code), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	m := &manifest.Manifest{
+		Sites: map[string]manifest.Site{
+			"internal/store.cache.Load": {
+				Location: []string{"internal/store/cache/cache.go:5"},
+				Family:   "file-read",
+				Facts:    manifest.Facts{Extractable: true},
+			},
+		},
+	}
+	rep, err := Run(root, m, Options{Advisory: true})
+	if err != nil {
+		t.Fatalf("Run: %v", err)
+	}
+
+	idForm := findingsByRule(rep, RuleIDForm)
+	if len(idForm) != 1 {
+		t.Fatalf("want exactly 1 id-form finding, got %d: %v", len(idForm), rep.Findings)
+	}
+	if idForm[0].Severity != SeverityError {
+		t.Errorf("id-form must be an error, got %s", idForm[0].Severity)
+	}
+	if !strings.Contains(idForm[0].Message, "internal/store/cache.Load") {
+		t.Errorf("id-form message must name the correct form: %s", idForm[0].Message)
+	}
+	if undeclared := findingsByRule(rep, RuleUndeclared); len(undeclared) != 0 {
+		t.Errorf("the dotted declaration's site must not double-report as undeclared: %v", undeclared)
 	}
 }
