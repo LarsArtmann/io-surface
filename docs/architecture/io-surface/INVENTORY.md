@@ -63,6 +63,24 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 - **`internal/absorb.gitHead`** — provenance only: the capability audit must name the revision the engine actually analyzed; falls back to the literal working-tree outside git so sandboxed runs stay valid
 
+## Reachability (capabilities)
+
+> Engine-observed by capslock v0.3.4 of `5a6c289-dirty` (2026-11-06): what each package can REACH, beyond its declared sites.
+> `direct` = through the package's own code (high signal); `deep` adds transitive
+> dependency paths (stdlib linkage reaches everywhere and carries no per-package signal).
+> Advisory: a package whose direct capability has no covered family is a `shadow-capability` info.
+
+| Package             | Direct             | Deep (transitive)          | Judgment                                                                                                                                                                                                         |
+| ------------------- | ------------------ | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/io-surface`    | `FILES`, `NETWORK` | `EXEC`, `FILES`, `NETWORK` | capslock v0.3.4 direct-NETWORK edge here is an SSA conflation phantom (json/v2 stream writer unified with http.response; zero network use — blind-spot run 2026-11-06, false-positive class 2)                   |
+| `internal/absorb`   | `EXEC`, `FILES`    | `EXEC`, `FILES`, `NETWORK` | —                                                                                                                                                                                                                |
+| `internal/check`    | `FILES`            | `EXEC`, `FILES`, `NETWORK` | —                                                                                                                                                                                                                |
+| `internal/emit`     | —                  | `EXEC`, `FILES`, `NETWORK` | —                                                                                                                                                                                                                |
+| `internal/extract`  | `FILES`, `NETWORK` | `EXEC`, `FILES`, `NETWORK` | capslock v0.3.4 direct-NETWORK edges here are SSA range-func conflation (strings.FieldsSeq$1 -> net/http.ParseCookie$1; the package is hermetic by contract — blind-spot run 2026-11-06, false-positive class 1) |
+| `internal/manifest` | `FILES`            | `EXEC`, `FILES`, `NETWORK` | —                                                                                                                                                                                                                |
+| `internal/render`   | —                  | `EXEC`, `FILES`, `NETWORK` | —                                                                                                                                                                                                                |
+| `internal/scaffold` | `EXEC`, `FILES`    | `EXEC`, `FILES`            | —                                                                                                                                                                                                                |
+
 ## Deliberately out of scope
 
 - timers and tickers (scheduling)
