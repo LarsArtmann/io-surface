@@ -11,8 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - `path/filepath` extraction (`Walk`/`WalkDir`/`Glob` → `file-read`, resolved
   tier): directory traversal and globbing are now visible I/O. The
-  self-hosting gate immediately caught the extractor's own `filepath.Walk` —
-  now declared in this repo's manifest
+  self-dogfood audit found the extractor's own `filepath.Walk` invisible to
+  the gate (a gate cannot see its own blind spots); it is now taught and
+  declared in this repo's manifest
 - House documentation set: `AGENTS.md` (agent context), `FEATURES.md`,
   `TODO_LIST.md`, `ROADMAP.md` — harvested from the birth status report
   (`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
