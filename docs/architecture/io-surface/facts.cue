@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "6b56dfa-dirty"
+	commit: "16a9a11"
 	date:   "2026-11-06"
 	claims: 20
 	method: "io-surface extract (AST, stdlib-only)"
@@ -34,8 +34,8 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:249",
-			"cmd/io-surface/commands.go:285",
+			"cmd/io-surface/commands.go:255",
+			"cmd/io-surface/commands.go:291",
 		]
 		family: "file-write"
 		facts: {
@@ -44,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:163",
-			"cmd/io-surface/commands.go:192",
+			"cmd/io-surface/commands.go:169",
+			"cmd/io-surface/commands.go:198",
 		]
 		family: "file-write"
 		facts: {
@@ -54,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:242",
+			"cmd/io-surface/commands.go:248",
 		]
 		family: "file-write"
 		facts: {
