@@ -239,19 +239,17 @@ func TestValidate_MalformedID(t *testing.T) {
 	}
 }
 
-func TestValidate_DottedSubpackageID(t *testing.T) {
+// TestValidate_DottedSubpackageID pins that dotted UNEXPORTED-TYPE forms are
+// statically legal: "extractor" is a real type in package extract, so a
+// lexical dotted-subpackage rejection would false-positive on the tool's own
+// manifest. The never-pair detection lives in check (rule io-surface/id-form)
+// where the extracted set can confirm the slash variant actually exists.
+func TestValidate_DottedUnexportedTypeFormIsLegal(t *testing.T) {
 	m := validateFixture(t, map[string]Site{
-		"internal/server.sso.Manager.ensureProvider": {Family: "outbound"},
-		"internal/server.views.CSS":                  {Family: "file-read"},
+		"internal/extract.extractor.parseFile": {Family: "file-read"},
 	})
-	errs := m.Validate()
-	if len(errs) != 2 {
-		t.Fatalf("want 2 dotted-subpackage errors, got %v", errs)
-	}
-	for _, want := range []string{"dotted subpackage", "internal/server/sso.Manager.ensureProvider", "internal/server/views.CSS"} {
-		if !strings.Contains(errs[0].Error(), want) && !strings.Contains(errs[1].Error(), want) {
-			t.Errorf("error must mention %q, got: %v / %v", want, errs[0], errs[1])
-		}
+	if errs := m.Validate(); len(errs) != 0 {
+		t.Fatalf("unexported-type dotted form must validate clean, got %v", errs)
 	}
 }
 
