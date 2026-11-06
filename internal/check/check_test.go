@@ -50,6 +50,22 @@ func fixtureManifest() *manifest.Manifest {
 				Family:   "file-read",
 				Facts:    manifest.Facts{Extractable: true},
 			},
+			// new-family sites (mmap / bufio / ServeContent), paired exactly
+			"internal/store.MmapFile": {
+				Location: []string{"internal/store/mapped.go:15"},
+				Family:   "file-read",
+				Facts:    manifest.Facts{Extractable: true},
+			},
+			"internal/store.Buffered": {
+				Location: []string{"internal/store/mapped.go:27"},
+				Family:   "stream-copy",
+				Facts:    manifest.Facts{Extractable: true},
+			},
+			"cmd/app.serve": {
+				Location: []string{"cmd/app/main.go:16"},
+				Family:   "stream-copy",
+				Facts:    manifest.Facts{Extractable: true},
+			},
 			// visible claim, exempt from extraction
 			"internal/store.DocOnly": {
 				Location: []string{"internal/store/store.go:1"},

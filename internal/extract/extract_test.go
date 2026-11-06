@@ -37,6 +37,9 @@ func TestExtract_FamiliesAndConfidence(t *testing.T) {
 		{"seam ident is weak tier", "internal/store.persistAll", "file-write", "atomicWriteFile", ConfidenceToken},
 		{"method token is weak tier", "internal/store.Server.Serve", "listener", ".ListenAndServe", ConfidenceToken},
 		{"embed var", "internal/store.quotaJSON", "embed", "go:embed quota.json", ConfidenceResolved},
+		{"resolved mmap", "internal/store.MmapFile", "file-read", "syscall.Mmap", ConfidenceResolved},
+		{"resolved bufio wrapper", "internal/store.Buffered", "stream-copy", "bufio.NewReader", ConfidenceResolved},
+		{"resolved serve content", "cmd/app.serve", "stream-copy", "http.ServeContent", ConfidenceResolved},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
