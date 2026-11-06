@@ -11,15 +11,15 @@ shipped commit (daemon `3604d6e`, local only, **not pushed**).
 
 **VERIFIED this session, with the command that proved it:**
 
-| Claim                                                              | Proof command                                             |
-| ------------------------------------------------------------------ | --------------------------------------------------------- |
-| Full CI bar green after all changes                                | `go build ./... && go vet ./... && go test ./... && gofmt -l . && go run ./cmd/io-surface check --root . && go run ./cmd/io-surface render --root . > /dev/null` → all green, check prints `9 declared, 9 extracted (9 resolved, 0 token), 0 baselined — 0 errors, 0 warnings, 0 infos` |
-| `init --force` refreshes ONLY `facts.cue`                          | `git diff --stat docs/architecture/io-surface/` after `init --force` → 1 file changed (facts.cue) |
-| Manifest regeneration is idempotent                                | second `init --force` → `git status docs/` empty          |
-| Judgment files survive a refresh byte-for-byte                     | `TestWrite_ForceRefreshesFactsOnly` in `internal/scaffold/scaffold_test.go` (plants claims/baseline/schema, asserts equality) |
-| Fixture extraction of the new family                               | `go run ./cmd/io-surface extract --root testdata/extract` → `internal/store.WalkFiles` @ `walk.go:10`, call `filepath.WalkDir`, resolved |
-| Coverage moved (scaffold 92.6→93.1%, extract 80.2→81.5%, check ~90.8%) | `go test -cover ./internal/scaffold ./internal/extract ./internal/check` |
-| Working tree clean, one unpushed commit                            | `git status` (clean), `git log origin/master..HEAD` (1)   |
+| Claim                                                                  | Proof command                                                                                                                                                                                                                                                                           |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Full CI bar green after all changes                                    | `go build ./... && go vet ./... && go test ./... && gofmt -l . && go run ./cmd/io-surface check --root . && go run ./cmd/io-surface render --root . > /dev/null` → all green, check prints `9 declared, 9 extracted (9 resolved, 0 token), 0 baselined — 0 errors, 0 warnings, 0 infos` |
+| `init --force` refreshes ONLY `facts.cue`                              | `git diff --stat docs/architecture/io-surface/` after `init --force` → 1 file changed (facts.cue)                                                                                                                                                                                       |
+| Manifest regeneration is idempotent                                    | second `init --force` → `git status docs/` empty                                                                                                                                                                                                                                        |
+| Judgment files survive a refresh byte-for-byte                         | `TestWrite_ForceRefreshesFactsOnly` in `internal/scaffold/scaffold_test.go` (plants claims/baseline/schema, asserts equality)                                                                                                                                                           |
+| Fixture extraction of the new family                                   | `go run ./cmd/io-surface extract --root testdata/extract` → `internal/store.WalkFiles` @ `walk.go:10`, call `filepath.WalkDir`, resolved                                                                                                                                                |
+| Coverage moved (scaffold 92.6→93.1%, extract 80.2→81.5%, check ~90.8%) | `go test -cover ./internal/scaffold ./internal/extract ./internal/check`                                                                                                                                                                                                                |
+| Working tree clean, one unpushed commit                                | `git status` (clean), `git log origin/master..HEAD` (1)                                                                                                                                                                                                                                 |
 
 **NOT verified, and why:**
 
@@ -73,24 +73,24 @@ shipped commit (daemon `3604d6e`, local only, **not pushed**).
 
 ## a) FULLY DONE
 
-| Work                                                                    | Evidence                                                                                     |
-| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `path/filepath` extraction family (`Walk`/`WalkDir`/`Glob` → file-read) | `internal/extract/extract.go:125,156-202`; fixture `walk.go`; `extract_test.go` row           |
-| TODO #1 closed: `init --force` can no longer clobber judgment files     | `scaffold.Write` skip logic; `TestWrite_ForceRefreshesFactsOnly`; CHANGELOG Fixed entry       |
-| Self-manifest refreshed to a clean, honest snapshot                     | `facts.cue` 9 sites / 12 locations; self-check `0/0/0`; idempotency proven                    |
-| Full CI bar green at session end                                        | build, vet, test (4 packages ok), gofmt clean, self-check, self-render                        |
-| Docs synced (AGENTS/CONTRIBUTING/CHANGELOG/FEATURES/TODO_LIST)          | daemon commit `3604d6e` (13 files, +138/−32)                                                  |
-| False narrative corrected on sight (see §d1)                            | CHANGELOG.md:12-16, FEATURES.md:48 now say the *audit* found the gap, not the gate            |
+| Work                                                                    | Evidence                                                                                |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `path/filepath` extraction family (`Walk`/`WalkDir`/`Glob` → file-read) | `internal/extract/extract.go:125,156-202`; fixture `walk.go`; `extract_test.go` row     |
+| TODO #1 closed: `init --force` can no longer clobber judgment files     | `scaffold.Write` skip logic; `TestWrite_ForceRefreshesFactsOnly`; CHANGELOG Fixed entry |
+| Self-manifest refreshed to a clean, honest snapshot                     | `facts.cue` 9 sites / 12 locations; self-check `0/0/0`; idempotency proven              |
+| Full CI bar green at session end                                        | build, vet, test (4 packages ok), gofmt clean, self-check, self-render                  |
+| Docs synced (AGENTS/CONTRIBUTING/CHANGELOG/FEATURES/TODO_LIST)          | daemon commit `3604d6e` (13 files, +138/−32)                                            |
+| False narrative corrected on sight (see §d1)                            | CHANGELOG.md:12-16, FEATURES.md:48 now say the _audit_ found the gap, not the gate      |
 
 ## b) PARTIALLY DONE
 
-| Work                                      | Done                                                            | Missing                                                                                     |
-| ----------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| TODO #19 (missing extraction families)    | `filepath.Walk/WalkDir/Glob` landed                             | `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio.New*`, `http.ServeContent` |
-| Dogfooding as a practice                  | Self-check in CI; honest snapshot committed                     | No local gate (TODO #15), no red-state dogfood recipe, no family-census audit tooling         |
-| Test coverage of the new `Write` branches | Fresh-write and skip-rewrite paths covered (93.1%)              | `--force` with a DELETED judgment file (recreate path) untested; refresh+load untested        |
-| Fleet rollout of the new family           | This repo regenerated                                           | InboxClean/dnsblockd facts not swept; no release cut, so consumers unaffected until 0.1.1    |
-| Birth-report defect trail                 | TODO_LIST #1 removed, CHANGELOG carries the fix                 | Birth report §d1 not annotated as fixed-forward (point-in-time doc, left untouched)          |
+| Work                                      | Done                                               | Missing                                                                                         |
+| ----------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| TODO #19 (missing extraction families)    | `filepath.Walk/WalkDir/Glob` landed                | `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio.New*`, `http.ServeContent` |
+| Dogfooding as a practice                  | Self-check in CI; honest snapshot committed        | No local gate (TODO #15), no red-state dogfood recipe, no family-census audit tooling           |
+| Test coverage of the new `Write` branches | Fresh-write and skip-rewrite paths covered (93.1%) | `--force` with a DELETED judgment file (recreate path) untested; refresh+load untested          |
+| Fleet rollout of the new family           | This repo regenerated                              | InboxClean/dnsblockd facts not swept; no release cut, so consumers unaffected until 0.1.1       |
+| Birth-report defect trail                 | TODO_LIST #1 removed, CHANGELOG carries the fix    | Birth report §d1 not annotated as fixed-forward (point-in-time doc, left untouched)             |
 
 ## c) NOT STARTED (as observed this session)
 
@@ -200,7 +200,7 @@ behind it. But four things deserve the harsh label:
    capabilities otherwise — everything taught is declared, everything declared
    is enforced by CI.
 8. **Scope creep trap?** Avoided: buildflow's findings, the 490-line file, and
-   the fleet sweep were all *noted and deferred*, not fixed mid-task. The one
+   the fleet sweep were all _noted and deferred_, not fixed mid-task. The one
    scope addition (TODO #1) was justified: the dogfood workflow depended on
    `--force` being safe.
 9. **Did we remove something useful?** TODO_LIST row #1 only (done, logged in
@@ -223,9 +223,9 @@ behind it. But four things deserve the harsh label:
     re-verify before asserting: that the gate would fail red — I asserted the
     rule outcome without running it. Caught in self-review, corrected.
 
-*Note on output format: the brutal-self-review skill defaults to a styled HTML
+_Note on output format: the brutal-self-review skill defaults to a styled HTML
 report in `docs/reviews/`; the user's explicit single-file `.md` instruction
-at `docs/status/` wins, so the self-review is folded in here instead.*
+at `docs/status/` wins, so the self-review is folded in here instead._
 
 ## f) Up to 50 things to get done next
 
@@ -233,58 +233,58 @@ Ranked by impact × effort. Items marked 🆕 are session-derived; the rest are
 carry-forward from `TODO_LIST.md` (numbering preserved). Items #1-#5 are the
 direct consequences of THIS session.
 
-| #  | Task                                                                                                                    | Src    | Impact | Effort |
-| -- | ----------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------ |
-| 1  | 🆕 Fixture cases for `filepath.Walk` and `filepath.Glob` (de-ghost the table; satisfy "table + fixture" rule fully)        | 🆕     | High   | 30min  |
-| 2  | 🆕 Test `--force` with a deleted judgment file (recreate path) + refresh-then-`manifest.Load` with planted claims          | 🆕     | High   | 30min  |
-| 3  | 🆕 Witness-the-red-state: document the dogfood recipe (teach → check FAILS → declare → green) in AGENTS.md                 | 🆕     | High   | 15min  |
-| 4  | 🆕 Sweep fleet repos (InboxClean, dnsblockd) for `filepath.Walk/WalkDir/Glob` before any 0.1.1 tag; regenerate their facts | 🆕     | High   | 1h     |
-| 5  | 🆕 `runInit` success message: say "refreshed facts.cue only" on the force path (stop overclaiming)                        | 🆕     | Med    | 15min  |
-| 6  | 🆕 Run `go test -race ./...` once and record the result (first data point toward TODO #34)                                | 🆕     | Med    | 10min  |
-| 7  | 🆕 Split extractor tables into `internal/extract/tables.go` (pure data move; addresses file-size finding)                  | 🆕     | Med    | 1h     |
-| 8  | 🆕 Annotate birth report §d1 (init --force defect) as fixed-forward with pointer to CHANGELOG                             | 🆕     | Low    | 10min  |
-| 9  | 🆕 README: one line on `--force` refresh semantics (facts-only)                                                           | 🆕     | Low    | 10min  |
-| 10 | #2  `check --json` always emits JSON (validation failures as findings)                                                    | TODO   | High   | 1h     |
-| 11 | #3  Print actual CUE `violations` entries instead of "incompatible list lengths"                                          | TODO   | High   | 1-2h   |
-| 12 | #4  `audit.commit` = real `git rev-parse` (+`-dirty`); my fresh snapshot currently says `"working-tree"`                   | TODO   | Med    | 30min  |
-| 13 | #5  `render --check` + BEGIN/END generated blocks (doc ↔ manifest drift gate)                                              | TODO   | High   | 3-4h   |
-| 14 | #6  CI: regenerate facts and fail on drift (my idempotency proof, mechanized)                                             | TODO   | Med    | 1h     |
-| 15 | #15 Local gate outside CI (pre-commit or buildflow provider — see question g3)                                            | TODO   | Med    | 30min  |
-| 16 | #18 BuildFlow provider via go-finding/toolsdk so the fleet gate runs `io-surface check`                                    | TODO   | Med    | 2-3h   |
-| 17 | #17 SARIF emission (suppressions + LSP diagnostics for free)                                                              | TODO   | Med    | 2-3h   |
-| 18 | #20 Derive seams from manifest `via` values (kills the hardcoded seamIdent table — same class as §e2)                      | TODO   | Med    | 2h     |
-| 19 | #19 remainder: `os.Std*`, `syscall.Mmap`, `net.ListenConfig`, `bufio.New*`, `http.ServeContent` families                   | TODO   | Med    | 1-2h   |
-| 20 | #11 `cmd/io-surface` tests (exit codes 0/1/2, `--force` flag wiring — the CLI level my fix is untested at)                 | TODO   | Med    | 2h     |
-| 21 | #12 manifest package tests (decode edge cases + planted violation)                                                        | TODO   | Med    | 1h     |
-| 22 | #10 Golden test for `render.Markdown`                                                                                      | TODO   | Med    | 1h     |
-| 23 | #13 render tests (claims columns, judgments, scope OUT) — same file as #22                                                 | TODO   | Med    | 1h     |
-| 24 | #7  Baseline "only shrinks" enforcement (rule is comments-only today)                                                      | TODO   | Med    | 1-2h   |
-| 25 | #8  Baseline `owner` + `expires`; expired entries fail                                                                     | TODO   | Med    | 1-2h   |
-| 26 | #9  Hint when declared sites fall outside `--dirs`                                                                         | TODO   | Med    | 30min  |
-| 27 | #14 Enforcement-policy field in the manifest (repo can't silently opt out)                                                 | TODO   | Med    | 2h     |
-| 28 | #23 manifest `version` field + schema bump rule                                                                            | TODO   | Med    | 30min  |
-| 29 | #24 `--ignore` globs for generated code                                                                                    | TODO   | Med    | 1h     |
-| 30 | #22 `baseline add` subcommand (stop hand-editing CUE)                                                                      | TODO   | Med    | 1h     |
-| 31 | #21 Cross-package seam support (`pkg/` helper owning the raw call)                                                         | TODO   | Med    | 2-3h   |
-| 32 | #25 Gate InboxClean: commit manifest + CI check (cross-repo)                                                               | TODO   | Med    | 30min  |
-| 33 | #26 dnsblockd: declare/baseline its 5 errors (cross-repo)                                                                  | TODO   | Med    | 1h     |
-| 34 | #43 Wire docs-gates into CI, pinned                                                                                        | TODO   | Med    | 1h     |
-| 35 | #44 CI job installing the module from the public path (module-path tripwire)                                               | TODO   | Med    | 30min  |
-| 36 | #39 Handle the open Dependabot PR (actions bump)                                                                           | TODO   | Med    | 15min  |
-| 37 | 🆕 Decide buildflow-vs-CI-bar reconciliation (g2): 350-line limit, golangci, -race — adopt fleet bar or document divergence  | 🆕     | Med    | 30min  |
-| 38 | #29 `extract --stats` family census (the blindness-audit tool, §e2)                                                        | TODO   | Low    | 1h     |
-| 39 | #28 Reconsider the noisy bare `.Do` token (classify ambiguous)                                                             | TODO   | Low    | 30min  |
-| 40 | #30 `version --json` with commit + date                                                                                    | TODO   | Low    | 30min  |
-| 41 | #36 Tag v0.1.0 (const says 0.1.0; no tag exists)                                                                           | TODO   | Low    | 15min  |
-| 42 | #37 Smoke-test `go install …@latest` through the public proxy                                                              | TODO   | High   | 10min  |
-| 43 | #38 Check pkg.go.dev indexing after #42                                                                                    | TODO   | Low    | 10min  |
-| 44 | #31 Document the taxonomy freeze rule (new family = schema bump)                                                           | TODO   | Low    | 15min  |
-| 45 | #32 Document ID migration on package moves                                                                                 | TODO   | Low    | 15min  |
-| 46 | #33 Register the repo in the fleet inventory (meta / stack-selection)                                                      | TODO   | Low    | 30min  |
-| 47 | #34 `-race` + very-large-repo benchmark, record results (after #6 gives the local data point)                              | TODO   | Low    | 1h     |
-| 48 | #35 Family distribution across ~10 fleet repos                                                                             | TODO   | Low    | 2h     |
-| 49 | #46 Seed `.docs-gates.json` thresholds                                                                                     | TODO   | Low    | 15min  |
-| 50 | #48 go-release flow for 0.1.1 once #10-#12 land (includes #4's commit field)                                               | TODO   | Low    | 30min  |
+| #  | Task                                                                                                                        | Src  | Impact | Effort |
+| -- | --------------------------------------------------------------------------------------------------------------------------- | ---- | ------ | ------ |
+| 1  | 🆕 Fixture cases for `filepath.Walk` and `filepath.Glob` (de-ghost the table; satisfy "table + fixture" rule fully)         | 🆕   | High   | 30min  |
+| 2  | 🆕 Test `--force` with a deleted judgment file (recreate path) + refresh-then-`manifest.Load` with planted claims           | 🆕   | High   | 30min  |
+| 3  | 🆕 Witness-the-red-state: document the dogfood recipe (teach → check FAILS → declare → green) in AGENTS.md                  | 🆕   | High   | 15min  |
+| 4  | 🆕 Sweep fleet repos (InboxClean, dnsblockd) for `filepath.Walk/WalkDir/Glob` before any 0.1.1 tag; regenerate their facts  | 🆕   | High   | 1h     |
+| 5  | 🆕 `runInit` success message: say "refreshed facts.cue only" on the force path (stop overclaiming)                          | 🆕   | Med    | 15min  |
+| 6  | 🆕 Run `go test -race ./...` once and record the result (first data point toward TODO #34)                                  | 🆕   | Med    | 10min  |
+| 7  | 🆕 Split extractor tables into `internal/extract/tables.go` (pure data move; addresses file-size finding)                   | 🆕   | Med    | 1h     |
+| 8  | 🆕 Annotate birth report §d1 (init --force defect) as fixed-forward with pointer to CHANGELOG                               | 🆕   | Low    | 10min  |
+| 9  | 🆕 README: one line on `--force` refresh semantics (facts-only)                                                             | 🆕   | Low    | 10min  |
+| 10 | #2 `check --json` always emits JSON (validation failures as findings)                                                       | TODO | High   | 1h     |
+| 11 | #3 Print actual CUE `violations` entries instead of "incompatible list lengths"                                             | TODO | High   | 1-2h   |
+| 12 | #4 `audit.commit` = real `git rev-parse` (+`-dirty`); my fresh snapshot currently says `"working-tree"`                     | TODO | Med    | 30min  |
+| 13 | #5 `render --check` + BEGIN/END generated blocks (doc ↔ manifest drift gate)                                                | TODO | High   | 3-4h   |
+| 14 | #6 CI: regenerate facts and fail on drift (my idempotency proof, mechanized)                                                | TODO | Med    | 1h     |
+| 15 | #15 Local gate outside CI (pre-commit or buildflow provider — see question g3)                                              | TODO | Med    | 30min  |
+| 16 | #18 BuildFlow provider via go-finding/toolsdk so the fleet gate runs `io-surface check`                                     | TODO | Med    | 2-3h   |
+| 17 | #17 SARIF emission (suppressions + LSP diagnostics for free)                                                                | TODO | Med    | 2-3h   |
+| 18 | #20 Derive seams from manifest `via` values (kills the hardcoded seamIdent table — same class as §e2)                       | TODO | Med    | 2h     |
+| 19 | #19 remainder: `os.Std*`, `syscall.Mmap`, `net.ListenConfig`, `bufio.New*`, `http.ServeContent` families                    | TODO | Med    | 1-2h   |
+| 20 | #11 `cmd/io-surface` tests (exit codes 0/1/2, `--force` flag wiring — the CLI level my fix is untested at)                  | TODO | Med    | 2h     |
+| 21 | #12 manifest package tests (decode edge cases + planted violation)                                                          | TODO | Med    | 1h     |
+| 22 | #10 Golden test for `render.Markdown`                                                                                       | TODO | Med    | 1h     |
+| 23 | #13 render tests (claims columns, judgments, scope OUT) — same file as #22                                                  | TODO | Med    | 1h     |
+| 24 | #7 Baseline "only shrinks" enforcement (rule is comments-only today)                                                        | TODO | Med    | 1-2h   |
+| 25 | #8 Baseline `owner` + `expires`; expired entries fail                                                                       | TODO | Med    | 1-2h   |
+| 26 | #9 Hint when declared sites fall outside `--dirs`                                                                           | TODO | Med    | 30min  |
+| 27 | #14 Enforcement-policy field in the manifest (repo can't silently opt out)                                                  | TODO | Med    | 2h     |
+| 28 | #23 manifest `version` field + schema bump rule                                                                             | TODO | Med    | 30min  |
+| 29 | #24 `--ignore` globs for generated code                                                                                     | TODO | Med    | 1h     |
+| 30 | #22 `baseline add` subcommand (stop hand-editing CUE)                                                                       | TODO | Med    | 1h     |
+| 31 | #21 Cross-package seam support (`pkg/` helper owning the raw call)                                                          | TODO | Med    | 2-3h   |
+| 32 | #25 Gate InboxClean: commit manifest + CI check (cross-repo)                                                                | TODO | Med    | 30min  |
+| 33 | #26 dnsblockd: declare/baseline its 5 errors (cross-repo)                                                                   | TODO | Med    | 1h     |
+| 34 | #43 Wire docs-gates into CI, pinned                                                                                         | TODO | Med    | 1h     |
+| 35 | #44 CI job installing the module from the public path (module-path tripwire)                                                | TODO | Med    | 30min  |
+| 36 | #39 Handle the open Dependabot PR (actions bump)                                                                            | TODO | Med    | 15min  |
+| 37 | 🆕 Decide buildflow-vs-CI-bar reconciliation (g2): 350-line limit, golangci, -race — adopt fleet bar or document divergence | 🆕   | Med    | 30min  |
+| 38 | #29 `extract --stats` family census (the blindness-audit tool, §e2)                                                         | TODO | Low    | 1h     |
+| 39 | #28 Reconsider the noisy bare `.Do` token (classify ambiguous)                                                              | TODO | Low    | 30min  |
+| 40 | #30 `version --json` with commit + date                                                                                     | TODO | Low    | 30min  |
+| 41 | #36 Tag v0.1.0 (const says 0.1.0; no tag exists)                                                                            | TODO | Low    | 15min  |
+| 42 | #37 Smoke-test `go install …@latest` through the public proxy                                                               | TODO | High   | 10min  |
+| 43 | #38 Check pkg.go.dev indexing after #42                                                                                     | TODO | Low    | 10min  |
+| 44 | #31 Document the taxonomy freeze rule (new family = schema bump)                                                            | TODO | Low    | 15min  |
+| 45 | #32 Document ID migration on package moves                                                                                  | TODO | Low    | 15min  |
+| 46 | #33 Register the repo in the fleet inventory (meta / stack-selection)                                                       | TODO | Low    | 30min  |
+| 47 | #34 `-race` + very-large-repo benchmark, record results (after #6 gives the local data point)                               | TODO | Low    | 1h     |
+| 48 | #35 Family distribution across ~10 fleet repos                                                                              | TODO | Low    | 2h     |
+| 49 | #46 Seed `.docs-gates.json` thresholds                                                                                      | TODO | Low    | 15min  |
+| 50 | #48 go-release flow for 0.1.1 once #10-#12 land (includes #4's commit field)                                                | TODO | Low    | 30min  |
 
 Blocked items not repeated here: #27 (session lock), #40-#42 (Forgejo token).
 
