@@ -40,6 +40,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the v0.3.4 blind-spot run (`docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md`)
   — 10/11 real direct sinks were already declared; Capslock false-positive
   classes are why the tier is advisory.
+- **Recorded enforcement policy (decision D4):** the manifest gains
+  `enforcement: "gate" | "audit"` (absent = `gate`, scaffolded explicitly).
+  `audit` reports error findings but exits 0 — the adoption posture — and
+  `check --enforce` overrides it for one run. The policy lives IN the
+  manifest so weakening the gate is a committed, reviewable diff, never a
+  silent CI edit; the JSON/SARIF report carries the policy (`enforcement`
+  field) and the human note goes to stderr so machine output stays
+  parseable.
 - SARIF output: `check --format sarif` emits SARIF 2.1.0 via the house
   `go-finding` library (rule IDs and severities pass through unchanged, so
   GitHub renders them natively); CI uploads the self-hosted SARIF as an

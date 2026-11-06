@@ -156,6 +156,12 @@ docs/architecture/io-surface/
   capabilities.cue  ENGINE-DERIVED (optional): per-package reachability, written only by `absorb`
 ```
 
+`facts.cue` records the repo's enforcement policy (written by `init`):
+`enforcement: "gate"` — error findings fail the build — or `"audit"`, which
+reports findings but exits 0 (the adoption posture). Because the policy lives
+in the manifest, weakening the gate is a committed, reviewable diff, never a
+silent CI edit; `check --enforce` overrides it for a single run.
+
 Two contract rules the manifest standard enforces on itself:
 
 - **Taxonomy freeze:** the families, disciplines, and capability names are
