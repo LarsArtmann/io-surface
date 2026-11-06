@@ -157,9 +157,6 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
 Fix work is tracked in `TODO_LIST.md`; this section is what to WATCH OUT for
 while working here:
 
-- `check --json` with a manifest validation failure prints text to stderr and
-  exits 1 with NO JSON on stdout — do not build a JSON-parsing consumer on
-  that path yet.
 - CUE constraint violations surface as an opaque "incompatible list lengths"
   error, not the actual violation entries — grep `violations` in the CUE
   package when debugging one.
