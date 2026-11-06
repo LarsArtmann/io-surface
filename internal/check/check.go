@@ -141,7 +141,7 @@ func ValidationReport(m *manifest.Manifest, errs []error) *Report {
 
 // Run extracts the tree under root and compares it against the manifest.
 func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
-	sites, err := extract.Extract(root, extract.Options{Dirs: opts.Dirs, Ignore: opts.Ignore})
+	sites, err := extract.Extract(root, extract.Options{Dirs: opts.Dirs, Ignore: opts.Ignore, Seams: manifestSeams(m)})
 	if err != nil {
 		return nil, fmt.Errorf("extracting %s: %w", root, err)
 	}
@@ -551,4 +551,20 @@ func join(items []string) string {
 	}
 
 	return out.String()
+}
+
+// manifestSeams learns the repo's wrapper vocabulary from the manifest: every
+// declared site whose facts.via names a wrapper contributes ident → family.
+// This is how a repo teaches the extractor its own seams without an extractor
+// edit — the hardcoded table is only the built-in default vocabulary.
+func manifestSeams(m *manifest.Manifest) map[string]string {
+	seams := map[string]string{}
+	for id := range m.Sites {
+		s := m.Sites[id]
+		if via := s.Facts.Via; via != "" {
+			seams[via] = s.Family
+		}
+	}
+
+	return seams
 }

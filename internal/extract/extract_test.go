@@ -181,3 +181,32 @@ func siteByIDOk(sites []*Site, id string) (*Site, bool) {
 
 	return nil, false
 }
+
+// TestExtract_ManifestDerivedSeams pins the #20 design: a repo-specific
+// wrapper is invisible to the built-in table, but extract.Options.Seams —
+// which check.Run derives from the manifest's facts.via values — teaches it
+// without an extractor edit.
+func TestExtract_ManifestDerivedSeams(t *testing.T) {
+	defaults, err := Extract("../../testdata/extract", Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	if _, has := siteByIDOk(defaults, "internal/store.callGenWrite"); has {
+		t.Fatal("callGenWrite extracted without a seam declaration — the test premise is broken")
+	}
+
+	seamed, err := Extract("../../testdata/extract", Options{Seams: map[string]string{"genWrite": "file-write"}})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	caller, has := siteByIDOk(seamed, "internal/store.callGenWrite")
+	if !has {
+		t.Fatal("manifest-derived seam did not surface the caller")
+	}
+	if caller.Confidence != ConfidenceToken {
+		t.Errorf("caller confidence = %q, want token (seam attribution is advisory)", caller.Confidence)
+	}
+	if caller.Via != "genWrite" {
+		t.Errorf("caller via = %q, want genWrite", caller.Via)
+	}
+}
