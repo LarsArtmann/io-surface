@@ -107,6 +107,9 @@ type Options struct {
 	Dirs []string
 	// Advisory includes weak-tier findings (default true).
 	Advisory bool
+	// Ignore skips files matching these extraction globs (generated code);
+	// kept in lockstep with extract.Options.Ignore.
+	Ignore []string
 }
 
 // bucket is one canonical group: every declared ID and every extracted site
@@ -138,7 +141,7 @@ func ValidationReport(m *manifest.Manifest, errs []error) *Report {
 
 // Run extracts the tree under root and compares it against the manifest.
 func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
-	sites, err := extract.Extract(root, extract.Options{Dirs: opts.Dirs})
+	sites, err := extract.Extract(root, extract.Options{Dirs: opts.Dirs, Ignore: opts.Ignore})
 	if err != nil {
 		return nil, fmt.Errorf("extracting %s: %w", root, err)
 	}
