@@ -210,3 +210,40 @@ func TestExtract_ManifestDerivedSeams(t *testing.T) {
 		t.Errorf("caller via = %q, want genWrite", caller.Via)
 	}
 }
+
+// TestExtract_CrossPackageSeam pins the #21 design: a caller in ANOTHER
+// package (`cmd/app.mirror` calling `store.genWrite`) resolves against the
+// seam vocabulary by import-path suffix matching — hermetic, no go/packages,
+// token tier like every seam attribution.
+func TestExtract_CrossPackageSeam(t *testing.T) {
+	defaults, err := Extract("../../testdata/extract", Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	if _, has := siteByIDOk(defaults, "cmd/app.mirror"); has {
+		t.Fatal("cross-package seam resolved without the vocabulary — premise broken")
+	}
+
+	seamed, err := Extract("../../testdata/extract", Options{
+		Seams: map[string]string{
+			"genWrite":        "file-write",
+			"atomicWriteFile": "file-write",
+		},
+	})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	caller, has := siteByIDOk(seamed, "cmd/app.mirror")
+	if !has {
+		t.Fatal("cross-package seam did not surface the caller")
+	}
+	if caller.Confidence != ConfidenceToken {
+		t.Errorf("confidence = %q, want token", caller.Confidence)
+	}
+	if caller.Via != "genWrite" {
+		t.Errorf("via = %q, want genWrite", caller.Via)
+	}
+	if !contains(caller.Calls, "store.genWrite") {
+		t.Errorf("calls = %v, want store.genWrite", caller.Calls)
+	}
+}
