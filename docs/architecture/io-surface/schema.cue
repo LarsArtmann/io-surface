@@ -1,4 +1,4 @@
-// schema.cue — the I/O surface manifest standard (io-surface/v1).
+// schema.cue — the I/O surface manifest standard (io-surface/v1.1).
 //
 // The manifest describes every production code location in this repository
 // that touches I/O: file system, embedded assets, databases, network
@@ -26,6 +26,12 @@
 // the secondary aspect in claims.rationale; every declared location still
 // lands in location, whichever section spelled it.
 package io_surface
+
+// Contract version (io-surface/v1.1). Absent in v1 manifests; new scaffolds
+// and every capability-carrying manifest declare it. A schema change bumps
+// the minor: a new family or capability name is a version bump, never a
+// casual edit (taxonomy freeze).
+version?: "io-surface/v1" | "io-surface/v1.1"
 
 #Family: "file-read" | "file-write" | "embed" | "database" | "listener" | "outbound" | "stream-copy" | "entropy" | "ipc-subprocess" | "env"
 
@@ -69,6 +75,37 @@ package io_surface
 
 sites: {[string]: #Site}
 
+// Capability facts (v1.1): what each first-party package can REACH, as
+// observed by an external reachability engine (Capslock, pinned; run in CI or
+// dev shells — never imported by the hermetic gate). Written only by
+// `io-surface absorb` into capabilities.cue; claims justify them like sites.
+//
+// The enum is the mapped vocabulary ONLY. Runtime-power capabilities (CGO,
+// UNSAFE_POINTER, REFLECT, RUNTIME, SYSTEM_CALLS, ...) are out-of-scope per
+// ROADMAP Q5. The single-source mapping lives in
+// internal/capability/capability.go — keep the two in sync.
+#CapabilityName: "FILES" | "NETWORK" | "EXEC"
+
+#CapabilitySet: {
+	// Repo/root-relative package path, e.g. "internal/extract".
+	pkg!: string
+	// Reachability through the package's OWN code (Capslock DIRECT edges).
+	direct!: [...#CapabilityName]
+	// Reachability including transitive dependency paths. Always a superset
+	// of direct; absorb guarantees the invariant.
+	deep!: [...#CapabilityName]
+}
+
+capabilities: [...#CapabilitySet] | *[]
+
+// Provenance of the last absorb run (engine pin, source revision, date).
+capabilityAudit?: {
+	engine!: string  // "capslock" today
+	version!: string // engine version the facts were observed with
+	commit!: string  // repo revision the engine analyzed
+	date!:   string  // YYYY-MM-DD
+}
+
 #Audit: {
 	commit: string
 	date:   string
@@ -94,4 +131,11 @@ baseline: [...#BaselineEntry] | *[]
 	id:   string
 	note: string
 	date: string
+	// Who vouches for the suppression (team or handle). Optional: the site,
+	// not a person, is the thing being grandfathered.
+	owner?: string
+	// YYYY-MM-DD. An expired entry FAILS the gate: grandfathering must not
+	// silently outlive its justification — fix the site or re-baseline
+	// deliberately.
+	expires?: string
 }
