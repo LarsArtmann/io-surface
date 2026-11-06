@@ -239,3 +239,76 @@ func TestRun_DottedSubpackageIDIsAnError(t *testing.T) {
 		t.Errorf("the dotted declaration's site must not double-report as undeclared: %v", undeclared)
 	}
 }
+
+// TestRun_UnusedBaselineWarns pins the only-shrinks rule: an entry that
+// suppresses nothing today is stale (warning) — keeping it would silently
+// swallow a future re-offender under the same canonical key.
+func TestRun_UnusedBaselineWarns(t *testing.T) {
+	m := fixtureManifest()
+	// LoadConfig is declared AND extracts (paired), so its baseline entry
+	// suppresses nothing; cmd/app.fetch does suppress an undeclared fixture
+	// site and must stay quiet.
+	m.Baseline = []manifest.BaselineEntry{
+		{ID: "internal/store.LoadConfig", Note: "stale", Date: "2026-11-01", Owner: "infra"},
+		{ID: "cmd/app.fetch", Note: "tracked in T1", Date: "2026-01-01"},
+	}
+	rep := runFixture(t, m, Options{Advisory: false})
+	used := findingsByRule(rep, RuleBaselineUnused)
+	if len(used) != 1 {
+		t.Fatalf("want exactly 1 unused-baseline warning, got %d: %v", len(used), used)
+	}
+	if used[0].ID != "internal/store.LoadConfig" {
+		t.Errorf("unused entry ID = %q, want the LoadConfig entry", used[0].ID)
+	}
+	if !strings.Contains(used[0].Message, "infra") {
+		t.Errorf("owner should surface in the message: %s", used[0].Message)
+	}
+}
+
+// TestRun_BaselineExpiry pins the owner/expiry contract: an expired entry is
+// an ERROR even while it suppresses a real finding; a future expiry stays
+// quiet; an omitted expiry never expires.
+func TestRun_BaselineExpiry(t *testing.T) {
+	m := fixtureManifest()
+	m.Baseline = []manifest.BaselineEntry{
+		{ID: "cmd/app.fetch", Note: "expired long ago", Date: "2026-01-01", Expires: "1999-01-01", Owner: "infra"},
+	}
+	rep := runFixture(t, m, Options{Advisory: false})
+	expired := findingsByRule(rep, RuleBaselineExpired)
+	if len(expired) != 1 {
+		t.Fatalf("want exactly 1 baseline-expired error, got %d", len(expired))
+	}
+	if expired[0].Severity != SeverityError {
+		t.Errorf("expired baseline must be an error, got %s", expired[0].Severity)
+	}
+
+	m.Baseline[0].Expires = "2999-12-31"
+	rep = runFixture(t, m, Options{Advisory: false})
+	if n := len(findingsByRule(rep, RuleBaselineExpired)); n != 0 {
+		t.Errorf("future expiry must stay quiet, got %d findings", n)
+	}
+}
+
+// TestRun_ScopeHintNamesTheDirsCause pins the --dirs trap: narrowing the scan
+// below the declared surface produces findings that look like manifest rot;
+// the report must name the flag as the cause (info, never a failure).
+func TestRun_ScopeHintNamesTheDirsCause(t *testing.T) {
+	m := fixtureManifest()
+	rep := runFixture(t, m, Options{Advisory: false, Dirs: []string{"cmd"}})
+	hints := findingsByRule(rep, RuleScopeHint)
+	if len(hints) != 1 {
+		t.Fatalf("want exactly 1 scope hint, got %d", len(hints))
+	}
+	if hints[0].Severity != SeverityInfo {
+		t.Errorf("scope hint must be info, got %s", hints[0].Severity)
+	}
+	if !strings.Contains(hints[0].Message, "--dirs") || !strings.Contains(hints[0].Message, "cmd") {
+		t.Errorf("hint must name the flag and the scanned dirs: %s", hints[0].Message)
+	}
+
+	// The full default scope covers every fixture site: no hint.
+	rep = runFixture(t, fixtureManifest(), Options{Advisory: false})
+	if n := len(findingsByRule(rep, RuleScopeHint)); n != 0 {
+		t.Errorf("default scope must not hint, got %d findings", n)
+	}
+}

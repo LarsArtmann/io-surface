@@ -136,7 +136,18 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   deliberate and documented in `internal/match/collision_test.go`.
 - `_test.go` files are never manifest sites; any path containing `/testutil/`
   is flagged `testinfra`. The walk skips dot-dirs, `vendor`, `node_modules`.
-- Default scan dirs: `cmd` and `internal` (override with `--dirs a,b`).
+- Default scan dirs: `cmd` and `internal` (override with `--dirs a,b`). A
+  narrowing that excludes declared sites adds a `scope-hint` info naming the
+  flag as the cause.
+- The CI facts-freshness gate ignores the audit `commit:`/`date:` lines via
+  `git diff -I` (`-I'^[[:space:]]*commit:' -I'^[[:space:]]*date:'`): those
+  two lines legitimately drift because HEAD always moves between the
+  manifest-refresh commit and the CI run. Do not "simplify" them away —
+  without them the gate is structurally red.
+- Baseline lifecycle is enforced: an entry suppressing nothing today warns
+  (`unused-baseline` — only-shrinks), an expired `expires:` date fails
+  (`baseline-expired`, error). The canonical-key hiding of two same-base-name
+  sites behind one entry remains — the warning is the guardrail, not a fix.
 
 ## Testing patterns
 
@@ -159,16 +170,16 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
 Fix work is tracked in `TODO_LIST.md`; this section is what to WATCH OUT for
 while working here:
 
-- CUE constraint violations surface as an opaque "incompatible list lengths"
-  error, not the actual violation entries — grep `violations` in the CUE
-  package when debugging one.
-- `audit.commit` in a freshly scaffolded manifest is always the literal
-  `"working-tree"`, not a real commit.
-- Baseline suppression is canonical-key based: two distinct same-base-name
-  sites can hide behind one baseline entry, and nothing enforces
-  "only shrinks".
-- `--dirs` that skips declared sites produces findings with no hint that the
-  flag caused them.
+- Baseline suppression is still canonical-key based: two distinct
+  same-base-name sites can hide behind one entry. The `unused-baseline`
+  warning shrinks stale suppressions, but the hiding itself is by design
+  (`internal/match/collision_test.go`).
+- The extractor's unexported-type dotted IDs (`internal/extract.extractor.X`)
+  are lexically indistinguishable from dotted-subpackage mistakes — the
+  `id-form` rule therefore confirms the slash variant against the extracted
+  set instead of guessing from the ID shape alone. A declared dotted ID with
+  NO extraction at all is NOT flagged; it classifies stale/extraction-blind
+  as before.
 
 The birth status report
 (`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
