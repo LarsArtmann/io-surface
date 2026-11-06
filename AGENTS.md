@@ -85,15 +85,15 @@ either `internal/scaffold` (`init`: write snapshot) or `internal/check`
 (`check`: pair extraction against `internal/manifest` load, emit findings) →
 `internal/render` (`render`: manifest → markdown).
 
-| Package             | Role                                                                                                                                                                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Package             | Role                                                                                                                                                                                                                                               |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cmd/io-surface`    | cmdguard-wired CLI: `NewApp` + batteries, typed flag structs (`commands.go`), handlers keep the exact output contract. Exit codes: 0 clean, 1 gate findings (`errFindings`), 2 usage/internal (`exitCode` in `main.go`). Version const lives here. |
-| `internal/extract`  | Hermetic AST walker (`go/parser` + `ast.Inspect`, deliberately NO `go/packages`, no network) so it runs in a Nix sandbox with `GOPROXY=off`.                                                          |
-| `internal/manifest` | Loads the CUE package in-process (no `cue` binary needed). `Load` doubles as constraint enforcement: a non-empty `violations` list fails CUE unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`. |
-| `internal/check`    | The bidirectional gate. 8 rules; buckets declared IDs and extracted sites by canonical group; pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`).                                     |
-| `internal/match`    | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`).                                                                                                    |
-| `internal/scaffold` | `init` writer; `schema.cue` is embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not the deployed copies.                                                                                |
-| `internal/render`   | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim).                                                                                                                    |
+| `internal/extract`  | Hermetic AST walker (`go/parser` + `ast.Inspect`, deliberately NO `go/packages`, no network) so it runs in a Nix sandbox with `GOPROXY=off`.                                                                                                       |
+| `internal/manifest` | Loads the CUE package in-process (no `cue` binary needed). `Load` doubles as constraint enforcement: a non-empty `violations` list fails CUE unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`.                                              |
+| `internal/check`    | The bidirectional gate. 8 rules; buckets declared IDs and extracted sites by canonical group; pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`).                                                                                  |
+| `internal/match`    | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`).                                                                                                                                                 |
+| `internal/scaffold` | `init` writer; `schema.cue` is embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not the deployed copies.                                                                                                                             |
+| `internal/render`   | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim).                                                                                                                                                                 |
 
 ### Where detection rules live
 

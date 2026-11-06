@@ -28,7 +28,7 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 
 | Feature                                    | Status                | Evidence                                                                             | Notes                                                                                                             |
 | ------------------------------------------ | --------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `check` — bidirectional gate               | 🟢 `FULLY_FUNCTIONAL` | `internal/check/check.go`; `check_test.go` (90.8% cov); CI self-check green          | Gate core works: pairing, 8 rules, severity model                                                                 |
+| `check` — bidirectional gate               | 🟢 `FULLY_FUNCTIONAL` | `internal/check/check.go`; `check_test.go` (90.8% cov); CI self-check green          | Gate core works: pairing, 11 rules, severity model                                                                |
 | `check --json` machine report              | 🟢 `FULLY_FUNCTIONAL` | `cmd/io-surface/commands.go` (`runCheck`); `TestRunCheck_ValidationFailureEmitsJSON` | Emission happens before the exit-code decision: every gate outcome is parseable stdout                            |
 | `init` — scaffold manifest                 | 🟢 `FULLY_FUNCTIONAL` | `internal/scaffold/scaffold.go`; `scaffold_test.go` (93.1% cov)                      | Green-by-construction; `--force` refreshes `facts.cue` only — claims/baseline/schema survive (plant-a-claim test) |
 | `render` — inventory markdown              | 🟢 `FULLY_FUNCTIONAL` | `internal/render/render.go`; CI self-render step                                     | Claims-aware (facts table + judgments prose); no golden test yet (TODO 10)                                        |
@@ -58,7 +58,7 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 | Constraint enforcement at load time                 | 🟢 `FULLY_FUNCTIONAL`     | `manifest.go:130-135`; verified via planted `violations` (birth report §a9) | Failure message is opaque though (TODO 3)                                         |
 | Schema validation (families, disciplines, ID shape) | 🟢 `FULLY_FUNCTIONAL`     | `manifest.go:166-195`                                                       | Unknown family/discipline/malformed ID are hard errors                            |
 | Baseline (grandfathered sites)                      | 🟡 `PARTIALLY_FUNCTIONAL` | `manifest.go:140-154`; `check.go:140-143,187-190`                           | Suppresses findings canonically; no only-shrinks gate, no owner/expiry (TODO 7/8) |
-| 8-rule finding model                                | 🟢 `FULLY_FUNCTIONAL`     | `internal/check/check.go:37-46`; every rule has a test case                 | Rule IDs are a stable contract (future SARIF keys)                                |
+| 11-rule finding model (incl. lifecycle)             | 🟢 `FULLY_FUNCTIONAL`     | `internal/check/check.go:37-46`; every rule has a test case                 | Rule IDs are a stable contract (future SARIF keys)                                |
 
 ## Renderer (`internal/render`)
 
