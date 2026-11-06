@@ -147,11 +147,25 @@ and a heuristics tier that could block a merge would be switched off within a we
 
 ```text
 docs/architecture/io-surface/
-  schema.cue     the standard (families, disciplines, facts/claims split) — do not edit
-  facts.cue      EXTRACTED: location, family, call tokens. Regenerate freely
-  claims.cue     HAND-WRITTEN: resource, trigger, discipline tags, exceptions, rationale
-  baseline.cue   grandfathered undeclared sites: {id, note, date}. Only shrinks
+  schema.cue        the standard (families, disciplines, facts/claims split) — do not edit
+  facts.cue         EXTRACTED: location, family, call tokens. Regenerate freely
+  claims.cue        HAND-WRITTEN: resource, trigger, discipline tags, exceptions, rationale
+  baseline.cue      grandfathered undeclared sites: {id, note, date}. Only shrinks
+  capabilities.cue  ENGINE-DERIVED (optional): per-package reachability, written only by `absorb`
 ```
+
+Two contract rules the manifest standard enforces on itself:
+
+- **Taxonomy freeze:** the families, disciplines, and capability names are
+  closed enums. Adding one is a schema version bump (`io-surface/v1` →
+  `v1.1`), never a casual edit — every consumer's manifest unifies against
+  the standard, so silent vocabulary growth would lie to older tools.
+- **ID migration:** a site ID embeds its package path, so moving a package
+  retires the old IDs and creates new ones. That is expected drift, not
+  data loss: regenerate facts, re-attach the claims prose to the new IDs,
+  and let `check` confirm the pairing. The baseline only shrinks — never
+  rename a baseline entry to "carry" it across a move; re-baseline
+  deliberately if the new site still needs grandfathering.
 
 Both files contribute to the same `sites` value (CUE unification), so a claims
 entry only carries what a human knows:
@@ -204,6 +218,10 @@ no `go/packages`, no module downloads), so it runs in a Nix sandbox with
 Type facts (interface dispatch, cross-package method sets) are out of scope by
 design: sites the AST cannot see are declared as `facts.extractable: false` instead
 of being guessed at.
+
+A discipline for keeping these docs honest: every status report claim names the
+command that verified it (`check --root .` → `0 errors`, `go test -race ./...`,
+`gh run view …`), so the next reader can re-run instead of trusting.
 
 ## What this is not
 
