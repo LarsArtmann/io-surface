@@ -8,6 +8,9 @@
 //	claims.cue    an empty, documented place for human judgment
 //	baseline.cue  empty; add entries only for findings you refuse to declare
 //
+// A forced refresh (--force) rewrites facts.cue only; the other three files
+// survive once they exist.
+//
 // Green-by-construction: the snapshot IS the current tree, so the first
 // `check` passes and can only fail on I/O added afterwards.
 package scaffold
@@ -40,8 +43,11 @@ func Files(sites []*extract.Site, date string) map[string][]byte {
 	}
 }
 
-// Write writes the scaffold for root into <root>/<Dir>, unless it already
-// exists (in which case it returns ErrExists and touches nothing).
+// Write writes the scaffold for root into <root>/<Dir>. On a manifest dir
+// without schema.cue it writes the full four-file set (or errors without
+// force). With force it refreshes ONLY facts.cue: claims.cue, baseline.cue
+// and schema.cue are never overwritten once present, because they carry human
+// judgment and the standard schema — regeneration is for the mechanical file.
 func Write(root string, sites []*extract.Site, date string, force bool) (string, error) {
 	dir := filepath.Join(root, Dir)
 	if _, err := os.Stat(filepath.Join(dir, "schema.cue")); err == nil && !force {
@@ -57,7 +63,13 @@ func Write(root string, sites []*extract.Site, date string, force bool) (string,
 	}
 	sort.Strings(names)
 	for _, name := range names {
-		if err := os.WriteFile(filepath.Join(dir, name), files[name], 0o644); err != nil {
+		path := filepath.Join(dir, name)
+		if name != "facts.cue" {
+			if _, err := os.Stat(path); err == nil {
+				continue // judgment/standard file already present: never clobber
+			}
+		}
+		if err := os.WriteFile(path, files[name], 0o644); err != nil {
 			return dir, err
 		}
 	}

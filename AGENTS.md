@@ -72,12 +72,11 @@ To refresh facts after an I/O-adding change:
 go run ./cmd/io-surface init --root . --force
 ```
 
-**⚠️ Hazard:** `init --force` rewrites ALL FOUR manifest files, including
-hand-written `claims.cue` and `baseline.cue` (`internal/scaffold/scaffold.go`
-— `Files()` returns all four and `Write()` writes them all; `--force` only
-bypasses the already-exists check). Until the fix lands (TODO_LIST #1): if
-`claims.cue`/`baseline.cue` carry hand-written entries, recover them from git
-after a `--force`, or hand-edit `facts.cue` locations instead.
+`init --force` is safe since 2026-11-06: it refreshes ONLY `facts.cue`
+(`internal/scaffold/scaffold.go` `Write` skips any judgment/standard file that
+already exists). `claims.cue`, `baseline.cue` and `schema.cue` are never
+overwritten by a refresh — guarded by the plant-a-claim test
+(`TestWrite_ForceRefreshesFactsOnly`).
 
 ## Architecture
 

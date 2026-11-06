@@ -128,3 +128,50 @@ func TestFiles_AllParse(t *testing.T) {
 		t.Fatalf("emitted CUE does not load: %v", err)
 	}
 }
+
+// TestWrite_ForceRefreshesFactsOnly is the plant-a-claim proof: an adopting
+// repo's hand-written judgment (claims, baseline, schema marker) must survive
+// a facts regeneration byte-for-byte, while facts.cue actually refreshes.
+func TestWrite_ForceRefreshesFactsOnly(t *testing.T) {
+	root := t.TempDir()
+	copyFixture(t, root)
+	sites, err := extract.Extract(root, extract.Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	dir, err := Write(root, sites, "2026-11-06", false)
+	if err != nil {
+		t.Fatalf("scaffold: %v", err)
+	}
+
+	planted := map[string]string{
+		"claims.cue":   "package io_surface\n\nsites: \"internal/store.LoadConfig\": claims: {rationale: \"keeper\"}\n",
+		"baseline.cue": "package io_surface\n\nbaseline: [{id: \"cmd/app.fetch\", note: \"tracked in T1\", date: \"2026-11-06\"}]\n",
+		"schema.cue":   "package io_surface\n\n// planted schema marker\n",
+	}
+	for name, content := range planted {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0o644); err != nil {
+			t.Fatalf("plant %s: %v", name, err)
+		}
+	}
+
+	if _, err = Write(root, sites, "2026-11-07", true); err != nil {
+		t.Fatalf("forced refresh: %v", err)
+	}
+	for name, want := range planted {
+		data, err := os.ReadFile(filepath.Join(dir, name))
+		if err != nil {
+			t.Fatalf("read %s: %v", name, err)
+		}
+		if string(data) != want {
+			t.Errorf("%s was rewritten by --force:\n got: %q\nwant: %q", name, data, want)
+		}
+	}
+	facts, err := os.ReadFile(filepath.Join(dir, "facts.cue"))
+	if err != nil {
+		t.Fatalf("read facts.cue: %v", err)
+	}
+	if !strings.Contains(string(facts), "\"2026-11-07\"") {
+		t.Error("facts.cue was not refreshed by --force")
+	}
+}

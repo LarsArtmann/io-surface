@@ -24,8 +24,8 @@ go run ./cmd/io-surface check --root .  # the tool gates its own repo
 Note: this repo is gated by its own tool — if your change adds an I/O call
 under `cmd/` or `internal/`, the self-check above will fail until the site is
 declared in the manifest (`docs/architecture/io-surface/`). Run
-`go run ./cmd/io-surface init --root . --force` to regenerate `facts.cue`
-(and restore `claims.cue`/`baseline.cue` from git if you had entries there).
+`go run ./cmd/io-surface init --root . --force` to regenerate `facts.cue`;
+your `claims.cue`/`baseline.cue` are never touched by a refresh.
 
 ## Reporting Issues
 
