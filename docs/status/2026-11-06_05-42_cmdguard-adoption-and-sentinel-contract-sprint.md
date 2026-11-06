@@ -251,56 +251,56 @@ final lint verdict on the new sentinel-fact tables is therefore UNKNOWN.
 
 ### io-surface (primary)
 
-| #  | Task                                                                                                  | Why now / note                                                        |
-| -- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| 1  | Finish cmdguard-side proof for the adoption: full `-race` + self-check re-run after latest daemon commits (§b) | Cheap; closes the last verification gap on THIS repo              |
-| 2  | Add cmdguard-lint step to io-surface CI (dogfood the dependency)                                        | The repo now imports cmdguard; CG001–CG008 catch CLI drift          |
-| 3  | Add `-race` to io-surface CI test step                                                                  | One-word change; matches house standard                             |
-| 4  | Settle dprint vs INVENTORY.md (exclude in `dprint.json` or normalize `--check`)                         | §e-3; next `dprint fmt` breaks CI today                              |
-| 5  | Tag `v0.1.0` (#36) — version const, README Status, CHANGELOG all say 0.1.0; needs push approval          | Unblocks #37                                                         |
-| 6  | Smoke `go install …@latest` via proxy (#37) — now also proves cmdguard dep resolution                   | The public install path has never been executed                      |
-| 7  | `baseline add <id> --note --date` subcommand (#22) — stop hand-editing CUE                              | Highest-value remaining CLI feature; fits the cmdguard command model |
-| 8  | `--dirs` scope hint when declared sites fall outside the scan (#9)                                      | Known confusing-failure mode (18 silent findings on InboxClean)      |
-| 9  | `extract --stats` per-package histogram (#29)                                                           | Small; debugging face                                                |
-| 10 | `version --json` with commit/build date (#30)                                                           | Machine surface; pairs with describe                                 |
-| 11 | Direct tests for `internal/manifest` (load/constraint failures)                                         | 0% direct coverage                                                   |
-| 12 | Direct tests for `internal/render` (golden beyond the existing one, claims prose)                        | 0% direct coverage                                                   |
-| 13 | Document doctor/describe/completion properly in README (flags, exit codes, examples)                    | New public surface is one table row today                            |
-| 14 | Decide ExitError(1) wrapper vs custom `exitCode` mapping (one exit-code owner)                          | Design cleanliness; cmdguard could own more                          |
-| 15 | Consider suppressing the fang error box when findings are the EXPECTED outcome (gate semantics)         | UX judgment: `check` findings are output, not failure prose          |
-| 16 | SARIF golden test (byte-stable artifact)                                                                | CI uploads it daily; nothing pins its shape                          |
-| 17 | README quickstart: mention batteries commands in the 60-second adoption                                 | First-hour experience                                                |
-| 18 | Roadmap: `render --format json` (inventory as data)                                                     | Demand-gated                                                         |
-| 19 | Docs: sharp-edge entry for "render owns INVENTORY.md bytes"                                             | Prevents the next dprint surprise                                    |
-| 20 | Harvest this report's §e items into TODO_LIST                                                           | Living backlog stays truthful                                        |
+| #  | Task                                                                                                           | Why now / note                                                       |
+| -- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 1  | Finish cmdguard-side proof for the adoption: full `-race` + self-check re-run after latest daemon commits (§b) | Cheap; closes the last verification gap on THIS repo                 |
+| 2  | Add cmdguard-lint step to io-surface CI (dogfood the dependency)                                               | The repo now imports cmdguard; CG001–CG008 catch CLI drift           |
+| 3  | Add `-race` to io-surface CI test step                                                                         | One-word change; matches house standard                              |
+| 4  | Settle dprint vs INVENTORY.md (exclude in `dprint.json` or normalize `--check`)                                | §e-3; next `dprint fmt` breaks CI today                              |
+| 5  | Tag `v0.1.0` (#36) — version const, README Status, CHANGELOG all say 0.1.0; needs push approval                | Unblocks #37                                                         |
+| 6  | Smoke `go install …@latest` via proxy (#37) — now also proves cmdguard dep resolution                          | The public install path has never been executed                      |
+| 7  | `baseline add <id> --note --date` subcommand (#22) — stop hand-editing CUE                                     | Highest-value remaining CLI feature; fits the cmdguard command model |
+| 8  | `--dirs` scope hint when declared sites fall outside the scan (#9)                                             | Known confusing-failure mode (18 silent findings on InboxClean)      |
+| 9  | `extract --stats` per-package histogram (#29)                                                                  | Small; debugging face                                                |
+| 10 | `version --json` with commit/build date (#30)                                                                  | Machine surface; pairs with describe                                 |
+| 11 | Direct tests for `internal/manifest` (load/constraint failures)                                                | 0% direct coverage                                                   |
+| 12 | Direct tests for `internal/render` (golden beyond the existing one, claims prose)                              | 0% direct coverage                                                   |
+| 13 | Document doctor/describe/completion properly in README (flags, exit codes, examples)                           | New public surface is one table row today                            |
+| 14 | Decide ExitError(1) wrapper vs custom `exitCode` mapping (one exit-code owner)                                 | Design cleanliness; cmdguard could own more                          |
+| 15 | Consider suppressing the fang error box when findings are the EXPECTED outcome (gate semantics)                | UX judgment: `check` findings are output, not failure prose          |
+| 16 | SARIF golden test (byte-stable artifact)                                                                       | CI uploads it daily; nothing pins its shape                          |
+| 17 | README quickstart: mention batteries commands in the 60-second adoption                                        | First-hour experience                                                |
+| 18 | Roadmap: `render --format json` (inventory as data)                                                            | Demand-gated                                                         |
+| 19 | Docs: sharp-edge entry for "render owns INVENTORY.md bytes"                                                    | Prevents the next dprint surprise                                    |
+| 20 | Harvest this report's §e items into TODO_LIST                                                                  | Living backlog stays truthful                                        |
 
 ### cmdguard (continuation of this session's work)
 
-| #  | Task                                                                                                                          | Why now / note                                                       |
-| -- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| #  | Task                                                                                                                                                           | Why now / note                                   |
+| -- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | 21 | Run `nix run .#check-all` to completion on the post-M06–M18 tree; fix any lint fallout (funlen on the 62-row table, gochecknoglobals on `referenceClassOrder`) | THE open risk; before anything else in this repo |
-| 22 | Split `sentinelFacts()` if funlen objects (data-driven table or generated rows), keeping one canonical table                   | Likely fallout from #21                                               |
-| 23 | Document `error_code` in ADR-002 (machine contract: additive fields, stability rule)                                           | The envelope is contract; the ADR is its home                        |
-| 24 | Golden error-envelope fixture (byte-stable JSON incl. `error_code`)                                                            | Mirrors describe-golden discipline                                   |
-| 25 | M09: lint/v0.2.0 prep — restore publish shape in `lint/go.mod`, CHANGELOG section, local gate green (tag/push needs approval)  | Fleet-wide guardrails wait on it                                     |
-| 26 | M09 release: tag + push + proxy verify + BuildFlow bump + fleet baseline (approval-gated)                                       | After #25                                                            |
-| 27 | M10: consumer proof (erraudit + timesheets build + full tests against the release)                                             | Adoption evidence                                                    |
-| 28 | Investigate the check-all golangci lint timeout (feeds M23 guardrails)                                                         | Flaky hard wall observed this session                                |
-| 29 | M11: `/v5` module scaffold (path, go.work, replaces, CI refs)                                                                  | Owner decision already locked (M01)                                  |
-| 30 | M14: the five `TODO(v5)` renames (CommandMetadata, TypeCodec, HuhPrompter, remove SetConfig, generic RegisterInScope)          | API honesty; clears 5 markers                                        |
-| 31 | M13: v5 default flips (strict, signals+graceful, batteries) + acceptance test                                                  | "Default is the superb path"                                         |
-| 32 | M12: deferred-error `Builder` + `NewApp` integration + taskctl migration (record LOC delta)                                    | Ends the constructor error ladder                                    |
-| 33 | M15: decision record on Get→GetService / Package redesign / Middleware unification                                             | Decide, do not drift                                                 |
-| 34 | M16: codemod + `MIGRATION_v4_v5.md`, dry-run on the three consumer repos                                                       | Makes the break payable                                              |
-| 35 | M19: QUICKSTART + TUTORIAL parity (batteries, describe, hints, runtime tag semantics) with compile-checked snippets            | First-hour experience                                                |
-| 36 | M18 follow-up: regenerate ERROR_REFERENCE into the website docs pipeline                                                        | Public docs cannot drift either                                      |
-| 37 | docs-generator example: add an ErrorCode consumption example                                                                   | Shows the machine-code surface                                       |
-| 38 | CT3: wire examples/config-explain into README + website                                                                        | Cheap, exists, unlinked                                              |
-| 39 | CT2: schema sub-module release decision (v0.1.0 vs workspace-local)                                                            | Owner call, sitting open since 2026-11-02                            |
-| 40 | M20–M27 P2 sweep (hint styling, `DescribeCommand(path)`, website parity, CG009, benchmarks, docs hygiene, HTML validator)       | Polish tier                                                          |
-| 41 | S2: re-check `nix eval nixpkgs#go_1_27.version` for ≥1.27.2 (still blocked upstream)                                           | Standing watch                                                       |
-| 42 | cmdguard: reset the session todo list to post-pivot reality (M09+ pending, M06–M08/M17–M18 done)                                | Backlog stops lying                                                  |
-| 43 | Cross-project lesson: "bare path + generic mandate → state interpretation before executing" → `references/lessons.md`          | Generalizes; belongs in crush-config by commit                       |
+| 22 | Split `sentinelFacts()` if funlen objects (data-driven table or generated rows), keeping one canonical table                                                   | Likely fallout from #21                          |
+| 23 | Document `error_code` in ADR-002 (machine contract: additive fields, stability rule)                                                                           | The envelope is contract; the ADR is its home    |
+| 24 | Golden error-envelope fixture (byte-stable JSON incl. `error_code`)                                                                                            | Mirrors describe-golden discipline               |
+| 25 | M09: lint/v0.2.0 prep — restore publish shape in `lint/go.mod`, CHANGELOG section, local gate green (tag/push needs approval)                                  | Fleet-wide guardrails wait on it                 |
+| 26 | M09 release: tag + push + proxy verify + BuildFlow bump + fleet baseline (approval-gated)                                                                      | After #25                                        |
+| 27 | M10: consumer proof (erraudit + timesheets build + full tests against the release)                                                                             | Adoption evidence                                |
+| 28 | Investigate the check-all golangci lint timeout (feeds M23 guardrails)                                                                                         | Flaky hard wall observed this session            |
+| 29 | M11: `/v5` module scaffold (path, go.work, replaces, CI refs)                                                                                                  | Owner decision already locked (M01)              |
+| 30 | M14: the five `TODO(v5)` renames (CommandMetadata, TypeCodec, HuhPrompter, remove SetConfig, generic RegisterInScope)                                          | API honesty; clears 5 markers                    |
+| 31 | M13: v5 default flips (strict, signals+graceful, batteries) + acceptance test                                                                                  | "Default is the superb path"                     |
+| 32 | M12: deferred-error `Builder` + `NewApp` integration + taskctl migration (record LOC delta)                                                                    | Ends the constructor error ladder                |
+| 33 | M15: decision record on Get→GetService / Package redesign / Middleware unification                                                                             | Decide, do not drift                             |
+| 34 | M16: codemod + `MIGRATION_v4_v5.md`, dry-run on the three consumer repos                                                                                       | Makes the break payable                          |
+| 35 | M19: QUICKSTART + TUTORIAL parity (batteries, describe, hints, runtime tag semantics) with compile-checked snippets                                            | First-hour experience                            |
+| 36 | M18 follow-up: regenerate ERROR_REFERENCE into the website docs pipeline                                                                                       | Public docs cannot drift either                  |
+| 37 | docs-generator example: add an ErrorCode consumption example                                                                                                   | Shows the machine-code surface                   |
+| 38 | CT3: wire examples/config-explain into README + website                                                                                                        | Cheap, exists, unlinked                          |
+| 39 | CT2: schema sub-module release decision (v0.1.0 vs workspace-local)                                                                                            | Owner call, sitting open since 2026-11-02        |
+| 40 | M20–M27 P2 sweep (hint styling, `DescribeCommand(path)`, website parity, CG009, benchmarks, docs hygiene, HTML validator)                                      | Polish tier                                      |
+| 41 | S2: re-check `nix eval nixpkgs#go_1_27.version` for ≥1.27.2 (still blocked upstream)                                                                           | Standing watch                                   |
+| 42 | cmdguard: reset the session todo list to post-pivot reality (M09+ pending, M06–M08/M17–M18 done)                                                               | Backlog stops lying                              |
+| 43 | Cross-project lesson: "bare path + generic mandate → state interpretation before executing" → `references/lessons.md`                                          | Generalizes; belongs in crush-config by commit   |
 
 ---
 
@@ -320,8 +320,8 @@ final lint verdict on the new sentinel-fact tables is therefore UNKNOWN.
 
 ---
 
-*Verification summary: io-surface — build/vet/-race/gofmt/self-check/
+_Verification summary: io-surface — build/vet/-race/gofmt/self-check/
 facts-fresh/self-render/INVENTORY --check/SARIF all green locally;
 cmdguard-lint 0 findings. cmdguard — build/vet/full suite/-race green;
 check-all lint verdict outstanding (#21). Nothing pushed; all changes are
-daemon-committed on both repos.*
+daemon-committed on both repos._

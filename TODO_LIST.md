@@ -76,6 +76,8 @@
 | 46 | Seed `.docs-gates.json` thresholds for this repo                                                     | 🔴 `TODO`    | Low    | 15min  | Defaults used; session report §f-46                                       |
 | 47 | Re-derive TODO_LIST evidence line numbers at the next docs audit (they rot)                          | 🔴 `TODO`    | Low    | 15min  | Inherent to the format; session report §e5                                |
 | 48 | Consider `go-release` flow for v0.1.1 once P0 items #1-4 land                                        | 🔴 `TODO`    | Low    | 30min  | go-release skill; session report §f-48                                    |
+| 49 | Decide whether stdout/stderr writes belong in `scope.in` (currently implicit out-of-scope)           | 🔴 `TODO`    | Low    | 30min  | Capslock v0.3.4 run 2026-11-06: `stdout.Write(data)` at `cmd/io-surface/commands.go:77` (SARIF to stdout) is real I/O the extractor deliberately does not list; `fmt.Print*` equally unseen; `scope.in` in facts.cue is silent on stdout; report: `docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md` |
+| 50 | Verify + file upstream Capslock issue: phantom NETWORK edges from SSA range-func/interface conflation | 🔴 `TODO`    | Low    | 1h     | Capslock v0.3.4 run 2026-11-06: `strings.FieldsSeq$1 → net/http.ParseCookie$1 @ iter.go:96` and `(*net/http.response).Write @ encoding/json/v2 v2_stream.go:156` in a CLI with zero network use; verify-before-filing skill applies; report: `docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md` |
 
 ---
 

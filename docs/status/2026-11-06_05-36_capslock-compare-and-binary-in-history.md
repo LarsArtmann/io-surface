@@ -46,14 +46,14 @@
 
 ## a) FULLY DONE
 
-*(this session only — it was a question-and-verify session by design)*
+_(this session only — it was a question-and-verify session by design)_
 
 1. **Capslock vs io-surface comparison, delivered and source-verified.** The answer,
    in one line each: Capslock asks "what capabilities can this package reach
-   *transitively*, including through dependencies?" (package/function granularity,
+   _transitively_, including through dependencies?" (package/function granularity,
    `go/packages`+SSA+callgraph, ~13 capabilities incl. `CGO`/`UNSAFE_POINTER`/`REFLECT`,
    informational with a `compare`-vs-baseline exit-1 mode). io-surface asks "is every
-   I/O call site in this first-party tree *declared, justified, and unchanged*?"
+   I/O call site in this first-party tree _declared, justified, and unchanged_?"
    (exact `file:line` sites, hermetic stdlib AST walk, CUE manifest with
    facts/claims/baseline, bidirectional CI gate with exit codes 0/1/2, two-tier
    honesty where unresolved receivers can never fail a build). Verdict delivered:
@@ -67,7 +67,7 @@
 
 ## b) PARTIALLY DONE
 
-*(observed state at HEAD; not authored by this session)*
+_(observed state at HEAD; not authored by this session)_
 
 1. **cmdguard v4 CLI migration.** `commands.go` (+249) + `main.go` (−350) landed via
    auto-commit `05874f3`, with real e2e tests (`main_test.go`, +178) and AGENTS.md
@@ -162,58 +162,58 @@
 
 ## f) NEXT TASKS (50, ranked by leverage — brainstorm, not commitment; new items first, then carry-over from TODO_LIST #3–#48)
 
-| # | Task | Impact | Effort | Source |
-|---|------|--------|--------|--------|
-| 1 | Un-track the binary: `git rm --cached cmd/io-surface/io-surface` + ignore pattern (repo-wide artifact class) | High | 5min | This session d1 |
-| 2 | Decide binary history fate: filter-repo purge (force-push both remotes, break clones) vs accept ~70 MB forever | High | owner decision | This session d1 |
-| 3 | Daemon-side guard: auto-commit daemon must skip binaries/artifacts (check-ignore-aware heuristic) | High | cross-repo | This session d1 |
-| 4 | Fix `AGENTS.md:6` "one external dependency" → generating-command phrasing (cmdguard + go-finding are real deps now) | Med | 5min | This session b1 |
-| 5 | Record Capslock cross-check idea in ROADMAP (capability-vocabulary mapping, CI-only, hermeticity caveat) | Med | 15min | This session c4 |
-| 6 | Diff the `facts.cue` ±6 change from `05874f3` and confirm what the refactor did to declared sites | Low | 10min | This session b2 |
-| 7 | Adopt `go build -o bin/` convention (buildflow-managed output dir) so artifacts have one coverable home | Med | 15min | This session e5 |
-| 8 | Re-anchor TODO_LIST evidence to symbols (`runCheck`, `exitCode`) after the `main.go` → `commands.go` split | Med | 30min | This session e4 / #47 |
-| 9 | Print actual `violations` entries on CUE unification failure (opaque "incompatible list lengths" today) | High | 1-2h | TODO #3 |
-| 10 | `audit.commit` = real `git rev-parse --short HEAD` (±`-dirty`), fallback `working-tree` | Med | 30min | TODO #4 |
-| 11 | Baseline "only shrinks" enforcement (fail on growth without an explicit allow flag) | Med | 1-2h | TODO #7 |
-| 12 | Baseline entries gain `owner` + `expires`; expired entries fail the gate | Med | 1-2h | TODO #8 |
-| 13 | Hint when declared sites fall outside `--dirs` (the 18 silent findings failure mode) | Med | 30min | TODO #9 |
-| 14 | `internal/manifest` tests: decode edge cases + planted constraint violation (0% today) | Med | 1h | TODO #12 |
-| 15 | `internal/render` tests: claims columns, judgments section, scope OUT | Med | 1h | TODO #13 |
-| 16 | Record enforcement policy (D4) in the manifest schema so repos cannot silently opt out | Med | 2h | TODO #14 |
-| 17 | Local pre-commit gate: `io-surface check` + `gofmt`/`vet` outside CI | Med | 30min | TODO #15/#16 |
-| 18 | BuildFlow provider via `go-finding/toolsdk` so `./bin/dev` runs the check | Med | 2-3h | TODO #18 |
-| 19 | Missing extraction families: `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio`, `http.ServeContent` | Med | 1h | TODO #19 |
-| 20 | Derive seams from manifest `via` values instead of hardcoded `seamIdent` | Med | 2h | TODO #20 |
-| 21 | Cross-package seam support (helper pkg owning the raw call) | Med | 2-3h | TODO #21 |
-| 22 | `io-surface baseline add <id> --note --date` subcommand (stop hand-editing CUE) | Med | 1h | TODO #22 |
-| 23 | `version: "io-surface/v1"` field in manifest; bump on schema change | Med | 30min | TODO #23 |
-| 24 | `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`) | Med | 1h | TODO #24 |
-| 25 | Gate InboxClean: track `docs/architecture/` + CI check (cross-repo) | Med | 30min | TODO #25 |
-| 26 | Declare or baseline dnsblockd's 6 errors; get it to 0 (cross-repo) | Med | 1h | TODO #26 |
-| 27 | dnsblockd reverse-mode check + retire `tools/io-extract` (BLOCKED: fleet lock) | Med | 2h | TODO #27 |
-| 28 | Reclassify bare `.Do`/`.Close` tokens as ambiguous, not a family | Low | 30min | TODO #28 |
-| 29 | `extract --stats` per-package histogram | Low | 1h | TODO #29 |
-| 30 | `version --json` with commit + build date | Low | 30min | TODO #30 |
-| 31 | Document taxonomy freeze rule (new family = schema version bump) | Low | 15min | TODO #31 |
-| 32 | Document ID migration for package moves | Low | 15min | TODO #32 |
-| 33 | Register repo in fleet inventory (`meta` / stack-selection) | Low | 30min | TODO #33 |
-| 34 | `-race` + very-large-repo benchmark; record results | Low | 1h | TODO #34 |
-| 35 | Family-distribution run over crush-daily + ~10 daemon repos | Low | 2h | TODO #35 |
-| 36 | Tag `v0.1.0` (const/README/CHANGELOG all say 0.1.0; no git tag) | Low | 15min | TODO #36 |
-| 37 | Smoke-test public `go install …@latest` through proxy.golang.org | High | 10min | TODO #37 |
-| 38 | Verify pkg.go.dev indexing after proxy cache | Low | 10min | TODO #38 |
-| 39 | Review/merge the open Dependabot actions-group PR | Med | 15min | TODO #39 |
-| 40 | Provision Forgejo API token on this machine (BLOCKED on external) | Med | 15min | TODO #40 |
-| 41 | Server-side push mirror Forgejo → GitHub (BLOCKED by #40) | Med | 15min | TODO #41 |
-| 42 | Flip Forgejo repo visibility per owner decision (BLOCKED by #40) | Low | 5min | TODO #42 |
-| 43 | Wire docs-gates into CI as a standing pinned gate | Med | 1h | TODO #43 |
-| 44 | CI job installing the module from the public path (module-path tripwire) | Med | 30min | TODO #44 |
-| 45 | Seed `.docs-gates.json` thresholds for this repo | Low | 15min | TODO #46 |
-| 46 | Run Capslock over this repo once, manually, as a blind-spot audit (before any CI adoption) | Med | 30min | This session e3 |
-| 47 | Deprecation plan for `--json` vs `--format json` if a third format lands | Low | 15min | 04:27 §e |
-| 48 | Re-derive GitHub CI status for `4a11e21` (first push after cmdguard landing) | Med | 10min | Scope gap |
-| 49 | Consider GoReleaser (or buildflow release path) now that binaries exist as a topic | Low | 30min | This session e5 |
-| 50 | CHANGELOG entry for the cmdguard migration + dep additions if not already covered | Low | 10min | This session b1 |
+| #  | Task                                                                                                                    | Impact | Effort         | Source                |
+| -- | ----------------------------------------------------------------------------------------------------------------------- | ------ | -------------- | --------------------- |
+| 1  | Un-track the binary: `git rm --cached cmd/io-surface/io-surface` + ignore pattern (repo-wide artifact class)            | High   | 5min           | This session d1       |
+| 2  | Decide binary history fate: filter-repo purge (force-push both remotes, break clones) vs accept ~70 MB forever          | High   | owner decision | This session d1       |
+| 3  | Daemon-side guard: auto-commit daemon must skip binaries/artifacts (check-ignore-aware heuristic)                       | High   | cross-repo     | This session d1       |
+| 4  | Fix `AGENTS.md:6` "one external dependency" → generating-command phrasing (cmdguard + go-finding are real deps now)     | Med    | 5min           | This session b1       |
+| 5  | Record Capslock cross-check idea in ROADMAP (capability-vocabulary mapping, CI-only, hermeticity caveat)                | Med    | 15min          | This session c4       |
+| 6  | Diff the `facts.cue` ±6 change from `05874f3` and confirm what the refactor did to declared sites                       | Low    | 10min          | This session b2       |
+| 7  | Adopt `go build -o bin/` convention (buildflow-managed output dir) so artifacts have one coverable home                 | Med    | 15min          | This session e5       |
+| 8  | Re-anchor TODO_LIST evidence to symbols (`runCheck`, `exitCode`) after the `main.go` → `commands.go` split              | Med    | 30min          | This session e4 / #47 |
+| 9  | Print actual `violations` entries on CUE unification failure (opaque "incompatible list lengths" today)                 | High   | 1-2h           | TODO #3               |
+| 10 | `audit.commit` = real `git rev-parse --short HEAD` (±`-dirty`), fallback `working-tree`                                 | Med    | 30min          | TODO #4               |
+| 11 | Baseline "only shrinks" enforcement (fail on growth without an explicit allow flag)                                     | Med    | 1-2h           | TODO #7               |
+| 12 | Baseline entries gain `owner` + `expires`; expired entries fail the gate                                                | Med    | 1-2h           | TODO #8               |
+| 13 | Hint when declared sites fall outside `--dirs` (the 18 silent findings failure mode)                                    | Med    | 30min          | TODO #9               |
+| 14 | `internal/manifest` tests: decode edge cases + planted constraint violation (0% today)                                  | Med    | 1h             | TODO #12              |
+| 15 | `internal/render` tests: claims columns, judgments section, scope OUT                                                   | Med    | 1h             | TODO #13              |
+| 16 | Record enforcement policy (D4) in the manifest schema so repos cannot silently opt out                                  | Med    | 2h             | TODO #14              |
+| 17 | Local pre-commit gate: `io-surface check` + `gofmt`/`vet` outside CI                                                    | Med    | 30min          | TODO #15/#16          |
+| 18 | BuildFlow provider via `go-finding/toolsdk` so `./bin/dev` runs the check                                               | Med    | 2-3h           | TODO #18              |
+| 19 | Missing extraction families: `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio`, `http.ServeContent` | Med    | 1h             | TODO #19              |
+| 20 | Derive seams from manifest `via` values instead of hardcoded `seamIdent`                                                | Med    | 2h             | TODO #20              |
+| 21 | Cross-package seam support (helper pkg owning the raw call)                                                             | Med    | 2-3h           | TODO #21              |
+| 22 | `io-surface baseline add <id> --note --date` subcommand (stop hand-editing CUE)                                         | Med    | 1h             | TODO #22              |
+| 23 | `version: "io-surface/v1"` field in manifest; bump on schema change                                                     | Med    | 30min          | TODO #23              |
+| 24 | `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`)                                                     | Med    | 1h             | TODO #24              |
+| 25 | Gate InboxClean: track `docs/architecture/` + CI check (cross-repo)                                                     | Med    | 30min          | TODO #25              |
+| 26 | Declare or baseline dnsblockd's 6 errors; get it to 0 (cross-repo)                                                      | Med    | 1h             | TODO #26              |
+| 27 | dnsblockd reverse-mode check + retire `tools/io-extract` (BLOCKED: fleet lock)                                          | Med    | 2h             | TODO #27              |
+| 28 | Reclassify bare `.Do`/`.Close` tokens as ambiguous, not a family                                                        | Low    | 30min          | TODO #28              |
+| 29 | `extract --stats` per-package histogram                                                                                 | Low    | 1h             | TODO #29              |
+| 30 | `version --json` with commit + build date                                                                               | Low    | 30min          | TODO #30              |
+| 31 | Document taxonomy freeze rule (new family = schema version bump)                                                        | Low    | 15min          | TODO #31              |
+| 32 | Document ID migration for package moves                                                                                 | Low    | 15min          | TODO #32              |
+| 33 | Register repo in fleet inventory (`meta` / stack-selection)                                                             | Low    | 30min          | TODO #33              |
+| 34 | `-race` + very-large-repo benchmark; record results                                                                     | Low    | 1h             | TODO #34              |
+| 35 | Family-distribution run over crush-daily + ~10 daemon repos                                                             | Low    | 2h             | TODO #35              |
+| 36 | Tag `v0.1.0` (const/README/CHANGELOG all say 0.1.0; no git tag)                                                         | Low    | 15min          | TODO #36              |
+| 37 | Smoke-test public `go install …@latest` through proxy.golang.org                                                        | High   | 10min          | TODO #37              |
+| 38 | Verify pkg.go.dev indexing after proxy cache                                                                            | Low    | 10min          | TODO #38              |
+| 39 | Review/merge the open Dependabot actions-group PR                                                                       | Med    | 15min          | TODO #39              |
+| 40 | Provision Forgejo API token on this machine (BLOCKED on external)                                                       | Med    | 15min          | TODO #40              |
+| 41 | Server-side push mirror Forgejo → GitHub (BLOCKED by #40)                                                               | Med    | 15min          | TODO #41              |
+| 42 | Flip Forgejo repo visibility per owner decision (BLOCKED by #40)                                                        | Low    | 5min           | TODO #42              |
+| 43 | Wire docs-gates into CI as a standing pinned gate                                                                       | Med    | 1h             | TODO #43              |
+| 44 | CI job installing the module from the public path (module-path tripwire)                                                | Med    | 30min          | TODO #44              |
+| 45 | Seed `.docs-gates.json` thresholds for this repo                                                                        | Low    | 15min          | TODO #46              |
+| 46 | Run Capslock over this repo once, manually, as a blind-spot audit (before any CI adoption)                              | Med    | 30min          | This session e3       |
+| 47 | Deprecation plan for `--json` vs `--format json` if a third format lands                                                | Low    | 15min          | 04:27 §e              |
+| 48 | Re-derive GitHub CI status for `4a11e21` (first push after cmdguard landing)                                            | Med    | 10min          | Scope gap             |
+| 49 | Consider GoReleaser (or buildflow release path) now that binaries exist as a topic                                      | Low    | 30min          | This session e5       |
+| 50 | CHANGELOG entry for the cmdguard migration + dep additions if not already covered                                       | Low    | 10min          | This session b1       |
 
 ## g) QUESTIONS I CANNOT FIGURE OUT MYSELF (3)
 
@@ -234,7 +234,7 @@
 
 ---
 
-*Point-in-time snapshot. Section (f) items #1–#8 are this session's fresh discoveries;
+_Point-in-time snapshot. Section (f) items #1–#8 are this session's fresh discoveries;
 #9–#50 are carry-over from the harvested TODO_LIST and prior reports — route through
 `docs-health` HARVEST before treating any as committed work. Then wait for
-instructions.*
+instructions._
