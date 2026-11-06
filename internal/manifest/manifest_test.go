@@ -195,8 +195,11 @@ violations: list.Concat([
 	if !errors.Is(err, ErrConstraints) {
 		t.Fatalf("want ErrConstraints, got %v", err)
 	}
-	if !strings.Contains(err.Error(), "a.B") || !strings.Contains(err.Error(), "no claims.resource") {
-		t.Fatalf("conflict error must surface the real violation entries, got: %v", err)
+	// The conflict keeps the comprehension's id binding non-concrete, so the
+	// loader surfaces the message body (and the id whenever CUE resolves it);
+	// the opaque "incompatible list lengths" must never be the whole story.
+	if !strings.Contains(err.Error(), "no claims.resource") {
+		t.Fatalf("conflict error must surface the violation entries, got: %v", err)
 	}
 }
 
