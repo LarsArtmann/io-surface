@@ -10,6 +10,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,7 +33,7 @@ func main() {
 	var err error
 	switch os.Args[1] {
 	case "check":
-		err = runCheck(os.Args[2:])
+		err = runCheck(os.Args[2:], os.Stdout)
 	case "init":
 		err = runInit(os.Args[2:])
 	case "render":
@@ -105,7 +106,7 @@ func manifestDir(root, flagValue string) string {
 	return filepath.Join(root, scaffold.Dir)
 }
 
-func runCheck(args []string) error {
+func runCheck(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("check", flag.ExitOnError)
 	root := fs.String("root", ".", "repository root")
 	man := fs.String("manifest", "", "manifest package directory (default <root>/"+scaffold.Dir+")")
@@ -122,27 +123,27 @@ func runCheck(args []string) error {
 	if err != nil {
 		return err
 	}
-	validationErrs := m.Validate()
-	for _, vErr := range validationErrs {
-		fmt.Fprintf(os.Stderr, "io-surface: %v\n", vErr)
-	}
-	if len(validationErrs) > 0 {
-		return errFindings
-	}
 
-	rep, err := check.Run(*root, m, check.Options{Advisory: *advisory, Dirs: parseDirs(*dirs)})
-	if err != nil {
-		return err
+	// A manifest that fails validation is not gated — it must be fixed — but
+	// the caller still gets a full report, so --json holds for every gate
+	// outcome and the exit-code decision happens after emission, uniformly.
+	var rep *check.Report
+	if vErrs := m.Validate(); len(vErrs) > 0 {
+		rep = check.ValidationReport(m, vErrs)
+	} else {
+		if rep, err = check.Run(*root, m, check.Options{Advisory: *advisory, Dirs: parseDirs(*dirs)}); err != nil {
+			return err
+		}
 	}
 
 	if *asJSON {
-		enc := json.NewEncoder(os.Stdout)
+		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
 		if err = enc.Encode(rep); err != nil {
 			return err
 		}
 	} else {
-		printReport(rep)
+		printReport(rep, stdout)
 	}
 
 	if rep.Failing() || (*strict && rep.Stats.Warnings > 0) {
@@ -152,16 +153,16 @@ func runCheck(args []string) error {
 	return nil
 }
 
-func printReport(rep *check.Report) {
+func printReport(rep *check.Report, w io.Writer) {
 	for _, f := range rep.Findings {
 		loc := ""
 		if f.Location != "" {
 			loc = "  " + f.Location
 		}
-		fmt.Printf("%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
-		fmt.Printf("        %s\n", f.Message)
+		fmt.Fprintf(w, "%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
+		fmt.Fprintf(w, "        %s\n", f.Message)
 	}
-	fmt.Printf("io-surface: %d declared, %d extracted (%d resolved, %d token), %d baselined — %d errors, %d warnings, %d infos\n",
+	fmt.Fprintf(w, "io-surface: %d declared, %d extracted (%d resolved, %d token), %d baselined — %d errors, %d warnings, %d infos\n",
 		rep.Stats.Declared, rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
 		rep.Stats.Baselined, rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
 }
