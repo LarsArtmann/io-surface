@@ -57,6 +57,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   self-dogfood audit found the extractor's own `filepath.Walk` invisible to
   the gate (a gate cannot see its own blind spots); it is now taught and
   declared in this repo's manifest
+- Memory-map, buffered-stream and file-serving extraction (resolved tier):
+  `syscall.Mmap`/`Munmap` → `file-read`, `bufio.NewReader`/`NewReaderSize`/
+  `NewWriter`/`NewWriterSize`/`NewReadWriter` → `stream-copy`, and
+  `http.ServeContent`/`ServeFile` → `stream-copy` — mmap and buffered
+  constructors were real I/O the tables never watched (Capslock blind-spot
+  run evidence)
+- Table-reachability invariant test: every package key in the extractor's
+  call table must be resolvable from an import path (exact map or fragment
+  match). It exists because `bufio` was watchable but unreachable — the
+  import was dropped before lookup, so the whole rule table was dead code
+  and `bufio.NewReader` call sites silently never extracted
 - House documentation set: `AGENTS.md` (agent context), `FEATURES.md`,
   `TODO_LIST.md`, `ROADMAP.md` — harvested from the birth status report
   (`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
