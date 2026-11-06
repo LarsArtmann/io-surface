@@ -13,7 +13,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | Family           | Sites | Claimed | With rationale |
 | ---------------- | ----: | ------: | -------------: |
 | `file-read`      |     7 |       1 |              1 |
-| `file-write`     |     4 |       1 |              1 |
+| `file-write`     |     5 |       2 |              2 |
 | `embed`          |     1 |       0 |              0 |
 | `ipc-subprocess` |     2 |       1 |              1 |
 
@@ -33,18 +33,20 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 - **`internal/absorb.ModulePath`** — a single small read to resolve the first-party package prefix; --module exists for manifests analyzed outside their repo
 
-## `file-write` (4)
+## `file-write` (5)
 
-| Site                       | Location                           | Resource                                   | Trigger                       | Discipline |
-| -------------------------- | ---------------------------------- | ------------------------------------------ | ----------------------------- | ---------- |
-| `cmd/io-surface.applyDoc`  | `cmd/io-surface/commands.go:255`   | —                                          | —                             | —          |
-| `cmd/io-surface.runAbsorb` | `cmd/io-surface/commands.go:169`   | Capslock JSON report passed via --capslock | every `io-surface absorb` run | bounded    |
-| `cmd/io-surface.runRender` | `cmd/io-surface/commands.go:248`   | —                                          | —                             | —          |
-| `internal/scaffold.Write`  | `internal/scaffold/scaffold.go:56` | —                                          | —                             | —          |
+| Site                               | Location                                 | Resource                                   | Trigger                             | Discipline |
+| ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- |
+| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:261`         | —                                          | —                                   | —          |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:175`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:254`         | —                                          | —                                   | —          |
+| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:39` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          |
+| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:56`       | —                                          | —                                   | —          |
 
 ### Judgments
 
 - **`cmd/io-surface.runAbsorb`** — the operator names the artifact; the engine output is decoded in memory with no streaming copy, so an oversized report fails loudly at decode rather than silently truncating
+- **`internal/manifest.AppendBaseline`** — the machine's only sanctioned write into a judgment file: a surgical insertion of one {id, note, date} entry, refusing duplicates and noteless entries so the baseline keeps its only-shrinks shape; the read-modify-write is single-file, unbuffered, and fails loudly on a missing file
 
 ## `embed` (1)
 

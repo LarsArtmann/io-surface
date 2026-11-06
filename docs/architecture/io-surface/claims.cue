@@ -38,3 +38,10 @@ sites: "internal/absorb.gitHead": claims: {
 	discipline: []
 	rationale:  "provenance only: the capability audit must name the revision the engine actually analyzed; falls back to the literal working-tree outside git so sandboxed runs stay valid"
 }
+
+sites: "internal/manifest.AppendBaseline": claims: {
+	resource:   "baseline.cue of the manifest being edited"
+	trigger:    "every `io-surface baseline add` run"
+	discipline: []
+	rationale:  "the machine's only sanctioned write into a judgment file: a surgical insertion of one {id, note, date} entry, refusing duplicates and noteless entries so the baseline keeps its only-shrinks shape; the read-modify-write is single-file, unbuffered, and fails loudly on a missing file"
+}

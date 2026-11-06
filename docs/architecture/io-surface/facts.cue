@@ -5,9 +5,9 @@
 package io_surface
 
 audit: {
-	commit: "16a9a11"
+	commit: "2efc501"
 	date:   "2026-11-06"
-	claims: 20
+	claims: 22
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -34,8 +34,8 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:255",
-			"cmd/io-surface/commands.go:291",
+			"cmd/io-surface/commands.go:261",
+			"cmd/io-surface/commands.go:297",
 		]
 		family: "file-write"
 		facts: {
@@ -44,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:169",
-			"cmd/io-surface/commands.go:198",
+			"cmd/io-surface/commands.go:175",
+			"cmd/io-surface/commands.go:204",
 		]
 		family: "file-write"
 		facts: {
@@ -54,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:248",
+			"cmd/io-surface/commands.go:254",
 		]
 		family: "file-write"
 		facts: {
@@ -114,6 +114,16 @@ sites: {
 		family: "file-read"
 		facts: {
 			call: ["filepath.Walk"]
+		}
+	}
+	"internal/manifest.AppendBaseline": {
+		location: [
+			"internal/manifest/baseline_write.go:39",
+			"internal/manifest/baseline_write.go:59",
+		]
+		family: "file-write"
+		facts: {
+			call: ["os.ReadFile", "os.WriteFile"]
 		}
 	}
 	"internal/manifest.Load": {
