@@ -83,6 +83,13 @@ func fixtureManifest() *manifest.Manifest {
 				Family:   "file-write",
 				Facts:    manifest.Facts{Extractable: true},
 			},
+			// unexported-type method: dotted ID but LEGAL (ttl is a type,
+			// not a subpackage) — the permanent id-form false-positive guard
+			"internal/store.ttl.Sweep": {
+				Location: []string{"internal/store/ttl.go:10"},
+				Family:   "file-read",
+				Facts:    manifest.Facts{Extractable: true},
+			},
 			"internal/store.callGenWrite": {
 				Location: []string{"internal/store/gen_seam.go:12"},
 				Family:   "file-write",
@@ -438,5 +445,66 @@ func TestRun_ManifestDerivedSeamPairs(t *testing.T) {
 		if f.ID == "internal/store.callGenWrite" && f.Rule != RuleLocationDrift {
 			t.Errorf("seam caller reported as %s (%s), want only benign location-drift", f.Rule, f.Severity)
 		}
+	}
+}
+
+// TestRun_UnexportedTypeMethodIsLegalID is the permanent fixture guard for
+// the id-form rule's narrow scope: a dotted ID whose first segment is an
+// UNEXPORTED TYPE (internal/store.ttl.Sweep) is legal and must never produce
+// an id-form finding — only a real package dot (internal/store.cache.Load in
+// a subpackage dir) is the authoring error.
+func TestRun_UnexportedTypeMethodIsLegalID(t *testing.T) {
+	rep := runFixture(t, fixtureManifest(), Options{Advisory: false})
+	for _, f := range findingsByRule(rep, RuleIDForm) {
+		if f.ID == "internal/store.ttl.Sweep" {
+			t.Errorf("id-form false-positive on an unexported-type method: %+v", f)
+		}
+	}
+}
+
+// TestRun_StrictDirsFailsOnBlindSpot pins the --strict-dirs contract: the
+// scope-hint info upgrades to an error when the operator asks for teeth, so
+// a --dirs narrowing that blinds the gate to declared sites fails the run.
+func TestRun_StrictDirsFailsOnBlindSpot(t *testing.T) {
+	m := fixtureManifest()
+	m.Baseline = []manifest.BaselineEntry{
+		{ID: "cmd/app.fetch", Note: "known", Date: "2026-01-01"},
+		{ID: "cmd/app.openDB", Note: "known", Date: "2026-01-01"},
+	}
+	hinted := runFixture(t, m, Options{Advisory: false, Dirs: []string{"cmd"}})
+	hints := findingsByRule(hinted, RuleScopeHint)
+	if len(hints) != 1 || hints[0].Severity != SeverityInfo {
+		t.Fatalf("default scope-hint = %+v, want one info", hints)
+	}
+	if hinted.Failing() {
+		t.Error("the hint alone must not fail the gate")
+	}
+
+	strict := runFixture(t, m, Options{Advisory: false, Dirs: []string{"cmd"}, StrictDirs: true})
+	blinds := findingsByRule(strict, RuleScopeHint)
+	if len(blinds) != 1 || blinds[0].Severity != SeverityError {
+		t.Fatalf("strict-dirs finding = %+v, want one error", blinds)
+	}
+	if !strict.Failing() {
+		t.Error("--strict-dirs blinding must fail the gate")
+	}
+}
+
+// TestRun_AllowUnusedBaselineGrace pins the grace flag's exact shape: the
+// unused-baseline finding still reports, but strictWarnings (the strict-mode
+// counter the CLI consults) stops counting it.
+func TestRun_AllowUnusedBaselineGrace(t *testing.T) {
+	m := fixtureManifest()
+	m.Baseline = append(m.Baseline, manifest.BaselineEntry{ID: "ghost.Never", Note: "stale", Date: "2026-01-01"})
+	rep := runFixture(t, m, Options{Advisory: false})
+	unused := findingsByRule(rep, RuleBaselineUnused)
+	if len(unused) != 1 {
+		t.Fatalf("unused-baseline findings = %d, want 1", len(unused))
+	}
+	if rep.StrictWarnings(false) != rep.Stats.Warnings || rep.Stats.Warnings < 1 {
+		t.Errorf("without grace, strictWarnings = %d (stats warnings %d), want equal and >=1", rep.StrictWarnings(false), rep.Stats.Warnings)
+	}
+	if got := rep.StrictWarnings(true); got != rep.Stats.Warnings-1 {
+		t.Errorf("with grace, strictWarnings = %d, want %d (one exempted)", got, rep.Stats.Warnings-1)
 	}
 }
