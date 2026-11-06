@@ -11,10 +11,21 @@ Thanks for your interest in contributing!
 
 ## Development Setup
 
-Run the following commands to set up your development environment:
+The whole quality bar (what CI enforces):
 
-    go test ./... -race
-    golangci-lint run ./...
+```bash
+go build ./...                          # build
+go vet ./...                            # vet
+go test ./...                           # tests
+gofmt -l .                              # must print nothing
+go run ./cmd/io-surface check --root .  # the tool gates its own repo
+```
+
+Note: this repo is gated by its own tool — if your change adds an I/O call
+under `cmd/` or `internal/`, the self-check above will fail until the site is
+declared in the manifest (`docs/architecture/io-surface/`). Run
+`go run ./cmd/io-surface init --root . --force` to regenerate `facts.cue`
+(and restore `claims.cue`/`baseline.cue` from git if you had entries there).
 
 ## Reporting Issues
 
