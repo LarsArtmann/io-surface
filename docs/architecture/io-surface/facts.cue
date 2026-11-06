@@ -7,7 +7,7 @@ package io_surface
 audit: {
 	commit: "working-tree"
 	date:   "2026-11-06"
-	claims: 12
+	claims: 14
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -30,9 +30,19 @@ scope: {
 }
 
 sites: {
+	"cmd/io-surface.applyDoc": {
+		location: [
+			"cmd/io-surface/main.go:246",
+			"cmd/io-surface/main.go:282",
+		]
+		family: "file-write"
+		facts: {
+			call: ["os.ReadFile", "os.WriteFile"]
+		}
+	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/main.go:229",
+			"cmd/io-surface/main.go:239",
 		]
 		family: "file-write"
 		facts: {
