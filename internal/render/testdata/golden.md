@@ -16,9 +16,9 @@
 
 ## `file-read` (1)
 
-| Site                        | Location                    | Resource            | Trigger       | Discipline           |
-| --------------------------- | --------------------------- | ------------------- | ------------- | -------------------- |
-| `internal/store.LoadConfig` | `internal/store/store.go:9` | service config file | process start | read-only, no-secret |
+| Site                        | Location                    | Resource            | Trigger       | Discipline           | Crit | Durab |
+| --------------------------- | --------------------------- | ------------------- | ------------- | -------------------- | ---- | ----- |
+| `internal/store.LoadConfig` | `internal/store/store.go:9` | service config file | process start | read-only, no-secret | —    | —     |
 
 ### Judgments
 
@@ -26,9 +26,9 @@
 
 ## `file-write` (1)
 
-| Site                  | Location                     | Resource   | Trigger               | Discipline |
-| --------------------- | ---------------------------- | ---------- | --------------------- | ---------- |
-| `internal/store.Save` | `internal/store/store.go:31` | state file | explicit user command | —          |
+| Site                  | Location                     | Resource   | Trigger               | Discipline | Crit | Durab |
+| --------------------- | ---------------------------- | ---------- | --------------------- | ---------- | ---- | ----- |
+| `internal/store.Save` | `internal/store/store.go:31` | state file | explicit user command | —          | —    | —     |
 
 ### Judgments
 
@@ -36,15 +36,15 @@
 
 ## `database` (1)
 
-| Site             | Location             | Resource          | Trigger     | Discipline |
-| ---------------- | -------------------- | ----------------- | ----------- | ---------- |
-| `cmd/app.openDB` | `cmd/app/main.go:24` | local sqlite file | command run | local-only |
+| Site             | Location             | Resource          | Trigger     | Discipline | Crit | Durab |
+| ---------------- | -------------------- | ----------------- | ----------- | ---------- | ---- | ----- |
+| `cmd/app.openDB` | `cmd/app/main.go:24` | local sqlite file | command run | local-only | —    | —     |
 
 ## `outbound` (1)
 
-| Site            | Location             | Resource | Trigger | Discipline |
-| --------------- | -------------------- | -------- | ------- | ---------- |
-| `cmd/app.fetch` | `cmd/app/main.go:18` | —        | —       | —          |
+| Site            | Location             | Resource | Trigger | Discipline | Crit | Durab |
+| --------------- | -------------------- | -------- | ------- | ---------- | ---- | ----- |
+| `cmd/app.fetch` | `cmd/app/main.go:18` | —        | —       | —          | —    | —     |
 
 ## Reachability (capabilities)
 

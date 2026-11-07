@@ -52,6 +52,7 @@ const (
 	RuleScopeHint          = "io-surface/scope-hint"
 	RuleShadowCapability   = "io-surface/shadow-capability"
 	RuleManifestValidation = "io-surface/manifest-validation"
+	RuleClaimConflict      = "io-surface/claim-conflict"
 )
 
 // Severity of a finding.
@@ -176,6 +177,7 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	rep.Stats.Declared = len(m.Sites)
 	rep.Stats.Baselined = len(m.Baseline)
 	rep.Stats.Extracted = len(sites)
+	checkClaimConflicts(m, rep)
 
 	buckets := map[string]*bucket{}
 	get := func(canon string) *bucket {
@@ -599,4 +601,48 @@ func manifestSeams(m *manifest.Manifest) map[string]string {
 	}
 
 	return seams
+}
+
+// disciplineFamilies maps disciplines to the families they can only make
+// sense on (claim-conflict, plan T20). Disciplines absent from the table
+// (bounded, pooled, no-domain-labels) are family-agnostic.
+var disciplineFamilies = map[string][]string{
+	"atomic-write":   {"file-write"},
+	"buffered-write": {"file-write"},
+	"single-writer":  {"database"},
+	"wal-pragmas":    {"database"},
+}
+
+// familyAllowsDiscipline reports whether a site claiming `discipline` on
+// `family` is coherent.
+func familyAllowsDiscipline(family, discipline string) bool {
+	required, constrained := disciplineFamilies[discipline]
+	if !constrained {
+		return true
+	}
+
+	return slices.Contains(required, family)
+}
+
+// checkClaimConflicts flags declared sites whose discipline claims cannot
+// hold on the site's family: "atomic-write" on a file-read site is a lying
+// claim, not a judgment. Warning severity — the manifest still gates, but a
+// conflicted claim weakens everything it documents.
+func checkClaimConflicts(m *manifest.Manifest, rep *Report) {
+	for _, id := range m.IDs() {
+		s := m.Sites[id]
+		for _, d := range s.Claims.Discipline {
+			if familyAllowsDiscipline(s.Family, d) {
+				continue
+			}
+			rep.add(Finding{
+				Rule:     RuleClaimConflict,
+				Severity: SeverityWarning,
+				ID:       id,
+				Family:   s.Family,
+				Location: m.Dir,
+				Message:  fmt.Sprintf("discipline %q cannot hold on family %q — the claim conflicts with the extraction", d, s.Family),
+			})
+		}
+	}
 }
