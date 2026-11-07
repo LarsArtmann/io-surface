@@ -60,15 +60,15 @@ info    io-surface/err-dropped           cmd/app.positiveBlankStat  cmd/app/main
         info, _ := os.Stat(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`
 info    io-surface/write-non-atomic      cmd/app.negativeExpression  cmd/app/main.go:56
         os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file
-info    io-surface/err-dropped           cmd/app.wrongRuleDoesNotSuppress  cmd/app/suppress.go:24
+info    io-surface/err-dropped           cmd/app.wrongRuleDoesNotSuppress  cmd/app/suppress.go:30
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
-info    io-surface/ignore-invalid        cmd/app/suppress.go  cmd/app/suppress.go:28
+info    io-surface/ignore-invalid        cmd/app/suppress.go  cmd/app/suppress.go:34
         io-surface:ignore err-dropped — grammar: //io-surface:ignore <rule> <reason…>; missing reason, so nothing was suppressed
-info    io-surface/err-dropped           cmd/app.reasonlessDirectiveDoesNotSuppress  cmd/app/suppress.go:29
+info    io-surface/err-dropped           cmd/app.reasonlessDirectiveDoesNotSuppress  cmd/app/suppress.go:35
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
-info    io-surface/ignore-invalid        cmd/app/suppress.go  cmd/app/suppress.go:33
+info    io-surface/ignore-invalid        cmd/app/suppress.go  cmd/app/suppress.go:39
         io-surface:ignore no-such-rule whatever — grammar: //io-surface:ignore <rule> <reason…>; unknown rule name, so nothing was suppressed
-info    io-surface/err-dropped           cmd/app.unknownRuleDirectiveDoesNotSuppress  cmd/app/suppress.go:34
+info    io-surface/err-dropped           cmd/app.unknownRuleDirectiveDoesNotSuppress  cmd/app/suppress.go:40
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
 info    io-surface/closer-missing        internal/store.leakNeverUsed  internal/store/closers.go:11
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
@@ -76,4 +76,4 @@ info    io-surface/closer-missing        internal/store.leakUsedNotClosed  inter
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
 info    io-surface/write-non-atomic      internal/store.negativeBlank  internal/store/closers.go:77
         os.Create(path) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file
-io-surface lint: 52 sites (50 resolved, 2 token) — 0 errors, 0 warnings, 39 infos (report only; pass --enforce to fail on errors)
+io-surface lint: 54 sites (52 resolved, 2 token) — 0 errors, 0 warnings, 39 infos (report only; pass --enforce to fail on errors)

@@ -28,7 +28,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/extract.extractor.walk`            | `internal/extract/extract.go:94`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.runExtract`                | `internal/extract/tables.go:107`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/manifest.Load`                     | `internal/manifest/manifest.go:192` | —                                                         | —                                        | —          | —    | —     |
-| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:402` | —                                                         | —                                        | —          | —    | —     |
+| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:468` | —                                                         | —                                        | —          | —    | —     |
 
 ### Judgments
 

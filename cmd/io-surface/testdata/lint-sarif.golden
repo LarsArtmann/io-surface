@@ -984,7 +984,7 @@
                   "uri": "cmd/app/suppress.go"
                 },
                 "region": {
-                  "startLine": 24,
+                  "startLine": 30,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -996,7 +996,7 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:24",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:30",
             "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
@@ -1007,99 +1007,6 @@
           "level": "note",
           "message": {
             "text": "io-surface:ignore err-dropped — grammar: //io-surface:ignore <rule> <reason…>; missing reason, so nothing was suppressed"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/suppress.go"
-                },
-                "region": {
-                  "startLine": 28,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:28",
-            "go-finding/meta/ruleDescription": "a suppression directive is malformed (unknown rule or missing reason)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/err-dropped",
-          "level": "note",
-          "message": {
-            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/suppress.go"
-                },
-                "region": {
-                  "startLine": 29,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:29",
-            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/ignore-invalid",
-          "level": "note",
-          "message": {
-            "text": "io-surface:ignore no-such-rule whatever — grammar: //io-surface:ignore <rule> <reason…>; unknown rule name, so nothing was suppressed"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/suppress.go"
-                },
-                "region": {
-                  "startLine": 33,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:33",
-            "go-finding/meta/ruleDescription": "a suppression directive is malformed (unknown rule or missing reason)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/err-dropped",
-          "level": "note",
-          "message": {
-            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
           },
           "locations": [
             {
@@ -1120,7 +1027,100 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:34",
+            "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:34",
+            "go-finding/meta/ruleDescription": "a suppression directive is malformed (unknown rule or missing reason)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:35",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/ignore-invalid",
+          "level": "note",
+          "message": {
+            "text": "io-surface:ignore no-such-rule whatever — grammar: //io-surface:ignore <rule> <reason…>; unknown rule name, so nothing was suppressed"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 39,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:39",
+            "go-finding/meta/ruleDescription": "a suppression directive is malformed (unknown rule or missing reason)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:40",
             "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"

@@ -23,8 +23,8 @@ func TestRun_FixtureReport(t *testing.T) {
 	if rep.Stats.Infos != 39 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
 		t.Errorf("stats = %+v, want 39 infos", rep.Stats)
 	}
-	if rep.Stats.Extracted != 52 || rep.Stats.Resolved != 50 {
-		t.Errorf("stats = %+v, want 52 extracted / 50 resolved", rep.Stats)
+	if rep.Stats.Extracted != 54 || rep.Stats.Resolved != 52 {
+		t.Errorf("stats = %+v, want 54 extracted / 52 resolved", rep.Stats)
 	}
 	if len(rep.Findings) != 39 {
 		t.Fatalf("findings = %d, want 39", len(rep.Findings))
