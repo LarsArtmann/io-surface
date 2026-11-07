@@ -7,6 +7,8 @@ package extract
 // test pins them together.
 
 import (
+	"fmt"
+
 	"go/ast"
 	"go/token"
 	"slices"
@@ -17,6 +19,14 @@ import (
 type detector struct {
 	rule string
 	run  func(e *extractor, c *capture) []Observation
+}
+
+// fnDetector is the declaration-shaped half of the registry: rules whose
+// subject is the whole function (client literals, stat-then-open pairs),
+// run once per function so per-capture execution cannot duplicate them.
+type fnDetector struct {
+	rule string
+	run  func(e *extractor, fn *ast.FuncDecl, imports map[string]string, id string) []Observation
 }
 
 // RuleDef is the published half of the rule contract: the stable name, the
@@ -35,6 +45,15 @@ var detectors = []detector{
 	{rule: RuleCloserMissing, run: detectCloserMissing},
 	{rule: RuleCloserMissing, run: detectBodyUnclosed},
 	{rule: RuleCtxDropped, run: detectCtxDropped},
+	{rule: RuleDeferInLoop, run: detectDeferInLoop},
+	{rule: RuleIOInLoop, run: detectIOInLoop},
+	{rule: RuleClientNoTimeout, run: detectBareHTTPHelper},
+}
+
+// fnDetectors is the declaration-shaped registry (once per function).
+var fnDetectors = []fnDetector{
+	{rule: RuleClientNoTimeout, run: detectClientNoTimeout},
+	{rule: RuleStatThenOpen, run: detectStatThenOpen},
 }
 
 // detectorRules is the metadata registry. Message receives the observation's
@@ -60,6 +79,38 @@ var detectorRules = []RuleDef{
 		Name:        RuleCtxDropped,
 		Severity:    "info",
 		Description: "a context.Context is in scope but the call uses the context-blind variant",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
+	{
+		Name:        RuleDeferInLoop,
+		Severity:    "info",
+		Description: "a deferred close or I/O call runs inside a loop but executes at function exit",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
+	{
+		Name:        RuleClientNoTimeout,
+		Severity:    "info",
+		Description: "an HTTP client or helper without a timeout",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
+	{
+		Name:        RuleStatThenOpen,
+		Severity:    "info",
+		Description: "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
+	{
+		Name:        RuleIOInLoop,
+		Severity:    "info",
+		Description: "a watched I/O call sits inside a loop body (N+1 shape)",
 		Message: func(o Observation) string {
 			return o.Evidence
 		},
@@ -296,4 +347,140 @@ func detectCtxDropped(e *extractor, c *capture) []Observation {
 	}
 
 	return []Observation{e.emit(c, RuleCtxDropped, evidenceOf(&e.fset, c.node)+" — the enclosing function takes a context.Context; prefer "+variant)}
+}
+
+// detectDeferInLoop flags deferred calls inside loop bodies: defers run at
+// FUNCTION exit, so every iteration's handle stays open until then. Fires on
+// Close-method defers and on deferred watched I/O calls alike; plain closes
+// in loops are the correct pattern and never fire.
+func detectDeferInLoop(e *extractor, c *capture) []Observation {
+	if !c.inLoop || c.shape != shapeDeferred {
+		return nil
+	}
+	isClose := false
+	if sel, ok := c.node.Fun.(*ast.SelectorExpr); ok && sel.Sel.Name == "Close" {
+		isClose = true
+	}
+	if !isClose && c.sel == "" {
+		return nil // unwatched non-Close defers are out of the I/O scope
+	}
+
+	return []Observation{e.emit(c, RuleDeferInLoop, evidenceOf(&e.fset, c.node)+" — defers run at function exit, so earlier loop iterations' resources stay open until then")}
+}
+
+// detectIOInLoop is the N+1 shape: a watched resolved I/O call inside a loop
+// body. Info only — hoisting is context-dependent and the fix may be wrong
+// for streamed workloads.
+func detectIOInLoop(e *extractor, c *capture) []Observation {
+	if !c.inLoop || c.sel == "" || c.shape == shapeDeferred {
+		return nil
+	}
+
+	return []Observation{e.emit(c, RuleIOInLoop, evidenceOf(&e.fset, c.node)+" — I/O inside a loop (N+1 shape); consider hoisting or batching")}
+}
+
+// detectBareHTTPHelper flags http.Get/Post/PostForm/Head: they use the
+// package default client, which has NO timeout — a hung server hangs the
+// caller forever.
+func detectBareHTTPHelper(e *extractor, c *capture) []Observation {
+	if !httpBodyCtors[c.sel] {
+		return nil
+	}
+
+	return []Observation{e.emit(c, RuleClientNoTimeout, evidenceOf(&e.fset, c.node)+" — the default client has no timeout; use a client with Timeout set (or a request with context)")}
+}
+
+// detectClientNoTimeout flags http.Client composite literals without a
+// Timeout field — declaration-shaped, run once per function.
+func detectClientNoTimeout(e *extractor, fn *ast.FuncDecl, imports map[string]string, id string) []Observation {
+	var obs []Observation
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		lit, ok := n.(*ast.CompositeLit)
+		if !ok {
+			return true
+		}
+		sel, ok := lit.Type.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		x, ok := sel.X.(*ast.Ident)
+		if !ok || imports[x.Name] != "http" || sel.Sel.Name != "Client" {
+			return true
+		}
+		for _, elt := range lit.Elts {
+			if kv, ok := elt.(*ast.KeyValueExpr); ok {
+				if key, ok := kv.Key.(*ast.Ident); ok && key.Name == "Timeout" {
+					return true
+				}
+			}
+		}
+		obs = append(obs, Observation{
+			SiteID:   id,
+			Rule:     RuleClientNoTimeout,
+			Call:     "http.Client{}",
+			Location: e.locOf(lit),
+			Evidence: evidenceOf(&e.fset, lit) + " — no Timeout field; a hung server hangs this client forever",
+		})
+
+		return true
+	})
+
+	return obs
+}
+
+// statOpeners pairs a preceding stat with the calls stat-then-open guards:
+// identical path expressions mean a double syscall (and a TOCTOU window).
+var statOpeners = map[string]bool{
+	"os.Open": true, "os.Create": true, "os.OpenFile": true,
+	"os.ReadFile": true, "os.WriteFile": true,
+}
+
+// detectStatThenOpen pairs os.Stat/os.Lstat with an open/read/write of the
+// SAME path expression within one function (printer-normalized comparison).
+// Only exact expression matches fire — anything looser would be guesswork.
+func detectStatThenOpen(e *extractor, fn *ast.FuncDecl, imports map[string]string, id string) []Observation {
+	statPaths := map[string]string{} // printed path -> first stat location
+	var obs []Observation
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		x, ok := sel.X.(*ast.Ident)
+		if !ok {
+			return true
+		}
+		key := imports[x.Name]
+		name := sel.Sel.Name
+		if len(call.Args) == 0 {
+			return true
+		}
+		printed := ""
+		switch {
+		case (key == "os" && (name == "Stat" || name == "Lstat")):
+			printed = evidenceOf(&e.fset, call.Args[0])
+			if _, exists := statPaths[printed]; !exists {
+				statPaths[printed] = e.locOf(call)
+			}
+		case statOpeners[key+"."+name]:
+			printed = evidenceOf(&e.fset, call.Args[0])
+			if statLoc, exists := statPaths[printed]; exists && statLoc != e.locOf(call) {
+				obs = append(obs, Observation{
+					SiteID:   id,
+					Rule:     RuleStatThenOpen,
+					Call:     key + "." + name,
+					Location: e.locOf(call),
+					Evidence: fmt.Sprintf("%s.%s of %s (stat'd at %s) — double syscall and a TOCTOU window; open and handle the error instead", key, name, printed, statLoc),
+				})
+			}
+		}
+
+		return true
+	})
+
+	return obs
 }

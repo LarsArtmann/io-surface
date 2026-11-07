@@ -74,8 +74,10 @@ type extractor struct {
 	currentImports []importAlias
 	// observations/captures are the detector channel (D1): non-nil only when
 	// ExtractWithObservations runs, never touched by plain Extract.
-	observations []Observation
-	captures     map[ast.Node]*capture
+	observations  []Observation
+	captures      map[ast.Node]*capture
+	captureList   []*capture
+	fnCaptureMark int
 }
 
 // importAlias pairs a file's local package alias with its full import path.
@@ -303,8 +305,11 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 		return
 	}
 	id := symbolID(pkg, fn)
+	var fnCaptures []*capture
 	if e.captures != nil {
-		e.captureContexts(fn, imports)
+		e.captureContexts(fn, imports, id)
+		fnCaptures = e.captureList[e.fnCaptureMark:]
+		e.fnCaptureMark = len(e.captureList)
 	}
 	ast.Inspect(fn.Body, func(n ast.Node) bool {
 		switch node := n.(type) {
@@ -323,8 +328,8 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 				if key, imported := imports[xIdent.Name]; imported {
 					if fam, watched := callFamily[key][call.Sel.Name]; watched {
 						e.record(id, node, testinfra, key+"."+call.Sel.Name, fam, ConfidenceResolved, "")
-						if e.captures != nil {
-							e.detect(id, node, key+"."+call.Sel.Name, fam)
+						if c, ok := e.captures[node]; ok {
+							c.sel, c.family = key+"."+call.Sel.Name, fam
 						}
 
 						return true
@@ -348,6 +353,9 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 
 		return true
 	})
+	if e.captures != nil {
+		e.runDetectors(id, fn, imports, fnCaptures)
+	}
 }
 
 func (e *extractor) record(id string, n ast.Node, testinfra bool, call, family, confidence, via string) {
