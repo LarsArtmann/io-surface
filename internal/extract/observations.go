@@ -244,9 +244,7 @@ func (e *extractor) detect(id string, call *ast.CallExpr, sel, family string) {
 	}
 	c.id, c.sel, c.family = id, sel, family
 	for _, d := range detectors {
-		for _, obs := range d.run(e, c) {
-			e.observations = append(e.observations, obs)
-		}
+		e.observations = append(e.observations, d.run(e, c)...)
 	}
 }
 

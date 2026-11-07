@@ -51,7 +51,7 @@ func TestDetectErrDropped_ShapeTable(t *testing.T) {
 		if obs[0].Call != "os.Remove" && obs[0].Call != "os.ReadFile" && obs[0].Call != "os.Stat" {
 			t.Errorf("%s: call = %q", tc.site, obs[0].Call)
 		}
-		if !strings.HasSuffix(obs[0].Location, "main.go:") {
+		if !strings.HasPrefix(obs[0].Location, "cmd/app/main.go:") {
 			t.Errorf("%s: location %q not repo-relative main.go", tc.site, obs[0].Location)
 		}
 	}

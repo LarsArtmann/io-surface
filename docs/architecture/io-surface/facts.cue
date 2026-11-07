@@ -5,8 +5,8 @@
 package io_surface
 
 audit: {
-	commit: "c4c39d8-dirty"
-	date:   "2026-11-06"
+	commit: "b47450a-dirty"
+	date:   "2026-11-07"
 	claims: 24
 	method: "io-surface extract (AST, stdlib-only)"
 }
@@ -89,19 +89,9 @@ sites: {
 			call: ["os.ReadFile"]
 		}
 	}
-	"internal/extract.Extract": {
-		location: [
-			"internal/extract/tables.go:85",
-			"internal/extract/tables.go:95",
-		]
-		family: "file-read"
-		facts: {
-			call: ["os.Stat"]
-		}
-	}
 	"internal/extract.extractor.collectSeamDecl": {
 		location: [
-			"internal/extract/extract.go:161",
+			"internal/extract/extract.go:165",
 		]
 		family: "file-read"
 		facts: {
@@ -110,7 +100,7 @@ sites: {
 	}
 	"internal/extract.extractor.parseFile": {
 		location: [
-			"internal/extract/extract.go:224",
+			"internal/extract/extract.go:228",
 		]
 		family: "file-read"
 		facts: {
@@ -119,11 +109,21 @@ sites: {
 	}
 	"internal/extract.extractor.walk": {
 		location: [
-			"internal/extract/extract.go:84",
+			"internal/extract/extract.go:88",
 		]
 		family: "file-read"
 		facts: {
 			call: ["filepath.Walk"]
+		}
+	}
+	"internal/extract.runExtract": {
+		location: [
+			"internal/extract/tables.go:106",
+			"internal/extract/tables.go:96",
+		]
+		family: "file-read"
+		facts: {
+			call: ["os.Stat"]
 		}
 	}
 	"internal/manifest.AppendBaseline": {
