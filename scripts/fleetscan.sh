@@ -25,8 +25,9 @@ if [[ -z "$REPOS_TSV" ]]; then
     python3 -c '
 import json, sys
 for p in json.load(sys.stdin):
-    if "go" in p.get("Types", []) and not p.get("Missing"):
-        print(p["Name"] + "\t" + p["Path"])' > "$REPOS_TSV"
+    types = p.get("typeDetails", {}).get("all", []) or [p.get("type", "")]
+    if "go" in types:
+        print(p["name"] + "\t" + p["path"])' > "$REPOS_TSV"
 fi
 
 python3 - "$REPOS_TSV" "$IOSURFACE_BIN" "$OUT" << 'PY'
@@ -64,7 +65,7 @@ for name, path in repos:
         scan_failures.append({"project": name, "path": path, "error": "json decode"})
         continue
     counts = {}
-    for f in rep.get("findings", []):
+    for f in (rep.get("findings") or []):
         counts[f["rule"]] = counts.get(f["rule"], 0) + 1
     for rule, n in counts.items():
         per_rule[rule] = per_rule.get(rule, 0) + n
