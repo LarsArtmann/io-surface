@@ -11,6 +11,66 @@
       },
       "results": [
         {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:11",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:21",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
           "ruleId": "io-surface/err-dropped",
           "level": "note",
           "message": {

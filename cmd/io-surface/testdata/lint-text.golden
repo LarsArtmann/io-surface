@@ -1,3 +1,7 @@
+info    io-surface/closer-missing        cmd/app.leakBody  cmd/app/http.go:11
+        resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
+info    io-surface/closer-missing        cmd/app.statusOnlyLeak  cmd/app/http.go:21
+        resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
 info    io-surface/err-dropped           cmd/app.positiveBare  cmd/app/main.go:12
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
 info    io-surface/err-dropped           cmd/app.positiveBlank  cmd/app/main.go:16
@@ -8,4 +12,4 @@ info    io-surface/closer-missing        internal/store.leakNeverUsed  internal/
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
 info    io-surface/closer-missing        internal/store.leakUsedNotClosed  internal/store/closers.go:21
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
-io-surface lint: 19 sites (19 resolved, 0 token) — 0 errors, 0 warnings, 5 infos (report only; pass --enforce to fail on errors)
+io-surface lint: 25 sites (25 resolved, 0 token) — 0 errors, 0 warnings, 7 infos (report only; pass --enforce to fail on errors)
