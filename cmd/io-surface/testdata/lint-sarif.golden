@@ -510,7 +510,7 @@
           "ruleId": "io-surface/defer-in-loop",
           "level": "note",
           "message": {
-            "text": "f.Close() — defers run at function exit, so earlier loop iterations' resources stay open until then"
+            "text": "f.Close() — defers run at function exit, so earlier loop iterations' resources stay open until then; move the body into a helper func and defer there"
           },
           "locations": [
             {
@@ -665,7 +665,7 @@
           "ruleId": "io-surface/defer-in-loop",
           "level": "note",
           "message": {
-            "text": "os.MkdirAll(dir, 0o755) — defers run at function exit, so earlier loop iterations' resources stay open until then"
+            "text": "os.MkdirAll(dir, 0o755) — defers run at function exit, so earlier loop iterations' resources stay open until then; move the body into a helper func and defer there"
           },
           "locations": [
             {
@@ -789,7 +789,7 @@
           "ruleId": "io-surface/write-non-atomic",
           "level": "note",
           "message": {
-            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file"
+            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
           },
           "locations": [
             {
@@ -1006,7 +1006,7 @@
           "ruleId": "io-surface/write-non-atomic",
           "level": "note",
           "message": {
-            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file"
+            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
           },
           "locations": [
             {
@@ -1254,7 +1254,7 @@
           "ruleId": "io-surface/write-non-atomic",
           "level": "note",
           "message": {
-            "text": "os.Create(path) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file"
+            "text": "os.Create(path) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
           },
           "locations": [
             {

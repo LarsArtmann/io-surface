@@ -166,7 +166,7 @@ bridge deferred until a consumer exists; golangci composition rejected.
   (v1.3) so `closer-missing` understands handle hand-off?** The closer-missing
   detector already suppresses the obvious transfer shapes (passing the handle
   into a call, storing it), but the fleet triage shows the remaining FP class
-  is *semantic* ownership the AST cannot see: a handle returned to a
+  is _semantic_ ownership the AST cannot see: a handle returned to a
   registry, a body handed to a streaming decoder, a connection owned by a
   pool. Proposed vocabulary — `claims.ownership: "self" | "caller" |
   "helper"` — with per-rule semantics:
@@ -182,7 +182,7 @@ bridge deferred until a consumer exists; golangci composition rejected.
   - **FP mapping:** the closer-missing FP classes from the fleet runs map
     1:1 — cache stores → `caller`, pool hand-off → `helper`, long-lived
     session handles → `caller`. The suppression directive stays the
-    fine-grained tool for one-off sites; ownership is the *policy* tool for
+    fine-grained tool for one-off sites; ownership is the _policy_ tool for
     a class of sites.
   - **Decision point:** ratify v1.3 scope (and the helper-naming mechanism)
     alongside the promotion policy — both are schema/contract decisions the

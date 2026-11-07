@@ -1,3 +1,5 @@
+> **Live remainder:** rows 29-36 re-verified against HEAD and struck with evidence 2026-11-07 (superb wrap); row 33 harvested as TODO_LIST #116. Archived 2026-11-07 (cadence 15/15).
+
 # io-surface Status — Pareto Execution: 1% → SARIF, Two Pilots Touched, One gitignore Landmine
 
 **Date:** 2026-11-06 04:27 CET · **Basis:** execution of
