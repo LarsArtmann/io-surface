@@ -125,7 +125,7 @@ _(Ranked by impact; the first ~15 are TODO_LIST carry-overs with owner-verified 
 30. **NEW: InboxClean gate pin policy** — `@v0.1.0` today; decide `@latest` vs. pinned (tag-lag risk).
 31. **NEW: dnsblockd cross-repo edit protocol** — document lock-acquire expectation for manifest-only edits (I edited with check-only, worked because free).
 32. **NEW: TODO_LIST row 36 is stale** (v0.1.0 already tagged) — docs-health sweep should drop it.
-33. **#28 `.Do`/`.Close` token ambiguity** classification.
+33. ~~**#28 `.Do`/`.Close` token ambiguity** classification.~~ RESOLVED 2026-11-06: TODO_LIST #28 DONE — bare `.Do` records no family (`methodToken["Do"] = ""`, the manifest claim decides); the 0.3.0 detector line classifies `Close` calls structurally (closer-missing), independent of family tokenization.
 34. **#29 `extract --stats`** per-package histogram.
 35. ~~**#30 `version --json`** with commit + build date.~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE.
 36. **#31 taxonomy-freeze documentation**.
