@@ -250,7 +250,7 @@ while working here:
   output, and never revert in-flight changes you didn't author.
 
 The birth status report
-(`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
+(`docs/status/archived/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
 is the honest record of this repo's origin (defects §d, open questions §g).
 The detector-suite evidence report
 (`docs/status/2026-11-07_08-08_io-bug-radar-p0-p2-detectors-fleet-proven.md`)

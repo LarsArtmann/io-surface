@@ -1,3 +1,8 @@
+> **Live remainder:** every open item in this report was harvested into
+> TODO_LIST (all struck/routed — docs-gates audit-all PASS) and its origin
+> record is summarized in AGENTS.md ("Sharp edges" + release history).
+> Archived 2026-11-07 per the docs-cadence ritual (count threshold 15).
+
 # io-surface — session status: birth of the tool, bench matrix, first pilot
 
 **Date:** 2026-11-06 00:14 CET · **Session:** `io-surface-arc` (no lock held in this repo)

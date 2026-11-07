@@ -4,15 +4,22 @@
 // imports this package, so `buildflow` (and ./bin/dev) runs the I/O gate as
 // a first-class pipeline tool with zero BuildFlow-side glue.
 //
-// Detection runs the full in-process pipeline (extract + check.Run) against
-// the working directory's own manifest (docs/architecture/io-surface). A
-// working directory without a manifest is a clean no-op: BuildFlow sweeps
-// the whole fleet, and repos that never adopted io-surface must not fail.
+// Detection runs BOTH faces of the tool against the working directory:
 //
-// Severity mapping honors the manifest's recorded enforcement policy (D4):
-// gate policy passes severities through unchanged; audit policy demotes
-// error findings to warning so an adopting repo's posture — recorded in ITS
-// manifest, reviewable in ITS diffs — controls whether BuildFlow fails.
+//   - the manifest gate (extract + check.Run) when the module adopted
+//     io-surface (docs/architecture/io-surface present), and
+//   - the io-bug-radar detector sweep (lint.Run) ALWAYS — the detectors are
+//     manifestless by design, so unadopted modules still get real bug
+//     findings. Radar ships at info severity (D4): BuildFlow's findings gate
+//     fails on errors, and radar errors only exist where a manifest claim
+//     escalated one.
+//
+// Severity mapping honors the manifest's recorded enforcement policy (D4)
+// for BOTH faces: gate policy passes severities through unchanged; audit
+// policy demotes error findings to warning — an adopting repo's posture,
+// recorded in ITS manifest, reviewable in ITS diffs, controls whether
+// BuildFlow fails. A working directory without a manifest is radar only,
+// never a step error.
 package provider
 
 import (
@@ -25,6 +32,7 @@ import (
 	"github.com/larsartmann/go-finding/toolsdk"
 
 	"github.com/larsartmann/io-surface/internal/check"
+	"github.com/larsartmann/io-surface/internal/lint"
 	"github.com/larsartmann/io-surface/internal/manifest"
 )
 
@@ -34,7 +42,7 @@ import (
 //nolint:gochecknoglobals // toolsdk contract: specs self-register as package-level vars
 var Provider = toolsdk.Register(toolsdk.Spec{
 	Name:         "io-surface",
-	Description:  "I/O surface manifest gate: undeclared I/O sites, stale claims, baseline lifecycle, location drift",
+	Description:  "I/O surface manifest gate (undeclared sites, stale claims, baseline lifecycle, location drift) + io-bug-radar detector sweep (dropped errors, unclosed bodies, non-atomic writes, …; advisory info severity, manifest optional)",
 	Trigger:      toolsdk.OnGoModule(),
 	Inputs:       []string{"**/*.go", "docs/architecture/io-surface/*.cue"},
 	ModuleFanOut: true,
@@ -48,29 +56,43 @@ var Provider = toolsdk.Register(toolsdk.Spec{
 
 		m, err := manifest.Load(manifestDir)
 		if errors.Is(err, manifest.ErrNotInitialized) {
-			// No manifest in this module: io-surface is not adopted here.
-			// A manifest that EXISTS but fails validation still reports.
-			return nil, nil
+			// No manifest in this module: io-surface is not adopted here, so
+			// the gate has nothing to pair against — but the radar face needs
+			// no manifest, and an unadopted module is exactly where its
+			// advisory findings carry the most information.
+			rep, lerr := lint.Run(dir, lint.Options{})
+			if lerr != nil {
+				return nil, lerr
+			}
+
+			return convert(rep, manifest.EnforcementGate), nil
 		}
 		if err != nil {
 			return nil, err
 		}
 
-		rep, err := check.Run(dir, m, check.Options{})
+		gateRep, err := check.Run(dir, m, check.Options{})
+		if err != nil {
+			return nil, err
+		}
+		radarRep, err := lint.Run(dir, lint.Options{})
 		if err != nil {
 			return nil, err
 		}
 
-		return convert(rep, m.EnforcementPolicy()), nil
+		// One policy governs both faces: audit demotion applies to gate
+		// errors and to radar findings a critical claim escalated alike.
+		return append(convert(gateRep, m.EnforcementPolicy()), convert(radarRep, m.EnforcementPolicy())...), nil
 	}),
 	Repair: nil,
 })
 
 // convert maps a check report into go-finding findings. Rule IDs stay
-// verbatim (`io-surface/undeclared-site`) so BuildFlow suppression files and
-// SARIF consumers see the same vocabulary as the CLI. Under the audit
-// policy, error findings demote to warning — the recorded posture governs,
-// exactly as `check` does with its exit code.
+// verbatim (`io-surface/undeclared-site`, `io-surface/write-non-atomic`) so
+// BuildFlow suppression files and SARIF consumers see the same vocabulary
+// as the CLI, whichever face produced the finding. Under the audit policy,
+// error findings demote to warning — the recorded posture governs, exactly
+// as `check` does with its exit code.
 func convert(rep *check.Report, policy string) []finding.Finding {
 	out := make([]finding.Finding, 0, len(rep.Findings))
 	for _, f := range rep.Findings {
