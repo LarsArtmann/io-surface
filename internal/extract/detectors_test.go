@@ -196,3 +196,35 @@ func TestDetectCloserMissing_HttpBody(t *testing.T) {
 		}
 	}
 }
+
+// TestDetectCtxDropped_ScopeGate pins the ctx rule: variant pairs fire only
+// when the enclosing function takes a context.Context; no-ctx functions,
+// receiver-typed params, and already-context-aware calls stay silent.
+func TestDetectCtxDropped_ScopeGate(t *testing.T) {
+	got := observationsBySite(t, "../../testdata/detectors", RuleCtxDropped)
+
+	positives := []string{"cmd/app.positiveExec", "cmd/app.positiveDial", "cmd/app.positiveDialTimeout", "cmd/app.positiveGet"}
+	for _, site := range positives {
+		if len(got[site]) != 1 {
+			t.Errorf("%s: %d observations, want 1 (all: %+v)", site, len(got[site]), got[site])
+		}
+	}
+	for _, site := range positives {
+		for _, o := range got[site] {
+			if !strings.Contains(o.Evidence, "context.Context") {
+				t.Errorf("%s: evidence lacks the variant hint: %q", site, o.Evidence)
+			}
+		}
+	}
+
+	negatives := []string{
+		"cmd/app.negativeNoCtx",       // no ctx in scope
+		"cmd/app.negativeReceiverCtx", // param is not context.Context
+		"cmd/app.negativeCtxVariant",  // already uses DialContext
+	}
+	for _, site := range negatives {
+		if obs := got[site]; len(obs) != 0 {
+			t.Errorf("%s: must stay silent, got %+v", site, obs)
+		}
+	}
+}

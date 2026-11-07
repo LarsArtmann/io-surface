@@ -1,3 +1,11 @@
+info    io-surface/ctx-dropped           cmd/app.positiveExec  cmd/app/ctx.go:14
+        exec.Command("git", "status") — the enclosing function takes a context.Context; prefer exec.CommandContext
+info    io-surface/ctx-dropped           cmd/app.positiveDial  cmd/app/ctx.go:20
+        net.Dial("tcp", "host.test:80") — the enclosing function takes a context.Context; prefer net.DialContext
+info    io-surface/ctx-dropped           cmd/app.positiveDialTimeout  cmd/app/ctx.go:27
+        net.DialTimeout("tcp", "host.test:80", 5*1e9) — the enclosing function takes a context.Context; prefer net.DialContext
+info    io-surface/ctx-dropped           cmd/app.positiveGet  cmd/app/ctx.go:34
+        http.Get("https://host.test/x") — the enclosing function takes a context.Context; prefer http.NewRequestWithContext
 info    io-surface/closer-missing        cmd/app.leakBody  cmd/app/http.go:11
         resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
 info    io-surface/closer-missing        cmd/app.statusOnlyLeak  cmd/app/http.go:21
@@ -12,4 +20,4 @@ info    io-surface/closer-missing        internal/store.leakNeverUsed  internal/
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
 info    io-surface/closer-missing        internal/store.leakUsedNotClosed  internal/store/closers.go:21
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
-io-surface lint: 25 sites (25 resolved, 0 token) — 0 errors, 0 warnings, 7 infos (report only; pass --enforce to fail on errors)
+io-surface lint: 32 sites (31 resolved, 1 token) — 0 errors, 0 warnings, 11 infos (report only; pass --enforce to fail on errors)

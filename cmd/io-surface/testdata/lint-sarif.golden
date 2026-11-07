@@ -11,6 +11,126 @@
       },
       "results": [
         {
+          "ruleId": "io-surface/ctx-dropped",
+          "level": "note",
+          "message": {
+            "text": "exec.Command(\"git\", \"status\") — the enclosing function takes a context.Context; prefer exec.CommandContext"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/ctx.go"
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:14",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/ctx-dropped",
+          "level": "note",
+          "message": {
+            "text": "net.Dial(\"tcp\", \"host.test:80\") — the enclosing function takes a context.Context; prefer net.DialContext"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/ctx.go"
+                },
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:20",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/ctx-dropped",
+          "level": "note",
+          "message": {
+            "text": "net.DialTimeout(\"tcp\", \"host.test:80\", 5*1e9) — the enclosing function takes a context.Context; prefer net.DialContext"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/ctx.go"
+                },
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:27",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/ctx-dropped",
+          "level": "note",
+          "message": {
+            "text": "http.Get(\"https://host.test/x\") — the enclosing function takes a context.Context; prefer http.NewRequestWithContext"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/ctx.go"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:34",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
           "ruleId": "io-surface/closer-missing",
           "level": "note",
           "message": {
