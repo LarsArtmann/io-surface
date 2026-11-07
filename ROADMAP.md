@@ -31,7 +31,10 @@ not exist yet. Cheapest fix first.
 - `io-surface diff a.cue b.cue` → release-note changelogs
 - `io-surface explain <id>`: family, calls, claims, what would change the verdict
 - D2 diagram rendering (families → containers, sites → nodes)
-- Test-gap map: durable `file-write` sites ↔ crash-recovery tests
+- Test-gap map: durable `file-write` sites ↔ crash-recovery tests (the v1.2
+  `durability` field and the `write-non-atomic` detector are this theme's data
+  source: `durable` write sites without a temp+rename are the test-gap list —
+  see README's write-non-atomic rule card for the decided semantics)
 - Baseline burn-down section in `render` (count, oldest entry, age)
 
 ### 3. Raise the extraction ceiling

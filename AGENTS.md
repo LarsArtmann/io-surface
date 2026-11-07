@@ -24,6 +24,7 @@ go test -cover ./...                    # with coverage
 gofmt -l .                              # must print NOTHING (CI gate)
 go run ./cmd/io-surface check --root .  # SELF-HOSTING GATE (CI runs exactly this)
 go run ./cmd/io-surface render --root . # render must not crash (CI checks)
+go run ./cmd/io-surface lint --root .   # detector radar (report-only; CI emits SARIF artifact)
 ```
 
 CI (`.github/workflows/ci.yml`): build → vet → test → gofmt gate → self-check

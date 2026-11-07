@@ -87,7 +87,7 @@ _(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked
 6. Verify GitHub CI on `7056141`: first run with `-race` + the `capabilities` job (capslock install with repo toolchain is the risky step).
 7. Re-check pkg.go.dev indexing (#38) once the crawler catches up.
 8. Decide #49: stdout/stderr in `scope.in`? (owner; evidence: `commands.go:77`, bufio/syscall now watched).
-9. T14 enforcement policy field (`advisory|gate` per manifest; the shadow/capability tier's promotion path).
+9. ~~T14 enforcement policy field (`advisory|gate` per manifest; the shadow/capability tier's promotion path).~~ RESOLVED 2026-11-07: shipped as the manifest `enforcement` field (`gate|audit` — EnforcementGate/EnforcementAudit, EnforcementPolicy(), audit-mode demotion live in check)
 10. T16b `baseline add` subcommand with `owner`/`expires` prompts (#22).
 11. #44 CI module-path tripwire (install from public path in CI — complements #37's manual smoke).
 12. #43 docs-gates standing CI gate, pinned rev.

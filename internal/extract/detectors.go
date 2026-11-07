@@ -125,7 +125,7 @@ var detectorRules = []RuleDef{
 		Severity:    "info",
 		Description: "a direct final-path write without a temp+rename in the same function",
 		Message: func(o Observation) string {
-			return o.Evidence
+			return o.Evidence + " — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
 		},
 	},
 	{
@@ -395,7 +395,7 @@ func detectDeferInLoop(e *extractor, c *capture) []Observation {
 		return nil // unwatched non-Close defers are out of the I/O scope
 	}
 
-	return []Observation{e.emit(c, RuleDeferInLoop, evidenceOf(&e.fset, c.node)+" — defers run at function exit, so earlier loop iterations' resources stay open until then")}
+	return []Observation{e.emit(c, RuleDeferInLoop, evidenceOf(&e.fset, c.node)+" — defers run at function exit, so earlier loop iterations' resources stay open until then; move the body into a helper func and defer there")}
 }
 
 // detectIOInLoop is the N+1 shape: a watched resolved I/O call inside a loop

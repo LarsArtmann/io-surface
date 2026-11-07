@@ -284,6 +284,13 @@ rejected by the gate itself: rule `io-surface/claim-conflict` (warning) flags
 `criticality`/`durability` are schema v1.2; v1.1 manifests keep unifying
 unchanged (the fields default to `normal`/`recoverable`).
 
+**Interaction with `--enforce`:** modulation happens BEFORE enforcement reads
+the report, so a `critical` site can lift an info finding to warning — or a
+warning to error — and `--enforce` then exits on it. The reverse also holds:
+an `ephemeral` durability claim DROPS a `write-non-atomic` finding out of the
+report entirely, so nothing you opt out of can fail the build. Enforcement
+never sees severities the modulation already consumed.
+
 ### ID conventions
 
 ```text

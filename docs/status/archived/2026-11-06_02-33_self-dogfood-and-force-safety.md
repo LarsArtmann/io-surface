@@ -1,4 +1,4 @@
-> **Live remainder:** routed into TODO_LIST at creation (rows #1-36 era); nothing open remains. Archived 2026-11-07 (cadence 15/15).
+> **Live remainder:** routed into TODO_LIST at creation (rows #1-36 era); row 28's version-refusal half harvested to TODO_LIST #116 at archive time. Archived 2026-11-07 (cadence 15/15).
 
 # Status Report — Self-Dogfood, filepath Extraction, and `init --force` Safety
 
@@ -264,7 +264,7 @@ direct consequences of THIS session.
 | 25 | #8 Baseline `owner` + `expires`; expired entries fail                                                                         | TODO | Med    | 1-2h   |
 | 26 | #9 Hint when declared sites fall outside `--dirs`                                                                             | TODO | Med    | 30min  |
 | 27 | #14 Enforcement-policy field in the manifest (repo can't silently opt out)                                                    | TODO | Med    | 2h     |
-| 28 | #23 manifest `version` field + schema bump rule                                                                               | TODO | Med    | 30min  |
+| 28 | ~~#23 manifest `version` field + schema bump rule~~ RESOLVED 2026-11-07: split — decode shipped with v1.1; the unknown-major refusal is harvested as TODO_LIST #116 |                                                                               | TODO | Med    | 30min  |
 | 29 | #24 `--ignore` globs for generated code                                                                                       | TODO | Med    | 1h     |
 | 30 | #22 `baseline add` subcommand (stop hand-editing CUE)                                                                         | TODO | Med    | 1h     |
 | 31 | #21 Cross-package seam support (`pkg/` helper owning the raw call)                                                            | TODO | Med    | 2-3h   |

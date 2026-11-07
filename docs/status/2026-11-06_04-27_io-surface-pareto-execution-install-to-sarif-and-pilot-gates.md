@@ -148,15 +148,14 @@ mine) · **dnsblockd:** manifest edits in working tree, **uncommitted**
 26. **#7 baseline "only shrinks" gate** (+ growth flag)
 27. **#8 baseline `owner`+`expires`**; expired entry fails
 28. ~~**#14a/b D4 enforcement policy** (schema field + check enforcement)~~ RESOLVED 2026-11-07: shipped as the manifest `enforcement` field (`gate|audit`) + SARIF property (internal/emit) — see manifest.EnforcementPolicy and the audit-demotion output
-29. **#20a/b seams derived from manifest `via` values**
+29. ~~**#20a/b seams derived from manifest `via` values**~~ RESOLVED 2026-11-07: shipped as check.manifestSeams (check.go:590) — declared sites' facts.via names feed the extractor's seam vocabulary
 30. **#21a/b cross-package seams**
-31. **#17 follow-up: weak-site → confidence 0.5 in emit** (honest SARIF
-    signal) or documented refusal
-32. **#22 `baseline add` subcommand**
+31. ~~**#17 follow-up: weak-site → confidence 0.5 in emit** (honest SARIF signal) or documented refusal~~ RESOLVED 2026-11-07 (refusal, documented): emit carries confidence 1.0 for every finding BY DESIGN — the package doc states the weak token tier's uncertainty is expressed by its rule (weak-site), not a made-up confidence number
+32. ~~**#22 `baseline add` subcommand**~~ RESOLVED 2026-11-06: shipped (`io-surface baseline add --id --note --date`, cmdguard example in main.go:135)
 33. **#23 manifest `version` field** + unknown-major refusal
-34. **#24 `--ignore` globs** for generated code
-35. **#15/#16 local pre-commit hook** (build+test+gofmt+vet+check)
-36. **#18a/b BuildFlow provider** via go-finding/toolsdk
+34. ~~**#24 `--ignore` globs** for generated code~~ RESOLVED 2026-11-06: shipped (Options.Ignore end-to-end, parseGlobs in commands.go, --ignore flag help names the generated-code use case)
+35. ~~**#15/#16 local pre-commit hook** (build+test+gofmt+vet+check)~~ RESOLVED 2026-11-06: shipped (.githooks/pre-commit via core.hooksPath, BuildFlow fleet template; the 2026-11-06 bash-bug fix lives in this repo)
+36. ~~**#18a/b BuildFlow provider** via go-finding/toolsdk~~ RESOLVED 2026-11-06: shipped (provider/ at repo root, self-registers via toolsdk; both faces since v0.4.0)
 37. **#27a/b dnsblockd reverse gate + retire tools/io-extract** (lock was
     free at 04:00)
 38. **#28 `.Do`/`.Close` tokens → ambiguous tier**
