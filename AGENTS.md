@@ -2,11 +2,13 @@
 
 `io-surface` is the I/O surface manifest gate: a Go CLI that extracts every I/O
 call site from a Go tree via a stdlib-only AST walk, compares it against a CUE
-manifest, and fails the build on I/O nobody documented. Single Go module
-(`go 1.27`), three direct dependencies (`cuelang.org/go` for the manifest,
-`cmdguard/v4` for the CLI, `go-finding` for SARIF — the gate core
-`internal/extract` itself stays stdlib-only), no `flake.nix` (deliberately
-withheld — status report §g-Q2), no Makefile/justfile.
+manifest, and fails the build on I/O nobody documented — AND (since v0.3.0,
+io-bug-radar) a detector layer that finds bad I/O via `io-surface lint`
+(manifestless, exit 0 unless `--enforce`; rules ship at info, promotion is
+evidence-gated). Single Go module (`go 1.27`), three direct dependencies
+(`cuelang.org/go` for the manifest, `cmdguard/v4` for the CLI, `go-finding`
+for SARIF — the gate core `internal/extract` itself stays stdlib-only), no
+`flake.nix` (deliberately withheld — status report §g-Q2), no Makefile/justfile.
 
 `README.md` documents the tool for users. This file documents the repo for
 agents working ON the tool.
@@ -114,18 +116,19 @@ either `internal/scaffold` (`init`: write snapshot) or `internal/check`
 (`check`: pair extraction against `internal/manifest` load, emit findings) →
 `internal/render` (`render`: manifest → markdown).
 
-| Package               | Role                                                                                                                                                                                                                                               |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cmd/io-surface`      | cmdguard-wired CLI: `NewApp` + batteries, typed flag structs (`commands.go`), handlers keep the exact output contract. Exit codes: 0 clean, 1 gate findings (`errFindings`), 2 usage/internal (`exitCode` in `main.go`). Version const lives here. |
-| `internal/extract`    | Hermetic AST walker (`go/parser` + `ast.Inspect`, deliberately NO `go/packages`, no network) so it runs in a Nix sandbox with `GOPROXY=off`.                                                                                                       |
-| `internal/manifest`   | Loads the CUE package in-process (no `cue` binary needed). `Load` doubles as constraint enforcement: a non-empty `violations` list fails CUE unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`.                                              |
-| `internal/check`      | The bidirectional gate. 14 rules (incl. lifecycle + scope-hint + shadow-capability); buckets declared IDs and extracted sites by canonical group; pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`).                              |
-| `internal/match`      | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`).                                                                                                                                                 |
-| `internal/scaffold`   | `init` writer; `schema.cue` is embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not the deployed copies.                                                                                                                             |
-| `internal/render`     | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim).                                                                                                                                                                 |
-| `internal/absorb`     | v1.1: pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `absorb --check` reports advisory drift (`io-surface/capability-drift`), never fails the gate.                                                                                  |
-| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping (`FamiliesFor`), engine edges folded into per-package sets.                                                                                                                      |
-| `internal/emit`       | Findings → go-finding model for consumer formats (SARIF via `--format sarif`); rule IDs and severities map 1:1, confidence 1.0 (deterministic gate).                                                                                               |
+| Package               | Role                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/io-surface`      | cmdguard-wired CLI: `NewApp` + batteries, typed flag structs (`commands.go`), handlers keep the exact output contract. Exit codes: 0 clean, 1 gate findings (`errFindings`), 2 usage/internal (`exitCode` in `main.go`). Version const lives here.                                                                                                                                                                                                                                                                                                                                                 |
+| `internal/extract`    | Hermetic AST walker (`go/parser` + `ast.Inspect`, deliberately NO `go/packages`, no network) so it runs in a Nix sandbox with `GOPROXY=off`. Plus the detector layer: `observations.go` (Observation channel + capture contexts) and `detectors.go` (8 rules, registry + metadata in one table); detection tables (errResults, closableCtors, httpBodyCtors, ctxVariantPairs, tinyBufferConsumers, writeCreators, closableCtors) live in `tables.go` like every other table. `Extract` stays byte-identical to pre-detector behavior — `ExtractWithObservations` is the observing entrypoint (D1). |
+| `internal/manifest`   | Loads the CUE package in-process (no `cue` binary needed). `Load` doubles as constraint enforcement: a non-empty `violations` list fails CUE unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`.                                                                                                                                                                                                                                                                                                                                                                                              |
+| `internal/check`      | The bidirectional gate. 14 rules (incl. lifecycle + scope-hint + shadow-capability); buckets declared IDs and extracted sites by canonical group; pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`).                                                                                                                                                                                                                                                                                                                                                                              |
+| `internal/match`      | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `internal/scaffold`   | `init` writer; `schema.cue` is embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not the deployed copies.                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `internal/render`     | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `internal/absorb`     | v1.1: pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `absorb --check` reports advisory drift (`io-surface/capability-drift`), never fails the gate.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping (`FamiliesFor`), engine edges folded into per-package sets.                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `internal/emit`       | Findings → go-finding model for consumer formats (SARIF via `--format sarif`); rule IDs and severities map 1:1, confidence 1.0 (deterministic gate).                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `internal/lint`       | The manifestless face: `lint.Run` = `ExtractWithObservations` → `check.Report` (Enforcement "lint"). Claim modulation when a manifest exists: `criticality: critical` escalates one step, `durability: ephemeral` drops write-non-atomic findings. Exit 0 unless `--enforce`.                                                                                                                                                                                                                                                                                                                      |
 
 ### Where detection rules live
 
@@ -149,6 +152,14 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   enums in `internal/scaffold/schema.cue`, the `Families`/`Disciplines` vars in
   `internal/manifest/manifest.go`, and README prose. A new family is a schema
   version bump, not a casual edit.
+- The manifest dir constant exists ONCE: `manifest.Dir` (scaffold aliases it).
+- Schema is v1.2: `claims.criticality` ("low|normal|critical", default
+  materializes on unification) and `claims.durability`
+  ("ephemeral|recoverable|durable"). The deployed copy
+  (`docs/architecture/io-surface/schema.cue`) must stay byte-identical to
+  `internal/scaffold/schema.cue`; pilot repos carry their own copies
+  (InboxClean is on v1.2, dnsblockd still v1 — its migration is an owner
+  decision).
 - The capability vocabulary exists in TWO places that must not drift: the
   `#CapabilityName` CUE enum in `internal/scaffold/schema.cue` and the
   closed enum + capability→families mapping in `internal/capability`. The Go
@@ -199,6 +210,13 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
 - `testdata/extract/` is a fixed miniature tree (`cmd/app`, `internal/store`)
   shared by `internal/extract` and `internal/check` tests. Tests reference
   sites by repo-relative ID; determinism is asserted.
+- `testdata/detectors/` is the SECOND miniature tree: deliberately bug-shaped
+  code for detector tests, kept OUT of the manifest contract on purpose (the
+  scaffold round-trip asserts severity-clean lint on the clean tree only).
+  It never compiles (testdata is invisible to the go tool) — parseable is the
+  only requirement. Lint output is byte-pinned by goldens
+  (`cmd/io-surface/testdata/lint-*.golden`); intentional output changes
+  re-run `go test ./cmd/io-surface -run TestGolden -update`.
 - `internal/scaffold`'s test is the round-trip proof: copy fixture → extract →
   scaffold → `manifest.Load` → `check.Run` → `render.Markdown`, and the check
   must be green (green-by-construction guarantee).
@@ -234,6 +252,13 @@ while working here:
 The birth status report
 (`docs/status/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
 is the honest record of this repo's origin (defects §d, open questions §g).
+The detector-suite evidence report
+(`docs/status/2026-11-07_08-08_io-bug-radar-p0-p2-detectors-fleet-proven.md`)
+records the v0.3.0 line: fleet numbers, FP classes and carve-outs, the T17
+severity verdicts (nothing promoted — D4 bar is FP≈0), and the pilot retro
+(InboxClean/gogenfilter onboarded, dnsblockd migration pending). Fleet runs
+reproduce via `./scripts/fleetscan.sh /tmp/fleetscan-report.json` (pma
+discovery → per-repo lint JSON → aggregate).
 
 ## Conventions
 
