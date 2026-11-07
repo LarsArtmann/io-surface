@@ -61,6 +61,23 @@ or grandfather it in `baseline.cue` with a note and a date.
 differs). Test files are never manifest sites; `internal/testutil/` sites are marked
 `testinfra`.
 
+### No manifest? Lint anyway
+
+The gate wants a manifest; the bugs don't. `lint` runs the same extraction plus
+detector rules over any Go tree — no onboarding:
+
+```bash
+io-surface lint --root .
+```
+
+Rules are evidence-gated: they ship at `info` and never fail a build by default;
+`--enforce` exits 1 on error-severity findings (severities are promoted only after
+fleet false-positive measurement, so a new version can never go red by surprise).
+Findings reuse the gate's rule-ID contract (`io-surface/err-dropped`, …), so
+`--format sarif` and `--format json` work unchanged. Detected today: discarded error
+returns (`x, _ := os.ReadFile(p)` flags; `_ =` deliberate ignores never do), with
+more I/O bug and inefficiency rules landing across the v0.3 line.
+
 ## Commands
 
 | Command                                                                                                            | What it does                                                                                                                             |
@@ -70,6 +87,7 @@ differs). Test files are never manifest sites; `internal/testutil/` sites are ma
 | `io-surface render [--root] [--out FILE]`                                                                          | Render the inventory markdown from the manifest (claims-aware)                                                                           |
 | `io-surface render --doc FILE [--check]`                                                                           | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                                    |
 | `io-surface extract [--root] [--include-tests]`                                                                    | Print the raw extraction as JSON (debugging, counts)                                                                                     |
+| `io-surface lint [--root] [--format text\|json\|sarif] [--enforce] [--include-tests]`                               | Detector findings without a manifest (exit 0 unless `--enforce` and error-severity findings); any Go tree lints                           |
 | `io-surface absorb --capslock REPORT [--check] [--module] [--engine-version]`                                      | Fold a pinned Capslock JSON report into `capabilities.cue` (that file only); `--check` reports advisory drift, never exits 1             |
 | `io-surface baseline add <id> --note WHY [--date YYYY-MM-DD]`                                                      | Grandfather one undeclared site in `baseline.cue` (surgical write, comments preserved); refuses duplicates                               |
 | `io-surface … --ignore 'zz_generated*,*_templ.go'`                                                                 | Skip generated files everywhere (init/check/extract/render/baseline): globs match repo-relative paths and file names                     |
