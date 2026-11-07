@@ -73,8 +73,8 @@ func sections(m *manifest.Manifest) string {
 		sort.Strings(ids)
 		fmt.Fprintf(&b, "## `%s` (%d)\n\n", fam, len(ids))
 		sites := newTable(
-			[]string{"Site", "Location", "Resource", "Trigger", "Discipline"},
-			make([]bool, 5),
+			[]string{"Site", "Location", "Resource", "Trigger", "Discipline", "Crit", "Durab"},
+			make([]bool, 7),
 		)
 		for _, id := range ids {
 			s := m.Sites[id]
@@ -86,7 +86,14 @@ func sections(m *manifest.Manifest) string {
 			if len(s.Claims.Discipline) > 0 {
 				disc = strings.Join(s.Claims.Discipline, ", ")
 			}
-			sites.row("`"+id+"`", loc, cell(s.Claims.Resource), cell(s.Claims.Trigger), cell(disc))
+			crit, durab := s.Claims.Criticality, s.Claims.Durability
+			if crit == "" || crit == manifest.CriticalityNormal {
+				crit = ""
+			}
+			if durab == "" || durab == manifest.DurabilityRecoverable {
+				durab = ""
+			}
+			sites.row("`"+id+"`", loc, cell(s.Claims.Resource), cell(s.Claims.Trigger), cell(disc), cell(crit), cell(durab))
 		}
 		b.WriteString(sites.render())
 		b.WriteString("\n")
