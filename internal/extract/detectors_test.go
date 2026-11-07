@@ -302,3 +302,67 @@ func TestDetectLoopAndTimeoutRules(t *testing.T) {
 		t.Errorf("stat-then-open pairs = %d, want 2", statPairs)
 	}
 }
+
+// TestDetectWriteNonAtomic pins the final-path write rule (plan T21): a
+// direct write without temp+rename fires, the rename-present function and
+// the sanctioned atomic-write seam stay silent.
+func TestDetectWriteNonAtomic(t *testing.T) {
+	_, obs, err := ExtractWithObservations("../../testdata/detectors", Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	bySite := map[string][]Observation{}
+	for _, o := range obs {
+		if o.Rule == RuleWriteNonAtomic {
+			bySite[o.SiteID] = append(bySite[o.SiteID], o)
+		}
+	}
+	if len(bySite["cmd/app.statLstatThenWrite"]) != 1 {
+		t.Errorf("statLstatThenWrite: %d write-non-atomic observations, want 1", len(bySite["cmd/app.statLstatThenWrite"]))
+	}
+	if len(bySite["cmd/app.atomicWriteDoneRight"]) != 0 {
+		t.Errorf("atomicWriteDoneRight (temp+rename) must stay silent, got %+v", bySite["cmd/app.atomicWriteDoneRight"])
+	}
+	if len(bySite["internal.store.atomicWriteFile"]) != 0 && len(bySite["cmd/app.atomicWriteFile"]) != 0 {
+		// the seam function itself is exempt wherever it lands
+		t.Errorf("the atomic-write seam must be exempt from its own rule: %+v", bySite)
+	}
+	for site := range bySite {
+		if strings.HasSuffix(site, ".atomicWriteFile") {
+			t.Errorf("seam function %s must be exempt from write-non-atomic", site)
+		}
+	}
+}
+
+// TestDetectTinyBuffer pins the sub-page buffer rule (plan T22): sub-page
+// buffers feeding resolved read helpers INSIDE loops fire; page-size
+// buffers and once-called uses stay silent.
+func TestDetectTinyBuffer(t *testing.T) {
+	_, obs, err := ExtractWithObservations("../../testdata/detectors", Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	var tiny []Observation
+	for _, o := range obs {
+		if o.Rule == RuleTinyBuffer {
+			tiny = append(tiny, o)
+		}
+	}
+	// tinyBufferReadFull (512) fires; tinyReaderSize (256) stays silent —
+	// the reader is built once outside any loop, and the uniform inLoop
+	// gate (plan T22: ".Read in loop") treats it as not-yet-amplified;
+	// onceTinyBuffer (512, single ReadFull) is silent for the same reason.
+	if len(tiny) != 1 {
+		t.Errorf("tiny-buffer observations = %d (%+v), want 1 loop-carried hit", len(tiny), tiny)
+	}
+	for _, o := range tiny {
+		if !strings.Contains(o.Evidence, "amplify syscalls") {
+			t.Errorf("tiny-buffer evidence lacks the fix hint: %q", o.Evidence)
+		}
+	}
+	for _, o := range tiny {
+		if strings.Contains(o.Evidence, "65536") {
+			t.Errorf("page-size buffer must stay silent, got %q", o.Evidence)
+		}
+	}
+}

@@ -20,13 +20,13 @@ func TestRun_FixtureReport(t *testing.T) {
 	if rep.Enforcement != "lint" {
 		t.Errorf("enforcement = %q, want lint", rep.Enforcement)
 	}
-	if rep.Stats.Infos != 28 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
-		t.Errorf("stats = %+v, want 28 infos", rep.Stats)
+	if rep.Stats.Infos != 34 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
+		t.Errorf("stats = %+v, want 34 infos", rep.Stats)
 	}
-	if rep.Stats.Extracted != 40 || rep.Stats.Resolved != 39 {
-		t.Errorf("stats = %+v, want 40 extracted / 39 resolved", rep.Stats)
+	if rep.Stats.Extracted != 47 || rep.Stats.Resolved != 45 {
+		t.Errorf("stats = %+v, want 47 extracted / 45 resolved", rep.Stats)
 	}
-	if len(rep.Findings) != 28 {
+	if len(rep.Findings) != 34 {
 		t.Fatalf("findings = %d, want 3", len(rep.Findings))
 	}
 	allowed := map[string]bool{
@@ -37,6 +37,8 @@ func TestRun_FixtureReport(t *testing.T) {
 		RuleID("io-in-loop"):        true,
 		RuleID("client-no-timeout"): true,
 		RuleID("stat-then-open"):    true,
+		RuleID("write-non-atomic"):  true,
+		RuleID("tiny-buffer"):       true,
 	}
 	for _, f := range rep.Findings {
 		if !allowed[f.Rule] {

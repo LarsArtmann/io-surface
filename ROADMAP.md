@@ -78,6 +78,41 @@ the hermetic extractor; Capslock adds _transitive reachability including
 dependencies_ from an external engine. Different economics, different trust
 tiers, different tools — neither subsumes the other.
 
+### 5. Detector composition boundary + SARIF policy (ADR, T24)
+
+Decision record for how the io-bug-radar detector layer composes with heavier
+analyzers, and when SARIF output reaches a consumer (plan
+`docs/planning/2026-11-07_05-02_io-bug-radar-pareto-plan.md` T24; evidence:
+`docs/status/2026-11-07_08-08_io-bug-radar-p0-p2-detectors-fleet-proven.md`).
+
+**Considered:**
+
+1. **golangci-lint plugin / focus-filter** — surface detector findings through
+   golangci's pipeline. Costs: an interlock dependency on the fleet's
+   golangci versions, a plugin build per version matrix, and zero new
+   information (the findings already exist as SARIF). Rejected.
+2. **Audit module** (go-finding consumer reading io-surface SARIF) — viable
+   later, but today there is no audit-module deployment to feed; building the
+   bridge before the consumer is YAGNI. Deferred.
+3. **Standalone CLI + SARIF as THE integration contract** (chosen, and what
+   v0.3.0 shipped): `io-surface lint --format sarif` emits stable rule IDs
+   (`io-surface/err-dropped`, …), confidence 1.0, severities from the
+   evidence-gated registry. Any consumer (LSP, go-finding pipeline, code
+   scanning) integrates without io-surface caring. The Theme 3 `--precise`
+   boundary stays untouched: detectors are AST-pattern observations on
+   already-resolved call sites; type-fact work remains Theme 3's own track.
+
+**SARIF upload policy (unblocks TODO #61):** upload findings to a
+code-scanning-style consumer only for rules promoted ABOVE info (T17 bar:
+FP≈0 on the fleet run). Until then, SARIF goes to CI artifacts, not gates —
+an info-severity flood in a scanning UI trains people to ignore the UI. The
+promotion evidence table in the status report is the gate for flipping any
+rule: today, zero rules qualify, so the policy resolves to "artifact-only"
+for every current rule. Revisit per rule, not per release.
+
+**Owner decision recorded:** standalone + artifact-only now; audit-module
+bridge deferred until a consumer exists; golangci composition rejected.
+
 ## Open questions (owner decisions, not tasks)
 
 - **Q1 — which repo gets the first _blocking_ gate?** dnsblockd has the richest

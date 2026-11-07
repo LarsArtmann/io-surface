@@ -2,6 +2,8 @@
 package main
 
 import (
+	"bufio"
+	"io"
 	"net/http"
 	"os"
 )
@@ -103,7 +105,7 @@ func atomicWriteFile(path string, data []byte) error {
 	return os.WriteFile(path, data, 0o644)
 }
 
-func tinyBufferReads(path string) error {
+func tinyBufferReadFull(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -111,15 +113,19 @@ func tinyBufferReads(path string) error {
 	defer f.Close()
 	buf := make([]byte, 512)
 	for {
-		if _, err := f.Read(buf); err != nil {
-			break
+		if _, err := io.ReadFull(f, buf); err != nil {
+			if errEOF(err) {
+				break
+			}
+
+			return err
 		}
 	}
 
 	return nil
 }
 
-func bigBufferReads(path string) error {
+func bigBufferReadFull(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -127,28 +133,39 @@ func bigBufferReads(path string) error {
 	defer f.Close()
 	buf := make([]byte, 65536)
 	for {
-		if _, err := f.Read(buf); err != nil {
-			break
+		if _, err := io.ReadFull(f, buf); err != nil {
+			if errEOF(err) {
+				break
+			}
+
+			return err
 		}
 	}
 
 	return nil
 }
 
-func tinyBufferScanner(path string) error {
+func tinyReaderSize(path string) (*bufio.Reader, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return bufio.NewReaderSize(f, 256), nil
+}
+
+func onceTinyBuffer(path string) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	scanner := newScanner(f)
-	buf := make([]byte, 128)
-	_ = buf
+	buf := make([]byte, 512)
 
-	return scanAll(scanner)
+	_, err = io.ReadFull(f, buf)
+
+	return err
 }
 
-type scanner = int
-
-func newScanner(f *os.File) scanner  { return 0 }
-func scanAll(s scanner) error        { return nil }
+func errEOF(err error) bool { return err != nil && err.Error() == "EOF" }

@@ -513,7 +513,9 @@ const tinyBufferThreshold = 4096
 // site, so the fix lands where the allocation is.
 func detectTinyBuffer(e *extractor, c *capture) []Observation {
 	idxs, watched := tinyBufferConsumers[c.sel]
-	if !watched || len(c.node.Args) <= idxs[0] {
+	// The amplification only matters under repetition: a once-called tiny
+	// buffer is not the bug shape (plan T22: ".Read in loop").
+	if !watched || !c.inLoop || len(c.node.Args) <= idxs[0] {
 		return nil
 	}
 	arg, ok := c.node.Args[idxs[0]].(*ast.Ident)
