@@ -105,3 +105,40 @@
 | 64 | Split the oversized core files to fleet-default 350 lines (extract tables/pairing/handlers) | 🔴 `TODO` | Low | 2h | STARTED 2026-11-06: detection tables split to `internal/extract/tables.go` (extract.go 657→449); remaining: check.go pairing split + test-file topical splits |
 
 | 63 | Wire cmdguard-lint into CI once the lint module ships without a go.mod replace | 🔵 `BLOCKED` | Low | 30min | `go run github.com/larsartmann/cmdguard/lint/cmd/cmdguard-lint@v0.1.0` fails: the module's go.mod carries replace directives (buildflow/file-or-fix verified 2026-11-06); fix belongs in the cmdguard repo's release flow, then the CI step is one `go run` line |
+
+## Detector Suite — io-bug-radar (harvested 2026-11-07)
+
+> Snapshot plan with full breakdown (Pareto tiers, 128 micro tasks, execution
+> graph): `docs/planning/2026-11-07_05-02_io-bug-radar-pareto-plan.md`.
+> Policy: detectors fire on the resolved tier only; every rule ships at info
+> severity; promotion to warning/error only after fleet FP evidence (T17).
+> Fleet baseline: 2026-11-07 scan, 182 projects, 5,802 production sites
+> (`/tmp/io-surface-portfolio-stats.json`, report at repo root).
+
+| #  | Task                                                                                                   | Status    | Impact | Effort | Evidence                                                         |
+| -- | ------------------------------------------------------------------------------------------------------ | --------- | ------ | ------ | ---------------------------------------------------------------- |
+| 65 | T1 Design: observation channel, detector registry, `lint` exit policy                                  | 🔴 `TODO` | High   | 1h     | plan §5 D1-D8; 14 existing rules `internal/check/check.go:41-54` |
+| 66 | T2 Plumbing: `extract.Observation` + `ExtractWithObservations` + AST capture contexts                  | 🔴 `TODO` | High   | 100min | plan T2; `Site` JSON is the facts.cue contract (no pollution)    |
+| 67 | T3 `err-dropped` rule + deliberate-ignore escape (`_ =` ok, `x, _ :=` flagged)                         | 🔴 `TODO` | High   | 90min  | plan T3; fleet surface ~2,400+ file/process call sites           |
+| 68 | T4 Detector fixture tree + text/SARIF goldens + round-trip assert                                      | 🔴 `TODO` | High   | 45min  | plan T4                                                          |
+| 69 | T5 `lint` command (no manifest, exit 0 unless `--enforce`)                                             | 🔴 `TODO` | High   | 90min  | plan T5; mirrors `enforcement` policy `schema.cue:41`            |
+| 70 | T6 `closer-missing` (ctor table + defer/Close search + escape suppression)                             | 🔴 `TODO` | High   | 100min | plan T6                                                          |
+| 71 | T7 `closer-missing` http variant (`resp.Body` close duty)                                              | 🔴 `TODO` | Med    | 45min  | plan T7                                                          |
+| 72 | T8 `ctx-dropped` (variant-pair table + ctx-in-scope)                                                   | 🔴 `TODO` | High   | 90min  | plan T8; `.ExecContext` 480 vs `exec.Command*` 375 fleet-wide    |
+| 73 | T9 `ctx-dropped` fixtures/goldens                                                                      | 🔴 `TODO` | Med    | 30min  | plan T9                                                          |
+| 74 | T10 Dogfood: `lint` on io-surface itself; fix/baseline every hit before any severity promotion         | 🔴 `TODO` | High   | 45min  | plan T10 (self-hosting red-risk guard)                           |
+| 75 | T11 Pilot FP sampling on 5 hotspot repos; per-rule go/no-go                                            | 🔴 `TODO` | High   | 100min | plan T11                                                         |
+| 76 | T12 `defer-in-loop`                                                                                    | 🔴 `TODO` | Med    | 45min  | plan T12                                                         |
+| 77 | T13 `client-no-timeout` (Client literal sans Timeout; bare http.Get/Post)                              | 🔴 `TODO` | Med    | 60min  | plan T13; 89 fleet repos open sockets                            |
+| 78 | T14 `stat-then-open` (identical-path-expr TOCTOU/double-syscall)                                       | 🔴 `TODO` | Med    | 90min  | plan T14; `os.Stat` 825 fleet sites                              |
+| 79 | T15 `io-in-loop` (info only, N+1 shape)                                                                | 🔴 `TODO` | Med    | 45min  | plan T15                                                         |
+| 80 | T16 Fleet harness: committed 182-repo runner + FP aggregates                                           | 🔴 `TODO` | High   | 100min | plan T16; resurrect portfolio-runner pattern                     |
+| 81 | T17 Severity promotion from evidence (thresholds, verdicts, promote, re-prove self-gate)               | 🔴 `TODO` | High   | 100min | plan T17                                                         |
+| 82 | T18 Release v0.3.0 (CHANGELOG, README, tag both remotes, proxy check, BuildFlow pickup)                | 🔴 `TODO` | High   | 90min  | plan T18; release protocol per AGENTS.md                         |
+| 83 | T19 Claims v1.2: `criticality`/`durability` schema (both schema.cue copies byte-identical)             | 🔴 `TODO` | High   | 100min | plan T19                                                         |
+| 84 | T20 Severity modulation (claims x observations) + `claim-conflict` rule                                | 🔴 `TODO` | High   | 90min  | plan T20                                                         |
+| 85 | T21 `write-non-atomic` (temp+rename pattern + manifest-`via` seam whitelist)                           | 🔴 `TODO` | Med    | 90min  | plan T21; file-write 917 fleet sites                             |
+| 86 | T22 `tiny-buffer` (small Read buffer in loop)                                                          | 🔴 `TODO` | Low    | 45min  | plan T22                                                         |
+| 87 | T23 Pilot onboarding: init + claims + green gate + CI in 2-3 repos                                     | 🔴 `TODO` | High   | 100min | plan T23                                                         |
+| 88 | T24 Spike: golangci focus filter vs audit module vs `--precise` boundary + SARIF upload policy (→ #61) | 🔴 `TODO` | Med    | 60min  | plan T24; ROADMAP Theme 3 cross-ref                              |
+| 89 | T25 Docs sync: TODO_LIST/FEATURES/ROADMAP after suite lands                                            | 🔴 `TODO` | Med    | 30min  | plan T25                                                         |

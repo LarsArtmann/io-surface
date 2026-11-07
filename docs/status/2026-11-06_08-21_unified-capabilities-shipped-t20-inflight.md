@@ -83,7 +83,7 @@ _(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked
 2. Solve the bufio mystery: failing test isolating `bufio.NewReader` classification; read `pkgOf`/`imports` construction; fix root-cause (possible silent extractor bug for other imports).
 3. Land T20: facts regen, INVENTORY re-render, CHANGELOG line, README Findings table rows for the two new advisory rules, green tree, commit, push, verify CI.
 4. Re-dogfood after T20: re-run absorb (mapped vocabulary unchanged — syscall is out-of-scope vocabulary; confirm Dropped counts), self-check green.
-5. Write plan errata (deviations from e.4/e.5) into the plan file.
+5. ~~Write plan errata (deviations from e.4/e.5) into the plan file.~~ RESOLVED same day: plan §3.7 "Execution errata — where the shipped design diverged from this plan" in `docs/planning/2026-11-06_06-02_unified-io-insights-pareto-plan.md` records the e.4/e.5 deviations (capability-drift moved to `absorb --check`, Q4/Q5 labels, T12/T13/T15 ownership, T21 re-base).
 6. Verify GitHub CI on `7056141`: first run with `-race` + the `capabilities` job (capslock install with repo toolchain is the risky step).
 7. Re-check pkg.go.dev indexing (#38) once the crawler catches up.
 8. Decide #49: stdout/stderr in `scope.in`? (owner; evidence: `commands.go:77`, bufio/syscall now watched).
