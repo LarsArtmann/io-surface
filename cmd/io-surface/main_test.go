@@ -549,7 +549,7 @@ func TestDescribe_Contract(t *testing.T) {
 			paths[sub.Path] = true
 		}
 	}
-	for _, want := range []string{"io-surface check", "io-surface init", "io-surface render", "io-surface extract", "io-surface absorb", "io-surface baseline", "io-surface baseline add", "io-surface version"} {
+	for _, want := range []string{"io-surface check", "io-surface init", "io-surface render", "io-surface extract", "io-surface lint", "io-surface absorb", "io-surface baseline", "io-surface baseline add", "io-surface version"} {
 		if !paths[want] {
 			t.Errorf("describe contract lost %q (has %d commands)", want, len(paths))
 		}
@@ -610,5 +610,55 @@ func TestExtractStats(t *testing.T) {
 	}
 	if total != len(doc.Sites) {
 		t.Errorf("stats TOTAL = %d, JSON sites = %d", total, len(doc.Sites))
+	}
+}
+
+// TestExecute_LintFace is the e2e contract for the manifestless lint face
+// (plan T5): findings on the bug fixture, the exit-0-by-default policy, the
+// --enforce policy, and the JSON report shape machines consume.
+func TestExecute_LintFace(t *testing.T) {
+	out, err := runApp(t, "lint", "--root", "../../testdata/detectors")
+	if err != nil {
+		t.Fatalf("lint: %v (findings must not fail by default)\n%s", err, out)
+	}
+	if !strings.Contains(out, "io-surface/err-dropped") || !strings.Contains(out, "data, _ := os.ReadFile(path)") {
+		t.Errorf("lint text output lost the err-dropped finding:\n%s", out)
+	}
+	if !strings.Contains(out, "report only; pass --enforce to fail on errors") {
+		t.Errorf("lint summary line lost the policy hint:\n%s", out)
+	}
+	if strings.Contains(out, "cmd/app.negativeDeliberate") || strings.Contains(out, "negativePropagate") {
+		t.Errorf("lint reported a deliberate-ignore or propagated call:\n%s", out)
+	}
+
+	out, err = runApp(t, "lint", "--root", "../../testdata/detectors", "--enforce")
+	if err != nil {
+		t.Fatalf("lint --enforce: %v (info findings must not fail)\n%s", err, out)
+	}
+
+	out, err = runApp(t, "lint", "--root", "../../testdata/detectors", "--format", "json")
+	if err != nil {
+		t.Fatalf("lint --format json: %v\n%s", err, out)
+	}
+	var rep check.Report
+	if err := json.Unmarshal([]byte(out), &rep); err != nil {
+		t.Fatalf("lint JSON not parseable: %v\n%s", err, out)
+	}
+	if rep.Enforcement != "lint" {
+		t.Errorf("enforcement = %q, want lint", rep.Enforcement)
+	}
+	if rep.Stats.Infos != 3 || rep.Stats.Errors != 0 {
+		t.Errorf("stats = %+v, want 3 infos / 0 errors", rep.Stats)
+	}
+	if len(rep.Findings) != 3 {
+		t.Errorf("findings = %d, want 3", len(rep.Findings))
+	}
+
+	out, err = runApp(t, "lint", "--root", "../../testdata/detectors", "--format", "sarif")
+	if err != nil {
+		t.Fatalf("lint --format sarif: %v\n%s", err, out)
+	}
+	if !strings.Contains(out, "io-surface/err-dropped") || !strings.Contains(out, `"version"`) {
+		t.Errorf("lint SARIF lost rule IDs or version:\n%.200s", out)
 	}
 }
