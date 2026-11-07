@@ -83,6 +83,11 @@ func TestDetectorRegistry_ParityPinsMetadata(t *testing.T) {
 			t.Errorf("detector %q has no detectorRules metadata", d.rule)
 		}
 	}
+	for _, d := range fnDetectors {
+		if _, ok := DetectorRule(d.rule); !ok {
+			t.Errorf("fnDetector %q has no detectorRules metadata", d.rule)
+		}
+	}
 	for _, r := range DetectorRules() {
 		found := false
 		for _, d := range detectors {

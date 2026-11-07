@@ -53,7 +53,7 @@ const (
 
 // capture is the local context of one call inside a function body.
 type capture struct {
-	id       string // enclosing symbol ID
+	id       string // enclosing symbol ID (set by the tracker)
 	node     *ast.CallExpr
 	parent   ast.Node // the statement directly containing the call
 	fn       *ast.FuncDecl
@@ -85,6 +85,7 @@ func ExtractWithObservations(root string, opts Options) ([]*Site, []Observation,
 type captureTracker struct {
 	e        *extractor
 	fn       *ast.FuncDecl
+	id       string
 	imports  map[string]string
 	ctxParam bool
 	parents  map[ast.Node]ast.Node
@@ -135,7 +136,7 @@ func isLoopNode(n ast.Node) bool {
 func (t *captureTracker) record(call *ast.CallExpr) {
 	parent := t.parents[call]
 	c := &capture{
-		id:       "",
+		id:       t.id,
 		node:     call,
 		parent:   parent,
 		fn:       t.fn,
@@ -169,6 +170,7 @@ func (t *captureTracker) record(call *ast.CallExpr) {
 		c.shape = shapeExpression
 	}
 	t.e.captures[call] = c
+	t.e.captureList = append(t.e.captureList, c)
 }
 
 func nodeIndex(list []ast.Expr, n ast.Node) int {
@@ -182,10 +184,11 @@ func nodeIndex(list []ast.Expr, n ast.Node) int {
 }
 
 // captureContexts fills the capture map for one function body.
-func (e *extractor) captureContexts(fn *ast.FuncDecl, imports map[string]string) {
+func (e *extractor) captureContexts(fn *ast.FuncDecl, imports map[string]string, id string) {
 	t := &captureTracker{
 		e:        e,
 		fn:       fn,
+		id:       id,
 		imports:  imports,
 		ctxParam: hasContextParam(fn),
 		parents:  map[ast.Node]ast.Node{},
@@ -236,15 +239,17 @@ func evidenceOf(fset *token.FileSet, n ast.Node) string {
 	return strings.Join(strings.Fields(buf.String()), " ")
 }
 
-// detect runs every registered detector over one resolved call capture.
-func (e *extractor) detect(id string, call *ast.CallExpr, sel, family string) {
-	c, ok := e.captures[call]
-	if !ok {
-		return
+// runDetectors executes the capture-shaped and declaration-shaped detector
+// registries after the walk: captureList preserves deterministic walk order,
+// and sortedObservations normalizes the global ordering.
+func (e *extractor) runDetectors(fnID string, fn *ast.FuncDecl, imports map[string]string, captures []*capture) {
+	for _, c := range captures {
+		for _, d := range detectors {
+			e.observations = append(e.observations, d.run(e, c)...)
+		}
 	}
-	c.id, c.sel, c.family = id, sel, family
-	for _, d := range detectors {
-		e.observations = append(e.observations, d.run(e, c)...)
+	for _, d := range fnDetectors {
+		e.observations = append(e.observations, d.run(e, fn, imports, fnID)...)
 	}
 }
 
