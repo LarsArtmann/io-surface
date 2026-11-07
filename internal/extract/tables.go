@@ -310,3 +310,22 @@ var ctxVariantPairs = map[string]string{
 	"http.PostForm":   "http.NewRequestWithContext",
 	"http.Head":       "http.NewRequestWithContext",
 }
+
+// tinyBufferConsumers maps calls that take a caller-supplied read/write
+// buffer to the argument index holding it. tiny-buffer flags buffers
+// allocated below one page (4096) that feed these calls in loops.
+var tinyBufferConsumers = map[string][]int{
+	"io.ReadFull":         {1},
+	"io.CopyBuffer":       {2},
+	"bufio.NewReaderSize": {1},
+	"bufio.NewWriterSize": {1},
+}
+
+// writeCreators maps direct write constructors write-non-atomic watches.
+// A function that writes through these and never renames a temp into place
+// writes non-atomically.
+var writeCreators = map[string]bool{
+	"os.WriteFile": true,
+	"os.Create":    true,
+	"os.OpenFile":  true,
+}

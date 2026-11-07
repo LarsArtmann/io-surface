@@ -8,10 +8,11 @@ package extract
 
 import (
 	"fmt"
-
 	"go/ast"
 	"go/token"
 	"slices"
+	"strconv"
+	"strings"
 )
 
 // detector is one registered rule: name + the function that produces its
@@ -48,12 +49,14 @@ var detectors = []detector{
 	{rule: RuleDeferInLoop, run: detectDeferInLoop},
 	{rule: RuleIOInLoop, run: detectIOInLoop},
 	{rule: RuleClientNoTimeout, run: detectBareHTTPHelper},
+	{rule: RuleTinyBuffer, run: detectTinyBuffer},
 }
 
 // fnDetectors is the declaration-shaped registry (once per function).
 var fnDetectors = []fnDetector{
 	{rule: RuleClientNoTimeout, run: detectClientNoTimeout},
 	{rule: RuleStatThenOpen, run: detectStatThenOpen},
+	{rule: RuleWriteNonAtomic, run: detectWriteNonAtomic},
 }
 
 // detectorRules is the metadata registry. Message receives the observation's
@@ -111,6 +114,22 @@ var detectorRules = []RuleDef{
 		Name:        RuleIOInLoop,
 		Severity:    "info",
 		Description: "a watched I/O call sits inside a loop body (N+1 shape)",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
+	{
+		Name:        RuleWriteNonAtomic,
+		Severity:    "info",
+		Description: "a direct final-path write without a temp+rename in the same function",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
+	{
+		Name:        RuleTinyBuffer,
+		Severity:    "info",
+		Description: "a sub-page buffer feeds a read/write helper (syscall amplification)",
 		Message: func(o Observation) string {
 			return o.Evidence
 		},
@@ -483,4 +502,172 @@ func detectStatThenOpen(e *extractor, fn *ast.FuncDecl, imports map[string]strin
 	})
 
 	return obs
+}
+
+// tinyBufferThreshold is the page-size bar: reads below it mean syscall
+// amplification (one Read syscall per 512 bytes instead of per 4096).
+const tinyBufferThreshold = 4096
+
+// detectTinyBuffer flags sub-page buffers that feed read/write helpers. The
+// observation anchors at the call (the capture point) but names the make
+// site, so the fix lands where the allocation is.
+func detectTinyBuffer(e *extractor, c *capture) []Observation {
+	idxs, watched := tinyBufferConsumers[c.sel]
+	if !watched || len(c.node.Args) <= idxs[0] {
+		return nil
+	}
+	arg, ok := c.node.Args[idxs[0]].(*ast.Ident)
+	if !ok {
+		return nil
+	}
+	binding, size := makeBufferBinding(c.fn, arg.Name)
+	if binding == nil || size < 0 || size >= tinyBufferThreshold {
+		return nil
+	}
+
+	return []Observation{e.emit(c, RuleTinyBuffer,
+		fmt.Sprintf("%s = make([]byte, %d) feeds %s — %d-byte reads amplify syscalls; size to >= %d (or use bufio.Scanner)",
+			arg.Name, size, c.sel, size, tinyBufferThreshold))}
+}
+
+// makeBufferBinding finds `name := make([]byte, N)` in fn and returns the
+// make call plus its literal size (-1 when the size is not a plain literal).
+func makeBufferBinding(fn *ast.FuncDecl, name string) (*ast.CallExpr, int64) {
+	var found *ast.CallExpr
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		assign, ok := n.(*ast.AssignStmt)
+		if !ok || len(assign.Rhs) != 1 || len(assign.Lhs) != 1 {
+			return true
+		}
+		lhs, ok := assign.Lhs[0].(*ast.Ident)
+		if !ok || lhs.Name != name {
+			return true
+		}
+		call, ok := assign.Rhs[0].(*ast.CallExpr)
+		if !ok || len(call.Args) < 2 {
+			return true
+		}
+		mk, ok := call.Fun.(*ast.Ident)
+		if !ok || mk.Name != "make" {
+			return true
+		}
+		arrayType, ok := call.Args[0].(*ast.ArrayType)
+		if !ok {
+			return true
+		}
+		if elt, ok := arrayType.Elt.(*ast.Ident); !ok || elt.Name != "byte" {
+			return true
+		}
+		lit, ok := call.Args[1].(*ast.BasicLit)
+		if !ok || lit.Kind != token.INT {
+			return true
+		}
+		if _, err := strconv.ParseInt(lit.Value, 0, 64); err != nil {
+			return true
+		}
+		found = call
+
+		return true
+	})
+	if found == nil {
+		return nil, -1
+	}
+	lit := found.Args[1].(*ast.BasicLit)
+	size, _ := strconv.ParseInt(lit.Value, 0, 64)
+
+	return found, size
+}
+
+// detectWriteNonAtomic flags direct final-path writes in functions that
+// never rename a temp into place (plan T21). Functions that ARE sanctioned
+// atomic-write seams are exempt — the wrapper exists precisely to own the
+// raw write. The observation names the write; lint weighs durability claims.
+func detectWriteNonAtomic(e *extractor, fn *ast.FuncDecl, imports map[string]string, id string) []Observation {
+	if isSeamSymbol(e, id) {
+		return nil
+	}
+	hasRename := false
+	var writes []*ast.CallExpr
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		sel, ok := call.Fun.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		x, ok := sel.X.(*ast.Ident)
+		if !ok {
+			return true
+		}
+		key := imports[x.Name] + "." + sel.Sel.Name
+		if key == "os.Rename" {
+			hasRename = true
+
+			return true
+		}
+		if writeCreators[key] && (key != "os.OpenFile" || openFileCreates(e, call)) {
+			writes = append(writes, call)
+		}
+
+		return true
+	})
+	if hasRename || len(writes) == 0 {
+		return nil
+	}
+	obs := make([]Observation, 0, len(writes))
+	for _, w := range writes {
+		obs = append(obs, Observation{
+			SiteID:   id,
+			Rule:     RuleWriteNonAtomic,
+			Call:     callKey(imports, w),
+			Location: e.locOf(w),
+			Evidence: evidenceOf(&e.fset, w) + " — direct final-path write without a temp+rename in this function; a crash mid-write tears the file",
+		})
+	}
+
+	return obs
+}
+
+// isSeamSymbol reports whether the enclosing symbol's base name is a
+// registered seam (atomicWriteFile et al.) — the sanctioned raw-write site.
+func isSeamSymbol(e *extractor, id string) bool {
+	if i := strings.LastIndex(id, "."); i >= 0 {
+		if _, isSeam := e.seams[id[i+1:]]; isSeam {
+			return true
+		}
+	}
+
+	return false
+}
+
+// openFileCreates reports whether an os.OpenFile call passes creation flags
+// (a name-based match on the O_* flag idents — the hermetic stand-in for
+// flag-constant resolution).
+func openFileCreates(e *extractor, call *ast.CallExpr) bool {
+	if len(call.Args) < 2 {
+		return false
+	}
+	printed := evidenceOf(&e.fset, call.Args[1])
+	if printed == "" {
+		return false
+	}
+
+	return strings.Contains(printed, "O_CREATE") || strings.Contains(printed, "O_WRONLY") ||
+		strings.Contains(printed, "O_RDWR") || strings.Contains(printed, "O_APPEND")
+}
+
+// callKey renders the resolved package-qualified call name for an observation.
+func callKey(imports map[string]string, call *ast.CallExpr) string {
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return ""
+	}
+	x, ok := sel.X.(*ast.Ident)
+	if !ok {
+		return ""
+	}
+
+	return imports[x.Name] + "." + sel.Sel.Name
 }

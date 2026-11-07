@@ -70,8 +70,20 @@ func Run(root string, opts Options) (*check.Report, error) {
 			return nil, fmt.Errorf("observation %s/%s has no rule metadata (registry drift)", o.Rule, o.Location)
 		}
 		sev := severityOf(def.Severity)
-		if c, declared := claims[o.SiteID]; declared && c.Criticality == manifest.CriticalityCritical {
+		c, declared := claims[o.SiteID]
+		if declared && c.Criticality == manifest.CriticalityCritical {
 			sev = escalate(sev)
+		}
+		// Durability weighs write-shaped findings (plan T21): a durable
+		// claim escalates write-non-atomic one step; an ephemeral claim
+		// drops it — the loss is declared harmless.
+		if o.Rule == extract.RuleWriteNonAtomic && declared {
+			switch c.Durability {
+			case manifest.DurabilityDurable:
+				sev = escalate(sev)
+			case manifest.DurabilityEphemeral:
+				continue
+			}
 		}
 		f := check.Finding{
 			Rule:     RuleID(o.Rule),
@@ -80,7 +92,7 @@ func Run(root string, opts Options) (*check.Report, error) {
 			Location: o.Location,
 			Message:  def.Message(o),
 		}
-		if claims[o.SiteID].Criticality == manifest.CriticalityCritical {
+		if declared && c.Criticality == manifest.CriticalityCritical {
 			f.Message += " [escalated: claims.criticality=critical]"
 		}
 		rep.Findings = append(rep.Findings, f)
