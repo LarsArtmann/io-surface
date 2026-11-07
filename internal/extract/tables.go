@@ -239,8 +239,12 @@ var errResults = map[string][]int{
 	"os.WriteFile": {0}, "os.Mkdir": {0}, "os.MkdirAll": {0},
 	"os.Remove": {0}, "os.RemoveAll": {0}, "os.Rename": {0},
 	"os.Truncate": {0}, "os.Setenv": {0}, "os.Unsetenv": {0},
-	// io
-	"io.ReadAll": {1}, "io.ReadFull": {1}, "io.Copy": {1}, "io.CopyN": {1}, "io.CopyBuffer": {1},
+	// io: io.ReadAll is deliberately ABSENT (T11 fleet evidence 2026-11-07:
+	// 9/9 sampled `body, _ := io.ReadAll(io.LimitReader(...))` hits were
+	// best-effort error-diagnosis reads — the capped-LimitReader blank
+	// discard IS the deliberate-ignore idiom, so flagging it was pure FP).
+	// ReadFull/Copy stay: uncapped transfers are usually load-bearing.
+	"io.ReadFull": {1}, "io.Copy": {1}, "io.CopyN": {1}, "io.CopyBuffer": {1},
 	// net
 	"net.Dial": {1}, "net.DialContext": {1}, "net.DialTimeout": {1},
 	"net.DialTCP": {1}, "net.DialUDP": {1},
