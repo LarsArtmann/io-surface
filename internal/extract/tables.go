@@ -138,6 +138,7 @@ var pkgOf = map[string]string{
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp":     "otlploghttp",
 	"github.com/coreos/go-oidc/v3/oidc":                               "oidc",
 	"github.com/larsartmann/go-cqrs-lite/system/v4":                   "cqrs-system",
+	"github.com/larsartmann/go-atomic-write":                          "atomicwrite",
 }
 
 // importSubstring matches cqrs engine imports by path fragment (several
@@ -193,6 +194,14 @@ var callFamily = map[string]map[string]string{
 	"oidc":          {"NewProvider": "outbound"},
 	"cqrs-system":   {"New": "database"},
 	"cqrs-engine":   {"New": "database", "Open": "database"},
+	// atomicwrite (go-atomic-write): the atomic file-write seam. Its calls
+	// are file-write sites exactly like the os.WriteFile calls they replace;
+	// FingerprintFile is the read half.
+	"atomicwrite": {
+		"Write": "file-write", "WriteWithPerm": "file-write", "WriteVerified": "file-write",
+		"WriteIfChanged": "file-write", "WriteFunc": "file-write", "WriteFuncWithPerm": "file-write",
+		"FingerprintFile": "file-read",
+	},
 }
 
 // methodToken classifies calls on unresolvable receivers by method name. ""
@@ -276,6 +285,11 @@ var errResults = map[string][]int{
 	// quic + collectors
 	"quic.Listen": {1}, "quic.Dial": {1},
 	"otlptracehttp.New": {1}, "otlploghttp.New": {1}, "oidc.NewProvider": {1},
+	// atomicwrite (go-atomic-write): the writes return error-only, slot 0;
+	// WriteIfChanged returns (bool, error), slot 1.
+	"atomicwrite.Write": {0}, "atomicwrite.WriteWithPerm": {0},
+	"atomicwrite.WriteVerified": {0}, "atomicwrite.WriteFunc": {0},
+	"atomicwrite.WriteFuncWithPerm": {0}, "atomicwrite.WriteIfChanged": {1},
 }
 
 // closableCtors maps constructor calls whose first result owns a Close method.

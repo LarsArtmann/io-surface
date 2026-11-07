@@ -36,6 +36,12 @@ not exist yet. Cheapest fix first.
 
 ### 3. Raise the extraction ceiling
 
+Consumer side of this theme: `render --format json` (the inventory as data,
+not prose) is a standing idea from the cmdguard-adoption sprint (2026-11-06,
+row 18) — queued behind the lint face's JSON, which already covers the
+machine-readable need for findings; render-as-data waits for a consumer
+that wants the inventory itself as JSON.
+
 Every "complete inventory" claim is bounded by what resolved imports can see
 (the token tier is 67% of dnsblockd's sites). Either add the precise tier or
 stop calling the inventory complete.

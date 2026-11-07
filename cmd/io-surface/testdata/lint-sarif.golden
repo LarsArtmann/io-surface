@@ -6,7 +6,7 @@
       "tool": {
         "driver": {
           "name": "io-surface",
-          "version": "0.3.0"
+          "version": "0.4.0"
         }
       },
       "results": [

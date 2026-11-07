@@ -62,6 +62,7 @@ func TestExtract_FamiliesAndConfidence(t *testing.T) {
 		{"resolved mmap", "internal/store.MmapFile", "file-read", "syscall.Mmap", ConfidenceResolved},
 		{"resolved bufio wrapper", "internal/store.Buffered", "stream-copy", "bufio.NewReader", ConfidenceResolved},
 		{"resolved serve content", "cmd/app.serve", "stream-copy", "http.ServeContent", ConfidenceResolved},
+		{"resolved third-party atomic write", "internal/store.SaveCheckpoint", "file-write", "atomicwrite.WriteWithPerm", ConfidenceResolved},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
