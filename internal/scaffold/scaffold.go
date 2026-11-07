@@ -24,8 +24,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/larsartmann/go-atomic-write"
-
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
 )
@@ -77,7 +75,7 @@ func Write(root string, sites []*extract.Site, date string, force bool) (string,
 				continue // judgment/standard file already present: never clobber
 			}
 		}
-		if err := atomicwrite.WriteWithPerm(path, files[name], 0o644); err != nil {
+		if err := os.WriteFile(path, files[name], 0o644); err != nil {
 			return dir, err
 		}
 	}

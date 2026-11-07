@@ -83,6 +83,13 @@ func fixtureManifest() *manifest.Manifest {
 				Family:   "file-write",
 				Facts:    manifest.Facts{Extractable: true},
 			},
+			// third-party atomic-write seam: resolved via pkgOf+callFamily,
+			// the same pairing as its os.WriteFile predecessors
+			"internal/store.SaveCheckpoint": {
+				Location: []string{"internal/store/atomicwrite.go:6"},
+				Family:   "file-write",
+				Facts:    manifest.Facts{Extractable: true},
+			},
 			// unexported-type method: dotted ID but LEGAL (ttl is a type,
 			// not a subpackage) — the permanent id-form false-positive guard
 			"internal/store.ttl.Sweep": {
