@@ -15,6 +15,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Nothing yet.
 
+## [0.3.0] - 2026-11-07
+
+### Added
+
+- **io-bug-radar: the detector layer (plan
+  `docs/planning/2026-11-07_05-02_io-bug-radar-pareto-plan.md`, evidence
+  `docs/status/2026-11-07_08-08_io-bug-radar-p0-p2-detectors-fleet-proven.md`).**
+  io-surface no longer only finds *undocumented* I/O — it now finds *bad* I/O.
+  Eight detector rules ship on top of the existing hermetic extraction:
+  `err-dropped` (discarded error returns; deliberate `_ =` ignores respected),
+  `closer-missing` (closable constructors never closed or handed off, plus the
+  `resp.Body` variant), `ctx-dropped` (context-blind variant while a
+  context.Context is in scope), `defer-in-loop`, `client-no-timeout` (bare
+  http helpers and `http.Client` literals sans Timeout), `stat-then-open`
+  (identical path expr stat'd then opened: double syscall + TOCTOU),
+  `io-in-loop` (N+1 shape), `tiny-buffer` pending P3. Rules run on the
+  resolved tier only (D3) and ship at `info` — severity promotion is
+  evidence-gated and none met the FP≈0 bar for this line (T17 verdict table
+  in the status report).
+- **`io-surface lint` — the manifestless face (D5):** detector findings for
+  any Go tree, no manifest required. Exit 0 unless `--enforce` and
+  error-severity findings exist; `--format text|json|sarif` reuses the gate's
+  report shape and SARIF pipeline; rule IDs are additive and stable
+  (`io-surface/err-dropped`, …). Fleet-proven: `scripts/fleetscan.sh` ran the
+  lint face over 160 pma-discovered repos (72 with findings) and the pilot
+  sampling surfaced one confirmed fd-leak bug in InboxClean plus one real N+1
+  in io-surface itself (fixed).
+- **Observation channel:** `extract.ExtractWithObservations` returns detector
+  observations alongside sites that stay byte-identical to plain `Extract`
+  (D1: the manifest facts contract is untouched — every committed facts.cue
+  keeps working unchanged).
+
+### Changed
+
+- Evidence-based err-dropped carve-outs from the fleet runs: `io.ReadAll`
+  (capped-LimitReader best-effort reads were 9/9 sampled FPs), `filepath.Glob`
+  (error fires only on malformed patterns; 14/27 sampled FPs), and
+  `crypto/rand.Read` (documented never to error). `check.symbolVisible` now
+  memoizes per-path reads (N+1 fix found by the tool's own lint face).
+
 ## [0.2.0] - 2026-11-06
 
 ### Changed
