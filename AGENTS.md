@@ -27,7 +27,9 @@ go run ./cmd/io-surface render --root . # render must not crash (CI checks)
 
 CI (`.github/workflows/ci.yml`): build → vet → test → gofmt gate → self-check
 → facts-freshness (`init --force` + filtered `git diff`) → self-render →
-inventory-doc freshness (`render --doc … --check`) → SARIF emit. That is the
+inventory-doc freshness (`render --doc … --check`) → SARIF emit → lint-radar
+SARIF (artifact-only, implements the TODO #61 policy — advisory, no
+enforcement until D4 promotion). That is the
 whole quality bar. `CONTRIBUTING.md` mentions
 `golangci-lint` but there is no `.golangci.yml` and CI does not run it.
 `dprint.json` exists for non-Go files (markdown/yaml/json) but CI does not
@@ -62,12 +64,17 @@ github  git@github.com:LarsArtmann/io-surface.git            # public mirror
 ## Releases & the BuildFlow provider
 
 - `provider/` (repo root, NOT internal/ — BuildFlow must import it)
-  self-registers as a BuildFlow DAG tool via `go-finding/toolsdk`. Both halves
-  of that loop ship together: the package here AND the blank import in
-  BuildFlow's `tools/providers/sdk_imports.go` (its go.mod requires the
-  published tag, so a provider change means a new release before BuildFlow
+  self-registers as a BuildFlow DAG tool via `go-finding/toolsdk`. Since
+  v0.4.0 Detect runs BOTH faces: the manifest gate (`check.Run`) for adopted
+  modules AND the io-bug-radar sweep (`lint.Run`) for every Go module —
+  manifestless modules get radar-only at info severity, never a step error,
+  and audit demotion applies to both faces (one recorded posture governs).
+  Both halves of that loop ship together: the package here AND the blank
+  import in BuildFlow's `tools/providers/sdk_imports.go` (its go.mod requires
+  the published tag, so a provider change means a new release before BuildFlow
   can pick it up).
-- Releases are 0.x SemVer (features = MINOR): v0.2.0 shipped 2026-11-06.
+- Releases are 0.x SemVer (features = MINOR): v0.2.0 shipped 2026-11-06,
+  v0.4.0 (provider two-face) 2026-11-07.
   Protocol that worked: version const + CHANGELOG cut + README status line →
   full gates → push → CI green on THAT commit → annotated tag to BOTH remotes
   → proxy `go list -m @vX` check → GitHub Release. pkg.go.dev indexing lags
@@ -75,10 +82,13 @@ github  git@github.com:LarsArtmann/io-surface.git            # public mirror
 - The BuildFlow pre-commit hook lives at `.githooks/pre-commit`
   (`core.hooksPath=.githooks`), fleet-template generated. The 2026-11-06
   template had a bash syntax bug (missing outer `done` + `$( )` close in the
-  staged-module loop) — fixed HERE; the upstream template fix belongs in the
-  BuildFlow repo. The hook's file-size gate reads `max_file_size` from
-  `.buildflow.yml` — this repo pins 650 with rationale (split tracked as
-  TODO #64).
+  staged-module loop) — fixed here at birth; the upstream template
+  (`BuildFlow internal/cli/precommit_types.go`) has since been fixed too
+  (verified structurally 2026-11-07), so the local hook and the template are
+  functionally identical (comment wording + `| sort -u` placement differ —
+  not worth regenerating). The hook's file-size gate reads `max_file_size`
+  from `.buildflow.yml` — this repo pins 650 with rationale (split tracked
+  as TODO #64).
 - Upstream Capslock phantom-edge issue (#50) is BLOCKED, not fileable: the
   verify-before-filing gate failed — a minimal zero-network FieldsSeq repro
   yields zero NETWORK edges under v0.3.4, so the conflation needs the fuller

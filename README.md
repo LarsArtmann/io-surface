@@ -78,6 +78,15 @@ Findings reuse the gate's rule-ID contract (`io-surface/err-dropped`, …), so
 returns (`x, _ := os.ReadFile(p)` flags; `_ =` deliberate ignores never do), with
 more I/O bug and inefficiency rules landing across the v0.3 line.
 
+### BuildFlow
+
+The `provider/` package self-registers io-surface as a first-class BuildFlow
+tool (go-finding toolsdk): `buildflow -s io-surface` runs the manifest gate
+for adopted repos AND the radar sweep for every Go module — no manifest, no
+adoption, still real findings at info severity. One recorded enforcement
+policy governs both faces: a manifest's `enforcement: "audit"` demotes errors
+to warnings, so a repo's own recorded posture decides whether BuildFlow fails.
+
 ## Commands
 
 | Command                                                                                                            | What it does                                                                                                                             |
@@ -283,6 +292,13 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
+`v0.4.0` — the integration line: the BuildFlow provider runs BOTH faces
+(`buildflow -s io-surface`): adopted repos get the manifest gate, every Go
+module in a BuildFlow sweep gets the advisory radar at info severity — the
+182-repo fleet scan became continuous evidence for severity promotion. CI
+now emits the tool's own lint SARIF as an artifact (artifact-only, per the
+recorded upload policy).
+
 `v0.3.0` — the detector line: `io-surface lint` finds dropped errors, leaked
 closers, context-blind calls, timeout-less clients, loop-carried I/O, and
 double syscalls in ANY Go tree — no manifest needed. Fleet-proven on 160 repos
@@ -291,8 +307,9 @@ severity promotion. Everything from `v0.2.0` stands: extractor, bidirectional
 gate, scaffolder, renderer, claims-aware docs embedding, capabilities via
 `absorb` (advisory).
 
-Next, in order: claims v1.2 (`criticality`/`durability`) with severity
-modulation, `write-non-atomic` + `tiny-buffer` rules, pilot repo CI wiring.
+Next, in order: dnsblockd v1→v1.2 judgment migration (owner call), the next
+pilot cohort (go-taskqueue, 37 findings), severity promotion once fleet
+evidence meets the FP≈0 bar.
 
 Shipped in the 0.2 line: `--json` holds for every gate outcome (validation
 failures included), `init --force` can no longer clobber `claims.cue`/

@@ -15,6 +15,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Nothing yet.
 
+## [0.4.0] - 2026-11-07
+
+### Added
+
+- **The BuildFlow provider runs both faces.** `buildflow -s io-surface` now
+  reports the io-bug-radar detector sweep alongside the manifest gate.
+  Adopted modules get gate and radar findings merged under one enforcement
+  policy (audit demotion covers both faces, including radar findings a
+  critical claim escalated); manifestless modules — the bulk of the fleet —
+  get the advisory radar at info severity, never a step error. The one-shot
+  182-repo fleet scan becomes continuous D4 promotion evidence on every
+  BuildFlow run.
+- CI: self-lint SARIF artifact (`io-surface lint --format sarif`), implementing
+  the artifact-only upload policy — advisory, no enforcement until a rule is
+  promoted on fleet false-positive evidence.
+
+### Changed
+
+- Provider tool description names both faces (visible in
+  `buildflow explain io-surface`); rule IDs and severities still map 1:1 to
+  the CLI vocabulary, so BuildFlow suppressions and SARIF consumers are
+  unaffected.
+
 ## [0.3.0] - 2026-11-07
 
 ### Added

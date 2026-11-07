@@ -88,6 +88,21 @@ jobs:
           path: io-surface.sarif
           if-no-files-found: error
 
+      # Self-hosted lint radar (TODO #61 policy, decided in T24's ADR):
+      # artifact-only SARIF from the io-bug-radar detectors — advisory info
+      # findings, never a gate (no --enforce until a rule is promoted on D4
+      # evidence). A 0-exit run with findings in the artifact IS the pass
+      # condition; the step reddens only if the lint face itself breaks.
+      - name: Emit self-hosted lint SARIF (artifact-only)
+        run: go run ./cmd/io-surface lint --root . --format sarif > io-surface-lint.sarif
+
+      - name: Upload lint SARIF artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: io-surface-lint-sarif
+          path: io-surface-lint.sarif
+          if-no-files-found: error
+
       # Docs battery: the five doc gates (freshness, audit-all, annotate,
       # routing, cadence) as one standing gate. Pinned to a docs-gates rev so
       # a fleet-side rule change cannot redden this repo silently — bump the
