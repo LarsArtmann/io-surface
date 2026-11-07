@@ -39,11 +39,11 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                               | Location                                 | Resource                                   | Trigger                             | Discipline | Crit | Durab |
 | ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- | ---- | ----- |
-| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:300`         | —                                          | —                                   | —          | —    | —     |
-| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:214`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    | —    | —     |
-| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:293`         | —                                          | —                                   | —          | —    | —     |
-| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:39` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          | —    | —     |
-| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:59`       | —                                          | —                                   | —          | —    | —     |
+| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:301`         | —                                          | —                                   | —          | —    | —     |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:215`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    | —    | —     |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:294`         | —                                          | —                                   | —          | —    | —     |
+| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:41` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          | —    | —     |
+| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:61`       | —                                          | —                                   | —          | —    | —     |
 
 ### Judgments
 
@@ -54,14 +54,14 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                          | Location                           | Resource | Trigger | Discipline | Crit | Durab |
 | ----------------------------- | ---------------------------------- | -------- | ------- | ---------- | ---- | ----- |
-| `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:31` | —        | —       | —          | —    | —     |
+| `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:33` | —        | —       | —          | —    | —     |
 
 ## `ipc-subprocess` (2)
 
 | Site                      | Location                            | Resource                                        | Trigger                                           | Discipline | Crit | Durab |
 | ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- | ---- | ----- |
 | `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          | —    | —     |
-| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:226` | —                                               | —                                                 | —          | —    | —     |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:228` | —                                               | —                                                 | —          | —    | —     |
 
 ### Judgments
 

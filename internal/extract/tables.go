@@ -83,6 +83,7 @@ func runExtract(root string, opts Options, observing bool) ([]*Site, []Observati
 	if observing {
 		e.observations = []Observation{}
 		e.captures = map[ast.Node]*capture{}
+		e.ignores = map[string][]ignoreDirective{}
 	}
 	dirs := opts.Dirs
 	if len(dirs) == 0 {
@@ -112,7 +113,7 @@ func runExtract(root string, opts Options, observing bool) ([]*Site, []Observati
 		}
 	}
 
-	return e.sortedSites(), sortedObservations(e.observations), nil
+	return e.sortedSites(), sortedObservations(append(e.filterSuppressed(e.observations), e.invalidIgnoreObservations()...)), nil
 }
 
 // pkgOf maps an import path to the canonical package key we classify by.

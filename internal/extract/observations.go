@@ -13,7 +13,6 @@ import (
 	"go/ast"
 	"go/format"
 	"go/token"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -29,7 +28,9 @@ type Observation struct {
 }
 
 // Rule names for the detector vocabulary (D7: additive and stable; the lint
-// face prefixes io-surface/ to form the finding rule ID).
+// face prefixes io-surface/ to form the finding rule ID). ignore-invalid is
+// metadata-only: emitted by the suppression scanner, never by a detector
+// capture (see suppress.go).
 const (
 	RuleErrDropped      = "err-dropped"
 	RuleCloserMissing   = "closer-missing"
@@ -40,6 +41,7 @@ const (
 	RuleIOInLoop        = "io-in-loop"
 	RuleWriteNonAtomic  = "write-non-atomic"
 	RuleTinyBuffer      = "tiny-buffer"
+	RuleIgnoreInvalid   = "ignore-invalid"
 )
 
 // Assign shapes: how a call's results are consumed at the statement level.
@@ -216,16 +218,12 @@ func hasContextParam(fn *ast.FuncDecl) bool {
 }
 
 // locOf formats a node position as the repo-relative "path:line" the manifest
-// contract keys on. Same formatting as record(); factored so observations and
-// sites can never drift apart.
+// contract keys on. Same formatting as the suppression scanner's relPath();
+// factored so observations and sites can never drift apart.
 func (e *extractor) locOf(n ast.Node) string {
 	pos := e.fset.Position(n.Pos())
-	rel := pos.Filename
-	if r, err := filepath.Rel(e.root, pos.Filename); err == nil {
-		rel = filepath.ToSlash(r)
-	}
 
-	return rel + ":" + strconv.Itoa(pos.Line)
+	return e.relPath(pos.Filename) + ":" + strconv.Itoa(pos.Line)
 }
 
 // evidence renders an AST node as the single-line source form used in

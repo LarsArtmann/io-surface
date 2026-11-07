@@ -73,11 +73,15 @@ type extractor struct {
 	// unlike the watched-package imports map).
 	currentImports []importAlias
 	// observations/captures are the detector channel (D1): non-nil only when
-	// ExtractWithObservations runs, never touched by plain Extract.
-	observations  []Observation
-	captures      map[ast.Node]*capture
-	captureList   []*capture
-	fnCaptureMark int
+	// ExtractWithObservations runs, never touched by plain Extract. The
+	// ignore maps ride the same lifecycle (suppression is observation-time
+	// work, T5).
+	observations   []Observation
+	captures       map[ast.Node]*capture
+	captureList    []*capture
+	fnCaptureMark  int
+	ignores        map[string][]ignoreDirective
+	invalidIgnores []ignoreDirective
 }
 
 // importAlias pairs a file's local package alias with its full import path.
@@ -274,6 +278,7 @@ func (e *extractor) parseFile(path string) error {
 	}
 
 	e.scanEmbeds(file, pkg, testinfra)
+	e.collectIgnores(file)
 
 	ast.Inspect(file, func(n ast.Node) bool {
 		fn, ok := n.(*ast.FuncDecl)

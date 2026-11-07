@@ -34,6 +34,11 @@ type RuleDef struct {
 	Severity    string // "info" until T17 evidence-gated promotion (D4)
 	Description string
 	Message     func(o Observation) string
+	// MetadataOnly marks rules emitted directly by machinery (today: the
+	// suppression scanner's ignore-invalid) rather than by a registered
+	// detector over a capture. The parity test exempts them from the
+	// reverse direction (metadata -> detector) only.
+	MetadataOnly bool
 }
 
 // detectors is the execution registry (order = observation emission order per
@@ -130,6 +135,15 @@ var detectorRules = []RuleDef{
 		Message: func(o Observation) string {
 			return o.Evidence
 		},
+	},
+	{
+		Name:        RuleIgnoreInvalid,
+		Severity:    "info",
+		Description: "a suppression directive is malformed (unknown rule or missing reason)",
+		Message: func(o Observation) string {
+			return o.Evidence + " — grammar: //io-surface:ignore <rule> <reason…>; " + o.Call + ", so nothing was suppressed"
+		},
+		MetadataOnly: true,
 	},
 }
 
