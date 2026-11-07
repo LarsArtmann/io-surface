@@ -1,7 +1,11 @@
 # 2026-11-07 08-08 — io-bug-radar P0–P2: detector suite shipped, fleet-proven, severity stayed info
 
-**Status:** DONE for plan phases P0/P1/P2 (tasks T1–T18 minus the release itself, which
-lands as v0.3.0 in the same series). P3 (T19–T25) follows.
+**Status:** DONE — ALL phases (P0/P1/P2/P3, tasks T1–T25 / TODO_LIST #65–#89). v0.3.0
+released, tagged and published mid-series (commit `336c279`); P3 landed on top:
+claims v1.2 (`criticality`/`durability`), severity modulation + `claim-conflict`,
+`write-non-atomic` + `tiny-buffer`, pilot onboarding (InboxClean full migration incl.
+the pdf.go fd-leak fix + CI pin bump; gogenfilter fresh scaffold + CI wiring),
+composition/SARIF ADR (ROADMAP Theme 5, TODO #61 decided), docs sync.
 **Verifies:** `docs/planning/2026-11-07_05-02_io-bug-radar-pareto-plan.md` §4 layer table.
 
 ## What shipped
@@ -72,8 +76,11 @@ ships above info (D4 held).
 
 ## Known gaps / next tasks
 
-- P3 (T19–T25): claims v1.2 (`criticality`/`durability`), severity modulation,
-  write-non-atomic, tiny-buffer, pilot onboarding, composition ADR, docs sync.
+- dnsblockd manifest still v1-era (old schema + disciplines.cue): its 131 hand-written
+  judgment claims need a deliberate v1→v1.2 migration (owner call — the constraint
+  failures are real and the claims context is human judgment; NOT mass-migrated here).
 - io-in-loop same-path refinement (loop body × printer-keyed expr) — v0.4 candidate.
 - err-dropped os.Remove-cleanup class: either a `//nolint`-style suppression story or
   acceptance; decide with more fleet data.
+- InboxClean's 21 new token-tier advisory sites (post-refresh) are undeclared-by-design
+  (weak-site infos); declaring or baselining them is InboxClean's own follow-up.

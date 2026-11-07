@@ -40,7 +40,9 @@ Every "complete inventory" claim is bounded by what resolved imports can see
 (the token tier is 67% of dnsblockd's sites). Either add the precise tier or
 stop calling the inventory complete.
 
-- Opt-in `--precise` tier using `golang.org/x/tools/go/packages`
+- Opt-in `--precise` tier using `golang.org/x/tools/go/packages` (boundary
+  recorded in Theme 5: the v0.3.0 detector layer consumes resolved-tier AST
+  captures only — precise stays this theme's own track)
 - Seams declared as data (manifest `via`) instead of a hardcoded table;
   cross-package seams
 - Extract `--stats` face for outlier packages; confidence distribution visible
@@ -124,7 +126,11 @@ bridge deferred until a consumer exists; golangci composition rejected.
   for the tool itself. (Birth report §g-Q2)
 - **Q3 — may the weak (heuristic) tier ever fail a build, or is it advisory
   forever?** Opt-in `--strict-weak` per repo is the compromise candidate; this
-  is a false-positive-budget policy call. (Birth report §g-Q3)
+  is a false-positive-budget policy call. (Birth report §g-Q3) For the
+  DETECTOR tier the answer already shipped (D3/D4, v0.3.0): token-tier sites
+  never produce detector findings structurally, and every rule ships at info
+  with fleet-evidence-gated promotion (Theme 5's SARIF policy keys off the
+  same promotion bar).
 - **Q4 — purge the ~67 MB binary blobs from git history, or keep them?** The
   auto-commit daemon committed a compiled `cmd/io-surface/io-surface` twice
   (blobs of 35,180,278 and 35,181,139 bytes, commits `05874f3` / `e15bf62`,
