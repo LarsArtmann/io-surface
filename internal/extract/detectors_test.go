@@ -170,3 +170,29 @@ func TestDetectCloserMissing_OwnershipTable(t *testing.T) {
 		}
 	}
 }
+
+// TestDetectCloserMissing_HttpBody pins the resp.Body variant: body reads
+// alone are the classic leak (io.ReadAll does not close), defer and plain
+// Close silence, whole-response return or hand-off transfers ownership.
+func TestDetectCloserMissing_HttpBody(t *testing.T) {
+	got := observationsBySite(t, "../../testdata/detectors", RuleCloserMissing)
+
+	positives := []string{"cmd/app.leakBody", "cmd/app.statusOnlyLeak"}
+	for _, site := range positives {
+		if len(got[site]) != 1 {
+			t.Errorf("%s: %d observations, want 1 (all: %+v)", site, len(got[site]), got[site])
+		}
+	}
+
+	negatives := []string{
+		"cmd/app.closedBody",
+		"cmd/app.plainCloseBody",
+		"cmd/app.transferredResp",
+		"cmd/app.handedOffResp",
+	}
+	for _, site := range negatives {
+		if obs := got[site]; len(obs) != 0 {
+			t.Errorf("%s: must stay silent, got %+v", site, obs)
+		}
+	}
+}

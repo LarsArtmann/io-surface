@@ -279,3 +279,22 @@ var closableCtors = map[string]bool{
 	"net.DialTCP": true, "net.DialUDP": true,
 	"tls.Listen": true, "tls.Dial": true,
 }
+
+// httpBodyCtors maps HTTP calls whose *Response carries the close duty in its
+// Body field (resp.Body.Close is the contract, not resp itself).
+var httpBodyCtors = map[string]bool{
+	"http.Get": true, "http.Post": true, "http.PostForm": true, "http.Head": true,
+}
+
+// ctxVariantPairs maps context-blind calls to their context-aware variant.
+// ctx-dropped fires only when the enclosing function actually takes a
+// context.Context — the pair table names the suggested replacement.
+var ctxVariantPairs = map[string]string{
+	"exec.Command":    "exec.CommandContext",
+	"net.Dial":        "net.DialContext",
+	"net.DialTimeout": "net.DialContext",
+	"http.Get":        "http.NewRequestWithContext",
+	"http.Post":       "http.NewRequestWithContext",
+	"http.PostForm":   "http.NewRequestWithContext",
+	"http.Head":       "http.NewRequestWithContext",
+}

@@ -33,6 +33,8 @@ type RuleDef struct {
 var detectors = []detector{
 	{rule: RuleErrDropped, run: detectErrDropped},
 	{rule: RuleCloserMissing, run: detectCloserMissing},
+	{rule: RuleCloserMissing, run: detectBodyUnclosed},
+	{rule: RuleCtxDropped, run: detectCtxDropped},
 }
 
 // detectorRules is the metadata registry. Message receives the observation's
@@ -186,4 +188,104 @@ func (s *closerScan) classify(id *ast.Ident, parent ast.Node) {
 	default:
 		s.used = true
 	}
+}
+
+// detectBodyUnclosed is the closer-missing http variant: resp.Body carries
+// the close duty. Field accesses (resp.StatusCode, resp.Body reads) do not
+// transfer ownership — io.ReadAll(resp.Body) without a Close is the classic
+// leak and still fires — while returning or passing the whole resp silences
+// the rule (ownership moved).
+func detectBodyUnclosed(e *extractor, c *capture) []Observation {
+	if !httpBodyCtors[c.sel] || c.shape != shapeAssign || c.slotIdx != 0 {
+		return nil
+	}
+	assign, ok := c.parent.(*ast.AssignStmt)
+	if !ok || len(assign.Lhs) == 0 {
+		return nil
+	}
+	binding, ok := assign.Lhs[0].(*ast.Ident)
+	if !ok || binding.Name == "_" || slices.Contains(c.blanks, 0) {
+		return nil
+	}
+	scan := bodyScan{bindingName: binding.Name, bindingPos: binding.Pos()}
+	ast.Inspect(c.fn.Body, func(n ast.Node) bool {
+		sel, ok := n.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		outer, ok := sel.X.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		x, ok := outer.X.(*ast.Ident)
+		if ok && x.Name == scan.bindingName && outer.Sel.Name == "Body" && sel.Sel.Name == "Close" {
+			scan.closed = true
+		}
+
+		return true
+	})
+	if !scan.closed {
+		ast.Walk(&scan, c.fn.Body)
+	}
+	if scan.closed || scan.transferred {
+		return nil
+	}
+
+	return []Observation{e.emit(c, RuleCloserMissing, evidenceOf(&e.fset, c.parent))}
+}
+
+// bodyScan classifies mentions of the response binding: field accesses are
+// neutral, whole-response returns/arguments/storage transfer ownership.
+type bodyScan struct {
+	bindingName string
+	bindingPos  token.Pos
+	stack       []ast.Node
+	closed      bool
+	transferred bool
+}
+
+func (s *bodyScan) Visit(n ast.Node) ast.Visitor {
+	if n == nil {
+		s.stack = s.stack[:len(s.stack)-1]
+
+		return nil
+	}
+	var parent ast.Node
+	if len(s.stack) > 0 {
+		parent = s.stack[len(s.stack)-1]
+	}
+	s.stack = append(s.stack, n)
+	if id, ok := n.(*ast.Ident); ok && id.Name == s.bindingName && id.Pos() != s.bindingPos {
+		switch p := parent.(type) {
+		case *ast.SelectorExpr:
+			if p.X == id {
+				return s // field access: neutral
+			}
+			s.transferred = true
+		case *ast.ReturnStmt:
+			s.transferred = true
+		case *ast.CallExpr:
+			if p.Fun != id {
+				s.transferred = true
+			}
+		case *ast.AssignStmt, *ast.KeyValueExpr, *ast.SendStmt:
+			s.transferred = true
+		}
+	}
+
+	return s
+}
+
+// detectCtxDropped fires when a context.Context is in scope (the enclosing
+// function takes one) but the call uses the context-blind variant. The
+// documented FP class: functions that deliberately detach work from the
+// caller's cancellation (background cleanup) still fire at info tier — the
+// finding is the nudge, not the verdict.
+func detectCtxDropped(e *extractor, c *capture) []Observation {
+	variant, watched := ctxVariantPairs[c.sel]
+	if !watched || !c.ctxParam {
+		return nil
+	}
+
+	return []Observation{e.emit(c, RuleCtxDropped, evidenceOf(&e.fset, c.node)+" — the enclosing function takes a context.Context; prefer "+variant)}
 }

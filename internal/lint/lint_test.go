@@ -17,13 +17,13 @@ func TestRun_FixtureReport(t *testing.T) {
 	if rep.Enforcement != "lint" {
 		t.Errorf("enforcement = %q, want lint", rep.Enforcement)
 	}
-	if rep.Stats.Infos != 5 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
-		t.Errorf("stats = %+v, want 5 infos", rep.Stats)
+	if rep.Stats.Infos != 7 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
+		t.Errorf("stats = %+v, want 7 infos", rep.Stats)
 	}
-	if rep.Stats.Extracted != 19 || rep.Stats.Resolved != 19 {
-		t.Errorf("stats = %+v, want 19 extracted / 19 resolved", rep.Stats)
+	if rep.Stats.Extracted != 25 || rep.Stats.Resolved != 25 {
+		t.Errorf("stats = %+v, want 25 extracted / 25 resolved", rep.Stats)
 	}
-	if len(rep.Findings) != 5 {
+	if len(rep.Findings) != 7 {
 		t.Fatalf("findings = %d, want 3", len(rep.Findings))
 	}
 	for _, f := range rep.Findings {
