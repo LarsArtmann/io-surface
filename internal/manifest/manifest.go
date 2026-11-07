@@ -42,6 +42,10 @@ type Facts struct {
 	Testinfra   bool     `json:"testinfra"`
 }
 
+// Dir is the conventional manifest location inside a repository (relative to
+// the repo root).
+const Dir = "docs/architecture/io-surface"
+
 // Claims are human judgment: never overwritten by tooling.
 type Claims struct {
 	Resource   string   `json:"resource"`

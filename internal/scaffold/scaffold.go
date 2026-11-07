@@ -25,13 +25,16 @@ import (
 	"strings"
 
 	"github.com/larsartmann/io-surface/internal/extract"
+	"github.com/larsartmann/io-surface/internal/manifest"
 )
 
 //go:embed schema.cue
 var schemaCUE []byte
 
 // Dir is the conventional manifest location inside a repository.
-const Dir = "docs/architecture/io-surface"
+// Dir is the conventional manifest location — aliased from the manifest
+// package, which owns the fact (one constant, one home).
+const Dir = manifest.Dir
 
 // Files returns the scaffold file set as path->content (paths relative to the
 // manifest dir). root names the repository the snapshot is taken from and only

@@ -492,13 +492,14 @@ type lintFlags struct {
 	Format       string `flag:"format" help:"output format: text, json, or sarif"`
 	Enforce      bool   `flag:"enforce" help:"exit 1 on error-severity findings (default: report only, exit 0)"`
 	IncludeTests bool   `flag:"include-tests" help:"also scan *_test.go files"`
+	Manifest     string `flag:"manifest" help:"manifest package directory for claim-based severity modulation (default <root>/docs/architecture/io-surface; absent manifest = no modulation)"`
 }
 
 // runLint is the manifestless face: extraction + detector observations, no
 // CUE manifest required. Exit 0 unless --enforce and error findings exist
 // (D5): rules ship at info, so the default can never surprise a CI.
 func runLint(_ context.Context, root *rootFlags, flags lintFlags) error {
-	rep, err := lint.Run(root.Root, lint.Options{Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore), IncludeTests: flags.IncludeTests})
+	rep, err := lint.Run(root.Root, lint.Options{Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore), IncludeTests: flags.IncludeTests, Manifest: flags.Manifest})
 	if err != nil {
 		return err
 	}
