@@ -97,6 +97,13 @@ func TestDetectorRegistry_ParityPinsMetadata(t *testing.T) {
 				break
 			}
 		}
+		for _, d := range fnDetectors {
+			if d.rule == r.Name {
+				found = true
+
+				break
+			}
+		}
 		if !found {
 			t.Errorf("detectorRules entry %q has no registered detector", r.Name)
 		}
@@ -231,5 +238,64 @@ func TestDetectCtxDropped_ScopeGate(t *testing.T) {
 		if obs := got[site]; len(obs) != 0 {
 			t.Errorf("%s: must stay silent, got %+v", site, obs)
 		}
+	}
+}
+
+// TestDetectLoopAndTimeoutRules pins the 20%-tier four: defer-in-loop,
+// io-in-loop, bare-helper client-no-timeout, and the declaration-shaped
+// client-literal + stat-then-open rules.
+func TestDetectLoopAndTimeoutRules(t *testing.T) {
+	deferInLoop := observationsBySite(t, "../../testdata/detectors", RuleDeferInLoop)
+	for _, site := range []string{"cmd/app.deferCloseInLoop", "cmd/app.deferIOInLoop"} {
+		if len(deferInLoop[site]) != 1 {
+			t.Errorf("%s: %d defer-in-loop observations, want 1", site, len(deferInLoop[site]))
+		}
+	}
+	for _, site := range []string{"cmd/app.deferOutsideLoop", "cmd/app.closeInsideLoopNoDefer"} {
+		if obs := deferInLoop[site]; len(obs) != 0 {
+			t.Errorf("%s: must stay silent for defer-in-loop, got %+v", site, obs)
+		}
+	}
+
+	ioInLoop := observationsBySite(t, "../../testdata/detectors", RuleIOInLoop)
+	if len(ioInLoop["cmd/app.closeInsideLoopNoDefer"]) != 1 {
+		t.Errorf("closeInsideLoopNoDefer: io-in-loop = %d, want 1 (os.Open in range body)", len(ioInLoop["cmd/app.closeInsideLoopNoDefer"]))
+	}
+	if obs := ioInLoop["cmd/app.deferOutsideLoop"]; len(obs) != 0 {
+		t.Errorf("deferOutsideLoop: io-in-loop must stay silent, got %+v", obs)
+	}
+
+	noTimeout := observationsBySite(t, "../../testdata/detectors", RuleClientNoTimeout)
+	if len(noTimeout["cmd/app.defaultsInFunc"]) != 1 {
+		t.Errorf("defaultsInFunc: %d bare-helper findings, want 1", len(noTimeout["cmd/app.defaultsInFunc"]))
+	}
+	if obs := noTimeout["cmd/app.clientWithTimeout"]; len(obs) != 0 {
+		t.Errorf("clientWithTimeout: literal finding must stay silent, got %+v", obs)
+	}
+
+	// The literal rules are declaration-shaped: look them up by location file.
+	_, obs, err := ExtractWithObservations("../../testdata/detectors", Options{})
+	if err != nil {
+		t.Fatalf("extract: %v", err)
+	}
+	literals, statPairs := 0, 0
+	for _, o := range obs {
+		switch o.Rule {
+		case RuleClientNoTimeout:
+			if strings.Contains(o.Location, "loops.go") && strings.Contains(o.Evidence, "no Timeout field") {
+				literals++
+			}
+		case RuleStatThenOpen:
+			statPairs++
+			if !strings.Contains(o.Evidence, "stat'd at") {
+				t.Errorf("stat-then-open evidence lacks both locations: %q", o.Evidence)
+			}
+		}
+	}
+	if literals != 2 { // clientWithoutTimeout + clientWithTransport
+		t.Errorf("client literals flagged = %d, want 2", literals)
+	}
+	if statPairs != 2 { // statThenReadFile + statLstatThenWrite(WriteFile pair only; Lstat is not an opener)
+		t.Errorf("stat-then-open pairs = %d, want 2", statPairs)
 	}
 }

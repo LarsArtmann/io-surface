@@ -15,16 +15,25 @@ func symbolVisible(root string, locations []string, symbol string) bool {
 	if symbol == "" || len(locations) == 0 {
 		return false
 	}
+	// Declared locations of one site usually share a file; reading each
+	// unique path once keeps the loop from re-reading it per location.
+	read := map[string][]byte{}
 	for _, loc := range locations {
 		path, _, ok := splitLocation(loc)
 		if !ok {
 			continue
 		}
-		src, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-		if err != nil {
-			continue
+		src, cached := read[path]
+		if !cached {
+			src, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+			if err != nil {
+				read[path] = nil
+
+				continue
+			}
+			read[path] = src
 		}
-		if strings.Contains(string(src), symbol) {
+		if src != nil && strings.Contains(string(src), symbol) {
 			return true
 		}
 	}
