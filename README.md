@@ -87,7 +87,7 @@ more I/O bug and inefficiency rules landing across the v0.3 line.
 | `io-surface render [--root] [--out FILE]`                                                                          | Render the inventory markdown from the manifest (claims-aware)                                                                           |
 | `io-surface render --doc FILE [--check]`                                                                           | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                                    |
 | `io-surface extract [--root] [--include-tests]`                                                                    | Print the raw extraction as JSON (debugging, counts)                                                                                     |
-| `io-surface lint [--root] [--format text\|json\|sarif] [--enforce] [--include-tests]`                               | Detector findings without a manifest (exit 0 unless `--enforce` and error-severity findings); any Go tree lints                           |
+| `io-surface lint [--root] [--format text\|json\|sarif] [--enforce] [--include-tests]`                              | Detector findings without a manifest (exit 0 unless `--enforce` and error-severity findings); any Go tree lints                          |
 | `io-surface absorb --capslock REPORT [--check] [--module] [--engine-version]`                                      | Fold a pinned Capslock JSON report into `capabilities.cue` (that file only); `--check` reports advisory drift, never exits 1             |
 | `io-surface baseline add <id> --note WHY [--date YYYY-MM-DD]`                                                      | Grandfather one undeclared site in `baseline.cue` (surgical write, comments preserved); refuses duplicates                               |
 | `io-surface … --ignore 'zz_generated*,*_templ.go'`                                                                 | Skip generated files everywhere (init/check/extract/render/baseline): globs match repo-relative paths and file names                     |
@@ -264,15 +264,18 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
-`v0.2.0` — extractor, bidirectional gate, scaffolder and renderer, with the CUE
-contract. Proven against two real repos: a hand-ported 131-site manifest (dnsblockd)
-and a from-scratch 126-site pilot (InboxClean), plus self-hosting.
+`v0.3.0` — the detector line: `io-surface lint` finds dropped errors, leaked
+closers, context-blind calls, timeout-less clients, loop-carried I/O, and
+double syscalls in ANY Go tree — no manifest needed. Fleet-proven on 160 repos
+(one command: `scripts/fleetscan.sh`); rules ship at `info` with evidence-gated
+severity promotion. Everything from `v0.2.0` stands: extractor, bidirectional
+gate, scaffolder, renderer, claims-aware docs embedding, capabilities via
+`absorb` (advisory).
 
-Next, in order: wire it into the pilot repos as a Nix/BuildFlow check, then
-SARIF emission and the systemd hardening generator (the highest-value consumer:
-`ReadWritePaths` derived from the `file-write` family).
+Next, in order: claims v1.2 (`criticality`/`durability`) with severity
+modulation, `write-non-atomic` + `tiny-buffer` rules, pilot repo CI wiring.
 
-Shipped since the tag: `--json` holds for every gate outcome (validation
+Shipped in the 0.2 line: `--json` holds for every gate outcome (validation
 failures included), `init --force` can no longer clobber `claims.cue`/
 `baseline.cue`, and the renderer embeds into hand-written docs via BEGIN/END
 markers with a `--check` drift gate — this repository's own inventory doc is

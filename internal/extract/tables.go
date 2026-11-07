@@ -256,11 +256,19 @@ var errResults = map[string][]int{
 	"http.NewRequest": {1}, "http.NewRequestWithContext": {1},
 	// database/sql
 	"sql.Open": {1},
-	// path/filepath
-	"filepath.Walk": {0}, "filepath.WalkDir": {0}, "filepath.Glob": {1},
+	// path/filepath: filepath.Glob is deliberately ABSENT (T16 fleet
+	// evidence 2026-11-07: 14/27 err-dropped hits were Glob blank-discards;
+	// Glob's error fires ONLY on a malformed pattern, and every sampled
+	// site passes a literal or config-validated pattern — safe by the
+	// stdlib contract). Walk/WalkDir stay: their errors carry real walk
+	// failures.
+	"filepath.Walk": {0}, "filepath.WalkDir": {0},
 	// crypto
 	"tls.Dial": {1}, "tls.Listen": {1}, "tls.LoadX509KeyPair": {1},
-	"rand.Read": {1}, "rsa.GenerateKey": {1}, "x509.CreateCertificate": {1},
+	// rand.Read is deliberately ABSENT: crypto/rand.Read is documented
+	// never to return an error (it panics on systemic failure instead), so
+	// flagging its blank discard contradicts the stdlib contract.
+	"rsa.GenerateKey": {1}, "x509.CreateCertificate": {1},
 	// os/exec (Command itself returns no error)
 	"exec.LookPath": {1},
 	// syscall
