@@ -135,8 +135,10 @@ func isLoopNode(n ast.Node) bool {
 func (t *captureTracker) record(call *ast.CallExpr) {
 	parent := t.parents[call]
 	c := &capture{
-		fn:       t.fn,
+		id:       "",
+		node:     call,
 		parent:   parent,
+		fn:       t.fn,
 		imports:  t.imports,
 		inLoop:   t.inLoop[call],
 		ctxParam: t.ctxParam,
@@ -147,7 +149,7 @@ func (t *captureTracker) record(call *ast.CallExpr) {
 		c.shape = shapeBare
 	case *ast.AssignStmt:
 		idx := nodeIndex(st.Rhs, call)
-		if idx >= 0 && len(st.Lhs) == len(st.Rhs) {
+		if idx >= 0 && (len(st.Rhs) == 1 || len(st.Lhs) == len(st.Rhs)) {
 			c.shape = shapeAssign
 			c.slotIdx = idx
 			c.slots = len(st.Lhs)
