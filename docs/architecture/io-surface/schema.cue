@@ -1,4 +1,4 @@
-// schema.cue — the I/O surface manifest standard (io-surface/v1.1).
+// schema.cue — the I/O surface manifest standard (io-surface/v1.2).
 //
 // The manifest describes every production code location in this repository
 // that touches I/O: file system, embedded assets, databases, network
@@ -27,11 +27,12 @@
 // lands in location, whichever section spelled it.
 package io_surface
 
-// Contract version (io-surface/v1.1). Absent in v1 manifests; new scaffolds
-// and every capability-carrying manifest declare it. A schema change bumps
-// the minor: a new family or capability name is a version bump, never a
-// casual edit (taxonomy freeze).
-version?: "io-surface/v1" | "io-surface/v1.1"
+// Contract version (io-surface/v1.2). Absent in v1 manifests; new scaffolds
+// declare the newest. A schema change bumps the minor: a new family,
+// capability name, or claims vocabulary is a version bump, never a casual
+// edit (taxonomy freeze). v1.1 added capabilities; v1.2 added the
+// claims.criticality/durability severity-modulation vocabulary.
+version?: "io-surface/v1" | "io-surface/v1.1" | "io-surface/v1.2"
 
 // Enforcement policy (decision D4: new undeclared sites fail the build).
 // "gate" is the default and the birth decision; "audit" reports findings
@@ -77,6 +78,16 @@ enforcement?: "gate" | "audit"
 		discipline: [...#Discipline] | *[]
 		exception: string | *""   // why a discipline rule does not apply
 		rationale: string | *""   // the judgment prose
+		// Severity-modulation vocabulary (v1.2, plan T19): the judgment
+		// inputs detector findings weigh. Absent = the defaults below, so
+		// v1.1 manifests keep unifying unchanged.
+		//
+		// criticality: what breaks when this site misbehaves. Detector
+		// findings on `critical` sites escalate one severity step (T20).
+		criticality: "low" | "normal" | "critical" | *"normal"
+		// durability: what a lost write costs. Only meaningful for write
+		// families; `durable` sites escalate write-shaped findings (T21).
+		durability: "ephemeral" | "recoverable" | "durable" | *"recoverable"
 	}
 }
 
