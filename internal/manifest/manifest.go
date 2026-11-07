@@ -49,7 +49,25 @@ type Claims struct {
 	Discipline []string `json:"discipline"`
 	Exception  string   `json:"exception"`
 	Rationale  string   `json:"rationale"`
+	// Severity-modulation inputs (v1.2). Zero values mean "unclaimed"; the
+	// detector severity modulation treats unclaimed as the schema defaults
+	// (normal / recoverable) without manifest edits.
+	Criticality string `json:"criticality,omitempty"`
+	Durability  string `json:"durability,omitempty"`
 }
+
+// Criticality/durability vocabularies (schema v1.2). The CUE closed enums in
+// schema.cue are the standard; these exist so the Go side can validate and
+// the detector modulation can escalate without stringly-typed guessing.
+const (
+	CriticalityLow      = "low"
+	CriticalityNormal   = "normal"
+	CriticalityCritical = "critical"
+
+	DurabilityEphemeral   = "ephemeral"
+	DurabilityRecoverable = "recoverable"
+	DurabilityDurable     = "durable"
+)
 
 // Site is one declared I/O surface entry.
 type Site struct {
