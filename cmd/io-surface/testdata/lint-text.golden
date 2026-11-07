@@ -62,11 +62,11 @@ info    io-surface/write-non-atomic      cmd/app.negativeExpression  cmd/app/mai
         os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file
 info    io-surface/err-dropped           cmd/app.wrongRuleDoesNotSuppress  cmd/app/suppress.go:24
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
-info    io-surface/ignore-invalid          cmd/app/suppress.go:28
+info    io-surface/ignore-invalid        cmd/app/suppress.go  cmd/app/suppress.go:28
         io-surface:ignore err-dropped — grammar: //io-surface:ignore <rule> <reason…>; missing reason, so nothing was suppressed
 info    io-surface/err-dropped           cmd/app.reasonlessDirectiveDoesNotSuppress  cmd/app/suppress.go:29
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
-info    io-surface/ignore-invalid          cmd/app/suppress.go:33
+info    io-surface/ignore-invalid        cmd/app/suppress.go  cmd/app/suppress.go:33
         io-surface:ignore no-such-rule whatever — grammar: //io-surface:ignore <rule> <reason…>; unknown rule name, so nothing was suppressed
 info    io-surface/err-dropped           cmd/app.unknownRuleDirectiveDoesNotSuppress  cmd/app/suppress.go:34
         os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`

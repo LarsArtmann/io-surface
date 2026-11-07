@@ -1,3 +1,5 @@
+> **Live remainder:** harvested into TODO_LIST #37-48 (§f) at creation; nothing open remains here. Archived 2026-11-07 (cadence 15/15).
+
 # io-surface — session status: publishing, mirroring, and the docs audit
 
 **Date:** 2026-11-06 01:20 CET

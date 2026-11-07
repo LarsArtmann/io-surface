@@ -136,6 +136,9 @@ func (e *extractor) invalidIgnoreObservations() []Observation {
 			why = "missing reason"
 		}
 		out = append(out, Observation{
+			// SiteID anchors at the file (a directive is not tied to a
+			// capture); the finding contract requires a non-empty ID.
+			SiteID:   d.file,
 			Rule:     RuleIgnoreInvalid,
 			Call:     why,
 			Location: d.file + ":" + strconv.Itoa(d.line),

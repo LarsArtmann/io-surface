@@ -23,10 +23,10 @@ CI fails when this block goes stale (`render --doc … --check`).
 | -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- | ---- | ----- |
 | `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          | —    | —     |
 | `internal/check.symbolVisible`               | `internal/check/location.go:28`     | —                                                         | —                                        | —          | —    | —     |
-| `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:167`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    | —    | —     |
-| `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:230`   | —                                                         | —                                        | —          | —    | —     |
-| `internal/extract.extractor.walk`            | `internal/extract/extract.go:90`    | —                                                         | —                                        | —          | —    | —     |
-| `internal/extract.runExtract`                | `internal/extract/tables.go:106`    | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:171`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    | —    | —     |
+| `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:234`   | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.extractor.walk`            | `internal/extract/extract.go:94`    | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.runExtract`                | `internal/extract/tables.go:107`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/manifest.Load`                     | `internal/manifest/manifest.go:192` | —                                                         | —                                        | —          | —    | —     |
 | `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:402` | —                                                         | —                                        | —          | —    | —     |
 

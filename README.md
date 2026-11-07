@@ -78,6 +78,24 @@ Findings reuse the gate's rule-ID contract (`io-surface/err-dropped`, …), so
 returns (`x, _ := os.ReadFile(p)` flags; `_ =` deliberate ignores never do), with
 more I/O bug and inefficiency rules landing across the v0.3 line.
 
+### Suppressing a finding: `//io-surface:ignore`
+
+When a finding is correct as written (a deliberate fire-and-forget cleanup, a
+force-kill path), silence it at the site — one rule at a time, with a reason
+that lives in the review diff:
+
+```go
+//io-surface:ignore err-dropped best-effort cache cleanup; nothing to do on failure
+os.Remove(cachePath)
+```
+
+The directive governs the call on its own line or the line directly below it.
+The rule name must be exact and the reason mandatory: a malformed directive
+(unknown rule, missing reason) suppresses nothing and instead reports its own
+`io-surface/ignore-invalid` finding, so a typo can never quietly eat a real
+bug. File-level ignores do not exist by design — a suppression that blunt is a
+baseline entry, not a comment.
+
 ### BuildFlow
 
 The `provider/` package self-registers io-surface as a first-class BuildFlow
