@@ -125,3 +125,41 @@ by this report beyond T3's verification sample (in flight).
 None new. Open question 2 (promotion-threshold ratification) now has its
 document: `docs/planning/2026-11-07_promotion-policy.md` §8 — the owner box
 remains unchecked, and under decision D1 nothing promotes until it is.
+
+## d2) Pilot retro #2 prep (plan T23)
+
+**Behavior metric (the number retro #2 reads):** findings-to-actions rate =
+(of the SARIF findings a pilot repo's CI collected in the period) how many
+resulted in a code change, an ignore-with-reason, a baseline entry, or a rule
+improvement — counted from git history, not memory. Formula:
+`actions / findings`, reported per rule; anything below 10% for a rule across
+two retro periods is a demotion candidate under the promotion policy §5.
+
+**Instrumentation (in place after T9/T15):** each pilot CI step uploads
+`io-surface-lint.sarif` as a workflow artifact (gogenfilter: landed; InboxClean:
+exact step documented in its PILOT-REVIEW bundle pending the owner's pin
+call). The artifact's `results[]` count per `ruleId` is the findings numerator;
+`properties.io-surface/ruleDescription` (T15) rides each result so the retro
+can read rule intent without tooling. Suppression directives (T5) land in
+normal code diffs, so `git log -S 'io-surface:ignore'` counts the
+suppression-action denominator; baseline entries count via the manifest diff.
+
+**Retro #2 schedule note:** run after ~2 pilot weeks of artifact history or
+after the first rule promotion, whichever comes first; harvested as TODO row
+(#T23) at wrap.
+
+## e) Verified how (every claim names its command)
+
+## d3) Lint benchmark (plan T22 — display-only per the non-goals)
+
+Verified how: `go build -o /tmp/iosfc ./cmd/io-surface && /tmp/iosfc lint
+--root <repo>` timed with `date +%s%N` around the run, 3 runs, median.
+
+| Repo (fleet Go LOC)    | Median wall time |
+| ---------------------- | ---------------- |
+| DiscordSync (209,383)  | 239 ms           |
+| go-taskqueue (121,304) | 156 ms           |
+
+Sub-second on the fleet's biggest tree — no hotspot profile warranted
+(threshold: >30 s). Display-only: these numbers gate nothing and must never
+share an exit code with the deterministic gate (non-goals).

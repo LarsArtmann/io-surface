@@ -159,6 +159,32 @@ bridge deferred until a consumer exists; golangci composition rejected.
   (taxonomy freeze applies) vs "permanently out-of-scope" gates whether
   `absorb` stores or drops them. First-class would also answer MODIFY/READ
   _SYSTEM_STATE for systemd-hardening consumers (Theme 2).
+- **Q6 (ADR, superb plan T18) — should claims grow an `ownership` field
+  (v1.3) so `closer-missing` understands handle hand-off?** The closer-missing
+  detector already suppresses the obvious transfer shapes (passing the handle
+  into a call, storing it), but the fleet triage shows the remaining FP class
+  is *semantic* ownership the AST cannot see: a handle returned to a
+  registry, a body handed to a streaming decoder, a connection owned by a
+  pool. Proposed vocabulary — `claims.ownership: "self" | "caller" |
+  "helper"` — with per-rule semantics:
+  - `self` (default): this function must close it (current behavior).
+  - `caller`: the function deliberately hands the handle to its caller;
+    closer-missing drops the finding when the handle is returned or stored.
+  - `helper`: a named helper owns closing (e.g. `defer util.Drain(b)`); the
+    claim names the helper, and closer-missing drops findings on sites whose
+    handle reaches that helper call.
+  - **Schema impact (D7 gate):** one optional enum field on claims — a v1.3
+    bump with additive defaults (absent = `self`), no site-shape change, no
+    family change. v1/v1.2 manifests load unchanged.
+  - **FP mapping:** the closer-missing FP classes from the fleet runs map
+    1:1 — cache stores → `caller`, pool hand-off → `helper`, long-lived
+    session handles → `caller`. The suppression directive stays the
+    fine-grained tool for one-off sites; ownership is the *policy* tool for
+    a class of sites.
+  - **Decision point:** ratify v1.3 scope (and the helper-naming mechanism)
+    alongside the promotion policy — both are schema/contract decisions the
+    owner owns. Design only; nothing implemented (frozen architecture
+    holds until ratification).
 
 ## Non-goals
 

@@ -20,14 +20,14 @@ func TestRun_FixtureReport(t *testing.T) {
 	if rep.Enforcement != "lint" {
 		t.Errorf("enforcement = %q, want lint", rep.Enforcement)
 	}
-	if rep.Stats.Infos != 39 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
-		t.Errorf("stats = %+v, want 39 infos", rep.Stats)
+	if rep.Stats.Infos != 41 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
+		t.Errorf("stats = %+v, want 41 infos", rep.Stats)
 	}
-	if rep.Stats.Extracted != 54 || rep.Stats.Resolved != 52 {
-		t.Errorf("stats = %+v, want 54 extracted / 52 resolved", rep.Stats)
+	if rep.Stats.Extracted != 56 || rep.Stats.Resolved != 54 {
+		t.Errorf("stats = %+v, want 56 extracted / 54 resolved", rep.Stats)
 	}
-	if len(rep.Findings) != 39 {
-		t.Fatalf("findings = %d, want 39", len(rep.Findings))
+	if len(rep.Findings) != 41 {
+		t.Fatalf("findings = %d, want 41", len(rep.Findings))
 	}
 	allowed := map[string]bool{
 		RuleID("err-dropped"):       true,

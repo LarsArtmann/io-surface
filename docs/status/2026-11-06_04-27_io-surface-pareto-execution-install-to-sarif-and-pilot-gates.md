@@ -147,7 +147,7 @@ mine) · **dnsblockd:** manifest edits in working tree, **uncommitted**
     net.ListenConfig, http.ServeContent
 26. **#7 baseline "only shrinks" gate** (+ growth flag)
 27. **#8 baseline `owner`+`expires`**; expired entry fails
-28. **#14a/b D4 enforcement policy** (schema field + check enforcement)
+28. ~~**#14a/b D4 enforcement policy** (schema field + check enforcement)~~ RESOLVED 2026-11-07: shipped as the manifest `enforcement` field (`gate|audit`) + SARIF property (internal/emit) — see manifest.EnforcementPolicy and the audit-demotion output
 29. **#20a/b seams derived from manifest `via` values**
 30. **#21a/b cross-package seams**
 31. **#17 follow-up: weak-site → confidence 0.5 in emit** (honest SARIF
