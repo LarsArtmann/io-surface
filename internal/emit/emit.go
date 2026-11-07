@@ -17,26 +17,50 @@ import (
 
 	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/io-surface/internal/check"
+	"github.com/larsartmann/io-surface/internal/extract"
 )
 
 // ToolName is the tool identity inside go-finding reports and SARIF output.
 const ToolName = "io-surface"
 
-// ToFindings converts a check report into go-finding findings.
+// ToFindings converts a check report into go-finding findings. Detector
+// rules carry their registry description as result-level
+// `properties.ruleDescription` (T15): go-finding's SARIF export has no
+// tool-level rules array, so the description rides the result — SARIF
+// consumers see WHAT a rule means without a second lookup.
 func ToFindings(rep *check.Report) []finding.Finding {
 	out := make([]finding.Finding, 0, len(rep.Findings))
 	for _, f := range rep.Findings {
-		out = append(out, finding.NewFinding(
+		fnd := finding.NewFinding(
 			finding.RuleName(f.Rule),
 			ToolName,
 			f.Message,
 			severityOf(f.Severity),
 			positionOf(f.Location),
 			1.0,
-		))
+		)
+		if def, ok := detectorRuleDescription(f.Rule); ok {
+			fnd.Metadata = map[string]string{"ruleDescription": def}
+		}
+		out = append(out, fnd)
 	}
 
 	return out
+}
+
+// detectorRuleDescription looks up a detector rule's published description
+// from its finding rule ID ("io-surface/err-dropped" → err-dropped).
+func detectorRuleDescription(ruleID string) (string, bool) {
+	name, ok := strings.CutPrefix(ruleID, "io-surface/")
+	if !ok {
+		return "", false
+	}
+	def, ok := extract.DetectorRule(name)
+	if !ok {
+		return "", false
+	}
+
+	return def.Description, true
 }
 
 // ToReport builds a go-finding Report from a check report.

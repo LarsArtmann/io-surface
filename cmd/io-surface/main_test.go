@@ -532,8 +532,14 @@ func TestDescribe_Contract(t *testing.T) {
 		Commands      []struct {
 			Path     string `json:"path"`
 			Commands []struct {
-				Path string `json:"path"`
+				Path  string `json:"path"`
+				Flags []struct {
+					Name string `json:"name"`
+				} `json:"flags"`
 			} `json:"commands"`
+			Flags []struct {
+				Name string `json:"name"`
+			} `json:"flags"`
 		} `json:"commands"`
 	}
 	if err := json.Unmarshal([]byte(out), &doc); err != nil {
@@ -552,6 +558,39 @@ func TestDescribe_Contract(t *testing.T) {
 	for _, want := range []string{"io-surface check", "io-surface init", "io-surface render", "io-surface extract", "io-surface lint", "io-surface absorb", "io-surface baseline", "io-surface baseline add", "io-surface version"} {
 		if !paths[want] {
 			t.Errorf("describe contract lost %q (has %d commands)", want, len(paths))
+		}
+	}
+	// The lint face's contract surface (T15): its flags are part of the
+	// machine-readable contract, so a renamed or dropped flag must break
+	// this test, not a fleet CI step.
+	var lintFlags map[string]bool
+	for i := range doc.Commands {
+		c := doc.Commands[i]
+		if c.Path == "io-surface lint" {
+			lintFlags = map[string]bool{}
+			for _, fl := range c.Flags {
+				lintFlags[fl.Name] = true
+			}
+
+			break
+		}
+		for _, sub := range c.Commands {
+			if sub.Path == "io-surface lint" {
+				lintFlags = map[string]bool{}
+				for _, fl := range sub.Flags {
+					lintFlags[fl.Name] = true
+				}
+
+				break
+			}
+		}
+	}
+	if lintFlags == nil {
+		t.Fatal("io-surface lint not found in describe output")
+	}
+	for _, want := range []string{"format", "enforce", "include-tests", "manifest"} {
+		if !lintFlags[want] {
+			t.Errorf("describe contract lost lint flag --%s (fleet consumers depend on it)", want)
 		}
 	}
 }

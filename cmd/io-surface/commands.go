@@ -495,7 +495,7 @@ func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags
 
 // lintFlags are the flags local to `io-surface lint`.
 type lintFlags struct {
-	Format       string `flag:"format" help:"output format: text, json, or sarif"`
+	Format       string `flag:"format" help:"output format: text, json, sarif, or github (workflow annotations)"`
 	Enforce      bool   `flag:"enforce" help:"exit 1 on error-severity findings (default: report only, exit 0)"`
 	IncludeTests bool   `flag:"include-tests" help:"also scan *_test.go files"`
 	Manifest     string `flag:"manifest" help:"manifest package directory for claim-based severity modulation (default <root>/docs/architecture/io-surface; absent manifest = no modulation)"`
@@ -525,6 +525,8 @@ func runLint(_ context.Context, root *rootFlags, flags lintFlags) error {
 		enc.SetIndent("", "  ")
 
 		return enc.Encode(rep)
+	case "github":
+		printGitHubAnnotations(rep, stdout)
 	default:
 		printLintReport(rep, stdout)
 	}
@@ -548,4 +550,52 @@ func printLintReport(rep *check.Report, w io.Writer) {
 	fmt.Fprintf(w, "io-surface lint: %d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
 		rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
 		rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
+}
+
+// printGitHubAnnotations renders findings as GitHub workflow commands
+// (https://docs.github.com/actions/reference/workflow-commands-for-github-actions):
+// every finding becomes one annotation anchored at its file:line, info maps
+// to ::notice. The exit-code contract is untouched — annotations decorate a
+// report-only run; --enforce still owns the exit code.
+func printGitHubAnnotations(rep *check.Report, w io.Writer) {
+	for _, f := range rep.Findings {
+		cmd := "notice"
+		switch f.Severity {
+		case check.SeverityError:
+			cmd = "error"
+		case check.SeverityWarning:
+			cmd = "warning"
+		}
+		file, line := splitAnnotationLocation(f.Location)
+		props := "title=" + githubEscape(f.Rule)
+		if file != "" {
+			props += ",file=" + githubEscape(file) + ",line=" + line
+		}
+		fmt.Fprintf(w, "::%s %s::%s\n", cmd, props, githubEscape(f.Message))
+	}
+	fmt.Fprintf(w, "::notice title=io-surface lint::%d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
+		rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
+		rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
+}
+
+// splitAnnotationLocation splits the repo-relative "path:line" location
+// contract; an empty line (path-only location) still anchors the file.
+func splitAnnotationLocation(loc string) (file, line string) {
+	if loc == "" {
+		return "", ""
+	}
+	i := strings.LastIndex(loc, ":")
+	if i < 0 {
+		return loc, ""
+	}
+
+	return loc[:i], loc[i+1:]
+}
+
+// githubEscape escapes the three characters the workflow-command data syntax
+// reserves (newline, CR, percent).
+func githubEscape(s string) string {
+	r := strings.NewReplacer("%", "%25", "\r", "%0D", "\n", "%0A")
+
+	return r.Replace(s)
 }

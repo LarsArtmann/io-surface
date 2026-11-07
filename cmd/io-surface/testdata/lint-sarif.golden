@@ -36,6 +36,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:14",
+            "go-finding/meta/ruleDescription": "a context.Context is in scope but the call uses the context-blind variant",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -66,6 +67,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:20",
+            "go-finding/meta/ruleDescription": "a context.Context is in scope but the call uses the context-blind variant",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -96,6 +98,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:27",
+            "go-finding/meta/ruleDescription": "a context.Context is in scope but the call uses the context-blind variant",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -126,6 +129,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/ctx.go:34",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -156,6 +160,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:34",
+            "go-finding/meta/ruleDescription": "a context.Context is in scope but the call uses the context-blind variant",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -186,6 +191,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:11",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -216,6 +222,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:11",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -246,6 +253,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:21",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -276,6 +284,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:21",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -306,6 +315,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:33",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -336,6 +346,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:47",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -366,6 +377,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:58",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -396,6 +408,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:62",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -426,6 +439,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:116",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -456,6 +470,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/tiny-buffer:cmd/app/loops.go:116",
+            "go-finding/meta/ruleDescription": "a sub-page buffer feeds a read/write helper (syscall amplification)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -486,6 +501,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:13",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -516,6 +532,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:136",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -546,6 +563,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:17",
+            "go-finding/meta/ruleDescription": "a deferred close or I/O call runs inside a loop but executes at function exit",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -576,6 +594,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:24",
+            "go-finding/meta/ruleDescription": "a deferred close or I/O call runs inside a loop but executes at function exit",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -606,6 +625,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:34",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -636,6 +656,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:34",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -666,6 +687,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:46",
+            "go-finding/meta/ruleDescription": "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -696,6 +718,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:57",
+            "go-finding/meta/ruleDescription": "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -726,6 +749,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/loops.go:57",
+            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -756,6 +780,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:69",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -786,6 +811,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:73",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -816,6 +842,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:81",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -846,6 +873,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/main.go:12",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -876,6 +904,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/main.go:16",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -906,6 +935,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/main.go:22",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -936,6 +966,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/main.go:56",
+            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -966,6 +997,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:24",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -996,6 +1028,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:28",
+            "go-finding/meta/ruleDescription": "a suppression directive is malformed (unknown rule or missing reason)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1026,6 +1059,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:29",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1056,6 +1090,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:33",
+            "go-finding/meta/ruleDescription": "a suppression directive is malformed (unknown rule or missing reason)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1086,6 +1121,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:34",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1116,6 +1152,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:11",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1146,6 +1183,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:21",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1176,6 +1214,7 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/write-non-atomic:internal/store/closers.go:77",
+            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }

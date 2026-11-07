@@ -108,3 +108,25 @@ func TestGolden_LintOutput(t *testing.T) {
 		t.Errorf("lint SARIF output drifted from the golden (re-run with -update):\n--- want (first 400) ---\n%.400s\n--- got (first 400) ---\n%.400s", wantSarif, sarifOut)
 	}
 }
+
+// TestExecute_LintGitHubFormat pins the workflow-annotation face (superb
+// plan T14): every finding renders as one ::notice/error/warning command
+// anchored at file:line, and the exit-code contract stays report-only.
+func TestExecute_LintGitHubFormat(t *testing.T) {
+	out, err := runApp(t, "lint", "--root", "../../testdata/detectors", "--format", "github")
+	if err != nil {
+		t.Fatalf("lint --format github: %v\n%s", err, out)
+	}
+	if !strings.Contains(out, "::notice title=io-surface/err-dropped,file=cmd/app/main.go,line=") {
+		t.Errorf("annotations lost the file/line anchor:\n%.400s", out)
+	}
+	if !strings.Contains(out, "title=io-surface/err-dropped") {
+		t.Errorf("annotations lost the rule title:\n%.400s", out)
+	}
+	if strings.Contains(out, "::error") || strings.Contains(out, "::warning") {
+		t.Errorf("info findings must render as ::notice only:\n%.400s", out)
+	}
+	if !strings.Contains(out, "::notice title=io-surface lint::") {
+		t.Errorf("annotations lost the summary line:\n%.400s", out)
+	}
+}
