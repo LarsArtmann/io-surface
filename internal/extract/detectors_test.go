@@ -79,11 +79,11 @@ func TestDetectErrDropped_ShapeTable(t *testing.T) {
 // rule vocabulary.
 func TestDetectorRegistry_ParityPinsMetadata(t *testing.T) {
 	for _, d := range detectors {
-		if _, ok := detectorRule(d.rule); !ok {
+		if _, ok := DetectorRule(d.rule); !ok {
 			t.Errorf("detector %q has no detectorRules metadata", d.rule)
 		}
 	}
-	for _, r := range detectorRules {
+	for _, r := range DetectorRules() {
 		found := false
 		for _, d := range detectors {
 			if d.rule == r.Name {

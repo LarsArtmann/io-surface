@@ -15,9 +15,9 @@ type detector struct {
 	run  func(e *extractor, c *capture) []Observation
 }
 
-// ruleDef is the published half of the rule contract: the stable name, the
+// RuleDef is the published half of the rule contract: the stable name, the
 // current severity, and the finding message builder the lint face uses.
-type ruleDef struct {
+type RuleDef struct {
 	Name        string
 	Severity    string // "info" until T17 evidence-gated promotion (D4)
 	Description string
@@ -32,7 +32,7 @@ var detectors = []detector{
 
 // detectorRules is the metadata registry. Message receives the observation's
 // Evidence clause and returns the complete human-facing finding message.
-var detectorRules = []ruleDef{
+var detectorRules = []RuleDef{
 	{
 		Name:        RuleErrDropped,
 		Severity:    "info",
@@ -43,15 +43,26 @@ var detectorRules = []ruleDef{
 	},
 }
 
-// detectorRule looks up metadata by rule name.
-func detectorRule(name string) (ruleDef, bool) {
+// DetectorRule returns the published metadata for a detector rule name —
+// the lookup the lint face uses to build stable rule IDs, severities, and
+// messages (D7: "io-surface/" + Name is the finding contract).
+func DetectorRule(name string) (RuleDef, bool) {
 	for _, r := range detectorRules {
 		if r.Name == name {
 			return r, true
 		}
 	}
 
-	return ruleDef{}, false
+	return RuleDef{}, false
+}
+
+// DetectorRules lists every rule's published metadata, in registry order —
+// the vocabulary source for docs and SARIF rule descriptions.
+func DetectorRules() []RuleDef {
+	out := make([]RuleDef, len(detectorRules))
+	copy(out, detectorRules)
+
+	return out
 }
 
 // detectErrDropped implements D8 exactly: a blank error slot in a named
@@ -73,14 +84,11 @@ func detectErrDropped(e *extractor, c *capture) []Observation {
 			return nil // D8: every slot blank is a deliberate ignore
 		}
 		for _, p := range errPos {
-			if containsInt(c.blanks, c.slotIdx+p) {
+			if slices.Contains(c.blanks, c.slotIdx+p) {
 				return []Observation{e.emit(c, RuleErrDropped, evidenceOf(&e.fset, c.parent))}
 			}
 		}
 	}
-	return nil
-}
 
-func containsInt(list []int, v int) bool {
-	return slices.Contains(list, v)
+	return nil
 }
