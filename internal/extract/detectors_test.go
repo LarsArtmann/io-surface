@@ -140,3 +140,33 @@ func TestExtractWithObservations_TokenSitesNeverObserved(t *testing.T) {
 		}
 	}
 }
+
+// TestDetectCloserMissing_OwnershipTable pins the closer-missing contract:
+// never-closed-and-never-handed-off fires (even when the value is used),
+// while Close, return, call-argument hand-off, storage, and blank slots stay
+// silent.
+func TestDetectCloserMissing_OwnershipTable(t *testing.T) {
+	got := observationsBySite(t, "../../testdata/detectors", RuleCloserMissing)
+
+	positives := []string{"internal/store.leakNeverUsed", "internal/store.leakUsedNotClosed"}
+	for _, site := range positives {
+		if len(got[site]) != 1 {
+			t.Errorf("%s: %d closer-missing observations, want 1 (all: %+v)", site, len(got[site]), got[site])
+		}
+	}
+
+	negatives := []string{
+		"internal/store.positiveDeferred",
+		"internal/store.positivePlainClose",
+		"internal/store.negativeReturned",
+		"internal/store.negativeHandedOff",
+		"internal/store.negativeStored",
+		"internal/store.negativeBlank",
+		"internal/store.negativeDBOpen",
+	}
+	for _, site := range negatives {
+		if obs := got[site]; len(obs) != 0 {
+			t.Errorf("%s: must stay silent, got %+v", site, obs)
+		}
+	}
+}

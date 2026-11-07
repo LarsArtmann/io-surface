@@ -265,3 +265,17 @@ var errResults = map[string][]int{
 	"quic.Listen": {1}, "quic.Dial": {1},
 	"otlptracehttp.New": {1}, "otlploghttp.New": {1}, "oidc.NewProvider": {1},
 }
+
+// closableCtors maps constructor calls whose first result owns a Close method.
+// closer-missing flags captures where that value is never closed in the
+// enclosing function and never handed off (returned, passed as an argument,
+// or stored).
+var closableCtors = map[string]bool{
+	"os.Open": true, "os.Create": true, "os.OpenFile": true, "os.CreateTemp": true,
+	"sql.Open":   true,
+	"net.Listen": true, "net.ListenPacket": true, "net.ListenTCP": true,
+	"net.ListenUDP": true, "net.ListenUnix": true,
+	"net.Dial": true, "net.DialContext": true, "net.DialTimeout": true,
+	"net.DialTCP": true, "net.DialUDP": true,
+	"tls.Listen": true, "tls.Dial": true,
+}
