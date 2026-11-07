@@ -6,7 +6,11 @@ package extract
 // the metadata table below are the two halves of the rule contract; a parity
 // test pins them together.
 
-import "slices"
+import (
+	"go/ast"
+	"go/token"
+	"slices"
+)
 
 // detector is one registered rule: name + the function that produces its
 // observations for a single capture.
@@ -28,6 +32,7 @@ type RuleDef struct {
 // capture; global ordering is imposed by sortedObservations).
 var detectors = []detector{
 	{rule: RuleErrDropped, run: detectErrDropped},
+	{rule: RuleCloserMissing, run: detectCloserMissing},
 }
 
 // detectorRules is the metadata registry. Message receives the observation's
@@ -39,6 +44,14 @@ var detectorRules = []RuleDef{
 		Description: "a watched call's error return is discarded",
 		Message: func(o Observation) string {
 			return o.Evidence + " — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+		},
+	},
+	{
+		Name:        RuleCloserMissing,
+		Severity:    "info",
+		Description: "a value from a closable constructor is never closed or handed off",
+		Message: func(o Observation) string {
+			return o.Evidence + " — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
 		},
 	},
 }
@@ -91,4 +104,86 @@ func detectErrDropped(e *extractor, c *capture) []Observation {
 	}
 
 	return nil
+}
+
+// detectCloserMissing flags closable constructor results that are never
+// closed AND never handed off in the enclosing function. The ownership
+// classifier is deliberately conservative: any return, call argument, or
+// assignment counts as a hand-off and silences the rule — a false negative
+// costs less than a false positive at info tier (D4). Method receivers other
+// than Close (f.Read) do NOT transfer ownership, so the classic
+// used-but-never-closed leak still fires.
+func detectCloserMissing(e *extractor, c *capture) []Observation {
+	if !closableCtors[c.sel] {
+		return nil
+	}
+	if c.shape != shapeAssign || c.slotIdx != 0 {
+		return nil
+	}
+	assign, ok := c.parent.(*ast.AssignStmt)
+	if !ok || len(assign.Lhs) == 0 {
+		return nil
+	}
+	binding, ok := assign.Lhs[0].(*ast.Ident)
+	if !ok || binding.Name == "_" || slices.Contains(c.blanks, 0) {
+		return nil
+	}
+	scan := closerScan{bindingName: binding.Name, bindingPos: binding.Pos()}
+	ast.Walk(&scan, c.fn.Body)
+	if scan.closed || scan.transferred {
+		return nil
+	}
+
+	return []Observation{e.emit(c, RuleCloserMissing, evidenceOf(&e.fset, c.parent))}
+}
+
+// closerScan classifies every mention of the constructor-bound identifier.
+type closerScan struct {
+	bindingName string
+	bindingPos  token.Pos
+	stack       []ast.Node
+	closed      bool
+	transferred bool
+	used        bool
+}
+
+func (s *closerScan) Visit(n ast.Node) ast.Visitor {
+	if n == nil {
+		s.stack = s.stack[:len(s.stack)-1]
+
+		return nil
+	}
+	var parent ast.Node
+	if len(s.stack) > 0 {
+		parent = s.stack[len(s.stack)-1]
+	}
+	s.stack = append(s.stack, n)
+	if id, ok := n.(*ast.Ident); ok && id.Name == s.bindingName && id.Pos() != s.bindingPos {
+		s.classify(id, parent)
+	}
+
+	return s
+}
+
+func (s *closerScan) classify(id *ast.Ident, parent ast.Node) {
+	switch p := parent.(type) {
+	case *ast.SelectorExpr:
+		if p.X == id && p.Sel.Name == "Close" {
+			s.closed = true
+		} else {
+			s.used = true
+		}
+	case *ast.ReturnStmt:
+		s.transferred = true
+	case *ast.CallExpr:
+		if p.Fun == id {
+			s.used = true
+		} else {
+			s.transferred = true
+		}
+	case *ast.AssignStmt, *ast.KeyValueExpr, *ast.SendStmt:
+		s.transferred = true
+	default:
+		s.used = true
+	}
 }

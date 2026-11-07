@@ -99,6 +99,66 @@
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "internal/store/closers.go"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:11",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "internal/store/closers.go"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:21",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
         }
       ]
     }
