@@ -55,12 +55,15 @@ const (
 type capture struct {
 	id       string // enclosing symbol ID
 	node     *ast.CallExpr
+	parent   ast.Node // the statement directly containing the call
 	fn       *ast.FuncDecl
 	imports  map[string]string
 	sel      string // resolved key, e.g. "os.ReadFile" (set at detect time)
 	family   string
 	location string
 	shape    string
+	slotIdx  int   // assign shape: which RHS expression this call is
+	slots    int   // assign shape: len(Lhs)
 	blanks   []int // assign shape: LHS positions bound to _
 	inLoop   bool  // inside a for/range BODY subtree (loop heads stay false)
 	ctxParam bool  // enclosing func has a context.Context parameter
@@ -130,20 +133,24 @@ func isLoopNode(n ast.Node) bool {
 // capture. Blanks are recorded positionally so err-dropped can name the exact
 // dropped result.
 func (t *captureTracker) record(call *ast.CallExpr) {
+	parent := t.parents[call]
 	c := &capture{
 		fn:       t.fn,
+		parent:   parent,
 		imports:  t.imports,
 		inLoop:   t.inLoop[call],
 		ctxParam: t.ctxParam,
 		location: t.e.locOf(call),
 	}
-	switch st := t.parents[call].(type) {
+	switch st := parent.(type) {
 	case *ast.ExprStmt:
 		c.shape = shapeBare
 	case *ast.AssignStmt:
 		idx := nodeIndex(st.Rhs, call)
 		if idx >= 0 && len(st.Lhs) == len(st.Rhs) {
 			c.shape = shapeAssign
+			c.slotIdx = idx
+			c.slots = len(st.Lhs)
 			for i, lhs := range st.Lhs {
 				if ident, ok := lhs.(*ast.Ident); ok && ident.Name == "_" {
 					c.blanks = append(c.blanks, i)

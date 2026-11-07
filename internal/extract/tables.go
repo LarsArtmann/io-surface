@@ -227,3 +227,41 @@ var seamIdent = map[string]string{
 	"FetchBlocklistWithLimit": "outbound",
 	"FetchBlocklistWithRetry": "outbound",
 }
+
+// errResults maps watched resolved calls to the result indexes that carry an
+// error (per the stdlib signatures they always have). err-dropped flags a
+// capture when an error slot is a blank. Calls without an error result
+// (constructors like bufio.NewReader, TempDir) are deliberately absent.
+var errResults = map[string][]int{
+	// os
+	"os.Open": {1}, "os.ReadFile": {1}, "os.Stat": {1}, "os.Lstat": {1},
+	"os.ReadDir": {1}, "os.Create": {1}, "os.OpenFile": {1}, "os.CreateTemp": {1},
+	"os.WriteFile": {0}, "os.Mkdir": {0}, "os.MkdirAll": {0},
+	"os.Remove": {0}, "os.RemoveAll": {0}, "os.Rename": {0},
+	"os.Truncate": {0}, "os.Setenv": {0}, "os.Unsetenv": {0},
+	// io
+	"io.ReadAll": {1}, "io.ReadFull": {1}, "io.Copy": {1}, "io.CopyN": {1}, "io.CopyBuffer": {1},
+	// net
+	"net.Dial": {1}, "net.DialContext": {1}, "net.DialTimeout": {1},
+	"net.DialTCP": {1}, "net.DialUDP": {1},
+	"net.Listen": {1}, "net.ListenPacket": {1}, "net.ListenTCP": {1},
+	"net.ListenUDP": {1}, "net.ListenUnix": {1}, "net.ListenUnixgram": {1},
+	"net.LookupHost": {1}, "net.LookupIP": {1},
+	// net/http
+	"http.Get": {1}, "http.Post": {1}, "http.PostForm": {1}, "http.Head": {1},
+	"http.NewRequest": {1}, "http.NewRequestWithContext": {1},
+	// database/sql
+	"sql.Open": {1},
+	// path/filepath
+	"filepath.Walk": {0}, "filepath.WalkDir": {0}, "filepath.Glob": {1},
+	// crypto
+	"tls.Dial": {1}, "tls.Listen": {1}, "tls.LoadX509KeyPair": {1},
+	"rand.Read": {1}, "rsa.GenerateKey": {1}, "x509.CreateCertificate": {1},
+	// os/exec (Command itself returns no error)
+	"exec.LookPath": {1},
+	// syscall
+	"syscall.Mmap": {1},
+	// quic + collectors
+	"quic.Listen": {1}, "quic.Dial": {1},
+	"otlptracehttp.New": {1}, "otlploghttp.New": {1}, "oidc.NewProvider": {1},
+}
