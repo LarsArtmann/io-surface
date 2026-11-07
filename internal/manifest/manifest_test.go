@@ -2,6 +2,7 @@ package manifest
 
 import (
 	"errors"
+	"maps"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -533,9 +534,7 @@ scope: {in: [], out: []}
 	}
 	withClaims := func(claims string) map[string]string {
 		m := map[string]string{}
-		for k, v := range base {
-			m[k] = v
-		}
+		maps.Copy(m, base)
 		m["claims.cue"] = "package io_surface\n\nsites: \"internal/store.LoadConfig\": claims: " + claims + "\n"
 
 		return m
