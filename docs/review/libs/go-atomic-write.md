@@ -2,7 +2,7 @@
 
 > **Status: USED — direct dependency** (`github.com/larsartmann/go-atomic-write v0.6.0`)
 > **Verdict: leveraged to the max, including the advanced verified-write path; two free patch bumps pending.**
-> **Adoption score: 90/100 (very high)** — 5.5 of 6 applicable capabilities fully leveraged
+> **Adoption score: 80/100 (high)** — 3 of 5 applicable capabilities fully leveraged, 2 partial (both opportunistic)
 > Latest version: **v0.6.2** (2026-11-04, module proxy confirms) · io-surface pins **v0.6.0**
 > Reviewed: 2026-11-07 · io-surface `docs/review/libs/` series
 
