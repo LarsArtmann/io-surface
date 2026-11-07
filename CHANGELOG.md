@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Detector severity modulation by claims (claims v1.2).** Claims grow two
+  typed fields — `criticality` (`normal`/`critical`) and `durability`
+  (`durable`/`ephemeral`) — with CUE-enforced vocabularies. `lint` escalates
+  findings one severity step on `critical` sites, and weighs `durability` for
+  `write-non-atomic`: a `durable` claim escalates it, an `ephemeral` claim
+  drops it (a temp file tearing at crash time is declared harmless).
+- **`claim-conflict` gate rule:** a manifest claim that contradicts the
+  extracted facts (family mismatch) is an error finding, not a silent lie.
+- **Two new detector rules complete the P3 line:** `write-non-atomic` (a
+  direct final-path write without temp+rename — a crash mid-write tears the
+  file) and `tiny-buffer` (a sub-page buffer feeding a read/write helper —
+  syscall amplification). The shipped ruleset is now 10 rules.
+- **Suppression directive `//io-surface:ignore <rule> <reason>`:** silence a
+  finding at the site, one rule at a time, reason mandatory, visible in the
+  review diff. Malformed directives (unknown rule, missing reason) suppress
+  nothing and emit their own `ignore-invalid` finding — a typo can never
+  quietly eat a real bug. File-level ignores are rejected by design (use the
+  baseline for that).
 - **Every file write the tool performs is crash-safe.** Scaffolding
   (`init`), `baseline.cue` appends, `capabilities.cue`, rendered `--out`
   files and the doc-embed path now write through `go-atomic-write`

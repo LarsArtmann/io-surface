@@ -108,7 +108,8 @@ func newApp() (*v4.CLI[rootFlags], error) {
 				v4.WithShort("Find I/O bug patterns without a manifest (report only)"),
 				v4.WithLong("Runs the same hermetic extraction plus detector rules over dropped errors, missing closers, context-blind calls and loop-carried I/O. "+
 					"No manifest is needed, so any Go tree can be linted; findings never fail by default — pass --enforce to exit 1 on error-severity findings. "+
-					"Severity is evidence-gated: rules ship at info and are promoted only after fleet false-positive measurement."),
+					"Severity is evidence-gated: rules ship at info and are promoted only after fleet false-positive measurement. "+
+					"Per-rule cards, known false-positive classes, and the //io-surface:ignore suppression grammar: see the README's detector rule cards."),
 				v4.WithExample("io-surface lint --root ."),
 			)
 			if err != nil {
