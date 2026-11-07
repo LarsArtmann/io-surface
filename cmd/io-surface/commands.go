@@ -18,6 +18,7 @@ import (
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/emit"
 	"github.com/larsartmann/io-surface/internal/extract"
+	"github.com/larsartmann/io-surface/internal/lint"
 	"github.com/larsartmann/io-surface/internal/manifest"
 	"github.com/larsartmann/io-surface/internal/render"
 	"github.com/larsartmann/io-surface/internal/scaffold"
@@ -484,4 +485,60 @@ func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags
 	}
 
 	return nil
+}
+
+// lintFlags are the flags local to `io-surface lint`.
+type lintFlags struct {
+	Format       string `flag:"format" help:"output format: text, json, or sarif"`
+	Enforce      bool   `flag:"enforce" help:"exit 1 on error-severity findings (default: report only, exit 0)"`
+	IncludeTests bool   `flag:"include-tests" help:"also scan *_test.go files"`
+}
+
+// runLint is the manifestless face: extraction + detector observations, no
+// CUE manifest required. Exit 0 unless --enforce and error findings exist
+// (D5): rules ship at info, so the default can never surprise a CI.
+func runLint(_ context.Context, root *rootFlags, flags lintFlags) error {
+	rep, err := lint.Run(root.Root, lint.Options{Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore), IncludeTests: flags.IncludeTests})
+	if err != nil {
+		return err
+	}
+
+	switch flags.Format {
+	case "sarif":
+		data, sErr := emit.SARIF(rep, version)
+		if sErr != nil {
+			return sErr
+		}
+		if _, err = stdout.Write(data); err != nil {
+			return err
+		}
+		fmt.Fprintln(os.Stdout)
+	case "json":
+		enc := json.NewEncoder(stdout)
+		enc.SetIndent("", "  ")
+
+		return enc.Encode(rep)
+	default:
+		printLintReport(rep, stdout)
+	}
+
+	if flags.Enforce && rep.Failing() {
+		return errFindings
+	}
+
+	return nil
+}
+
+func printLintReport(rep *check.Report, w io.Writer) {
+	for _, f := range rep.Findings {
+		loc := ""
+		if f.Location != "" {
+			loc = "  " + f.Location
+		}
+		fmt.Fprintf(w, "%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
+		fmt.Fprintf(w, "        %s\n", f.Message)
+	}
+	fmt.Fprintf(w, "io-surface lint: %d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
+		rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
+		rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
 }

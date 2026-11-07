@@ -104,6 +104,17 @@ func newApp() (*v4.CLI[rootFlags], error) {
 				return err
 			}
 
+			lintCmd, err := v4.NewCommand("lint", lintFlags{}, runLint,
+				v4.WithShort("Find I/O bug patterns without a manifest (report only)"),
+				v4.WithLong("Runs the same hermetic extraction plus detector rules over dropped errors, missing closers, context-blind calls and loop-carried I/O. "+
+					"No manifest is needed, so any Go tree can be linted; findings never fail by default — pass --enforce to exit 1 on error-severity findings. "+
+					"Severity is evidence-gated: rules ship at info and are promoted only after fleet false-positive measurement."),
+				v4.WithExample("io-surface lint --root ."),
+			)
+			if err != nil {
+				return err
+			}
+
 			absorbCmd, err := v4.NewCommand("absorb", absorbFlags{}, runAbsorb,
 				v4.WithShort("Ingest a pinned Capslock report as capability facts (advisory)"),
 				v4.WithLong("Folds a Capslock JSON report into per-package capability sets and writes capabilities.cue — that file ONLY; "+
@@ -142,7 +153,7 @@ func newApp() (*v4.CLI[rootFlags], error) {
 				return err
 			}
 
-			return v4.AddCommands(app, checkCmd, initCmd, renderCmd, extractCmd, absorbCmd, baselineCmd, versionCmd)
+			return v4.AddCommands(app, checkCmd, initCmd, renderCmd, extractCmd, lintCmd, absorbCmd, baselineCmd, versionCmd)
 		},
 		v4.WithCLIVersion(version),
 		v4.WithBatteries(),
