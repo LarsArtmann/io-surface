@@ -18,8 +18,10 @@ func positiveBlank(path string) ([]byte, error) {
 	return data, nil
 }
 
-func positivePartialBlank(path string) {
-	_, _ = os.Stat(path)
+func positiveBlankStat(path string) (os.FileInfo, error) {
+	info, _ := os.Stat(path)
+
+	return info, nil
 }
 
 func negativeDeliberate(path string) {
@@ -27,7 +29,7 @@ func negativeDeliberate(path string) {
 }
 
 func negativeAllBlank(path string) {
-	_, _ = os.Remove(path)
+	_, _ = os.Stat(path)
 }
 
 func negativeHandled(path string) error {
@@ -50,6 +52,12 @@ func negativeDeferred(dir string) {
 	defer os.MkdirAll(dir, 0o755)
 }
 
-func negativeExpression(path string) {
-	println(len(os.Stat(path)))
+func negativeExpression(path string, data []byte) error {
+	if os.WriteFile(path, data, 0o644) != nil {
+		return errWriteFailed
+	}
+
+	return nil
 }
+
+var errWriteFailed = error(nil)
