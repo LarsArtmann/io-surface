@@ -6,6 +6,8 @@ package extract
 // the metadata table below are the two halves of the rule contract; a parity
 // test pins them together.
 
+import "slices"
+
 // detector is one registered rule: name + the function that produces its
 // observations for a single capture.
 type detector struct {
@@ -80,11 +82,5 @@ func detectErrDropped(e *extractor, c *capture) []Observation {
 }
 
 func containsInt(list []int, v int) bool {
-	for _, x := range list {
-		if x == v {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(list, v)
 }
