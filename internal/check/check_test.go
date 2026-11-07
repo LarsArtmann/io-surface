@@ -516,3 +516,25 @@ func TestRun_AllowUnusedBaselineGrace(t *testing.T) {
 		t.Errorf("with grace, strictWarnings = %d, want %d (one exempted)", got, rep.Stats.Warnings-1)
 	}
 }
+
+// TestClaimConflict pins the discipline-vs-family coherence rule (plan
+// T20): "atomic-write" on a file-read site conflicts, the same discipline on
+// a file-write site is fine, and family-agnostic disciplines never conflict.
+func TestClaimConflict(t *testing.T) {
+	m := fixtureManifest()
+	s := m.Sites["internal/store.LoadConfig"] // file-read, paired exactly
+	s.Claims.Discipline = []string{"atomic-write"}
+	m.Sites["internal/store.LoadConfig"] = s
+	w := m.Sites["internal/store.Store.WriteTemp"] // file-write, id-drift pair
+	w.Claims.Discipline = []string{"atomic-write", "bounded"}
+	m.Sites["internal/store.Store.WriteTemp"] = w
+
+	rep := runFixture(t, m, Options{Advisory: false})
+	conflicts := findingsByRule(rep, RuleClaimConflict)
+	if len(conflicts) != 1 || conflicts[0].ID != "internal/store.LoadConfig" {
+		t.Fatalf("claim conflicts = %+v, want exactly internal/store.LoadConfig", conflicts)
+	}
+	if conflicts[0].Severity != SeverityWarning {
+		t.Errorf("claim-conflict severity = %q, want warning", conflicts[0].Severity)
+	}
+}

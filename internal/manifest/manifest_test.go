@@ -7,8 +7,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"github.com/larsartmann/io-surface/internal/scaffold"
 )
 
 // writeManifest scaffolds a CUE package in a temp dir from the given files.
@@ -501,13 +499,25 @@ func TestValidate_CapabilityInvariants(t *testing.T) {
 	}
 }
 
+// v12Schema reads the REAL standard schema from the scaffold package's
+// source tree (the single source of truth), keeping this test cycle-free.
+func v12Schema(t *testing.T) string {
+	t.Helper()
+	data, err := os.ReadFile("../../internal/scaffold/schema.cue")
+	if err != nil {
+		t.Fatalf("read standard schema: %v", err)
+	}
+
+	return string(data)
+}
+
 // TestLoad_V12ClosedSchema pins the v1.2 severity vocabulary (plan T19):
 // the REAL embedded schema accepts the new claims fields and rejects values
 // outside the closed enums — a typo like "critcal" must fail unification,
 // not silently decode.
 func TestLoad_V12ClosedSchema(t *testing.T) {
 	base := map[string]string{
-		"schema.cue": string(scaffold.Files(".", nil, "")["schema.cue"]),
+		"schema.cue": v12Schema(t),
 		"facts.cue": `package io_surface
 
 sites: "internal/store.LoadConfig": {
