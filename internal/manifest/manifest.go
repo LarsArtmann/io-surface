@@ -257,8 +257,9 @@ func Load(dir string) (*Manifest, error) {
 // gogenfilter manifests); anything undecodable is skipped rather than
 // inventing a schema every repo must adopt.
 type Violation struct {
-	ID  string `json:"id"`
-	Msg string `json:"msg"`
+	ID   string `json:"id"`
+	Msg  string `json:"msg"`
+	Path string `json:"path,omitempty"` // CUE path of the entry (T11): anchors the violation even when id/msg decode empty
 }
 
 var violationsPath = cue.ParsePath("violations")
@@ -284,15 +285,24 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 	fmt.Fprintf(&b, " — %d constraint violation(s):", len(entries))
 	seen := map[string]bool{}
 	for _, v := range entries {
-		key := v.ID + "|" + v.Msg
+		key := v.ID + "|" + v.Msg + "|" + v.Path
 		if seen[key] {
 			continue
 		}
 		seen[key] = true
-		if v.ID != "" {
-			fmt.Fprintf(&b, "\n  - %s: %s", v.ID, v.Msg)
-		} else {
-			fmt.Fprintf(&b, "\n  - %s", v.Msg)
+		where := ""
+		if v.Path != "" {
+			where = " (at " + v.Path + ")"
+		}
+		switch {
+		case v.ID != "":
+			fmt.Fprintf(&b, "\n  - %s: %s%s", v.ID, v.Msg, where)
+		case v.Msg != "":
+			fmt.Fprintf(&b, "\n  - %s%s", v.Msg, where)
+		default:
+			// id and msg both decode empty (a foreign violations schema):
+			// the CUE path is then the only locator the user has.
+			fmt.Fprintf(&b, "\n  - constraint at %s", where)
 		}
 	}
 
@@ -314,10 +324,51 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 // shape where the conflict sits inside one file's multiple declarations.
 func violationEntries(value cue.Value) []Violation {
 	seen := map[string]bool{}
-	decode := func(v cue.Value) ([]Violation, bool) {
+	// contentful drops decode artifacts: a violations-shaped value that is a
+	// list CONCAT (dnsblockd's disciplines.cue) exposes its comprehension
+	// sub-lists as operands, and decoding those against []Violation yields
+	// contentless structs that look like violations but name nothing (the
+	// pre-T11 "opaque ` - .` entry" bug). A real violation always carries an
+	// id or a msg; an entry with neither is noise, not a finding.
+	contentful := func(entries []Violation) []Violation {
+		kept := entries[:0]
+		for _, v := range entries {
+			if v.ID != "" || v.Msg != "" {
+				kept = append(kept, v)
+			}
+		}
+
+		return kept
+	}
+	// entriesWithPaths decodes one list-typed value element-wise when the
+	// list resolves (per-entry CUE paths survive), falling back to a whole
+	// decode annotated with the list's own path (the conflict hides the
+	// elements but the locator still names the violations field).
+	entriesWithPaths := func(v cue.Value) ([]Violation, bool) {
+		if elems := listElements(v); len(elems) > 0 {
+			var entries []Violation
+			for _, el := range elems {
+				var one Violation
+				if err := el.Decode(&one); err != nil {
+					continue
+				}
+				one.Path = el.Path().String()
+				entries = append(entries, one)
+			}
+			if len(entries) > 0 {
+				return entries, true
+			}
+		}
 		var entries []Violation
 		if err := v.Decode(&entries); err != nil && len(entries) == 0 {
 			return nil, false
+		}
+		if p := v.Path().String(); p != "" {
+			for i := range entries {
+				if entries[i].Path == "" {
+					entries[i].Path = p
+				}
+			}
 		}
 
 		return entries, len(entries) > 0
@@ -325,18 +376,18 @@ func violationEntries(value cue.Value) []Violation {
 
 	var out []Violation
 	field := value.LookupPath(violationsPath)
-	if entries, ok := decode(field); ok {
-		return deduped(out, entries, seen)
+	if entries, ok := entriesWithPaths(field); ok {
+		return deduped(out, contentful(entries), seen)
 	}
 	if _, operands := field.Expr(); operands != nil {
 		for _, o := range operands {
-			if entries, ok := decode(o); ok {
+			if entries, ok := entriesWithPaths(o); ok {
 				out = append(out, entries...)
 			}
 		}
 	}
-	if len(out) > 0 {
-		return out
+	if len(contentful(out)) > 0 {
+		return contentful(out)
 	}
 	if _, operands := value.Expr(); operands != nil {
 		for _, o := range operands {
@@ -344,10 +395,25 @@ func violationEntries(value cue.Value) []Violation {
 			if sub.Err() != nil {
 				continue
 			}
-			if entries, ok := decode(sub); ok {
+			if entries, ok := entriesWithPaths(sub); ok {
 				out = append(out, entries...)
 			}
 		}
+	}
+
+	return contentful(out)
+}
+
+// listElements returns the element values of a list-typed CUE value, empty
+// when the value is not a resolvable list (conflict shapes).
+func listElements(v cue.Value) []cue.Value {
+	it, err := v.List()
+	if err != nil {
+		return nil
+	}
+	var out []cue.Value
+	for it.Next() {
+		out = append(out, it.Value())
 	}
 
 	return out
