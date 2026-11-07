@@ -264,8 +264,17 @@ func TestDetectLoopAndTimeoutRules(t *testing.T) {
 	}
 
 	ioInLoop := observationsBySite(t, "../../testdata/detectors", RuleIOInLoop)
-	if len(ioInLoop["cmd/app.closeInsideLoopNoDefer"]) != 1 {
-		t.Errorf("closeInsideLoopNoDefer: io-in-loop = %d, want 1 (os.Open in range body)", len(ioInLoop["cmd/app.closeInsideLoopNoDefer"]))
+	// Same-path refinement (superb T16): a range-bound target opened once
+	// per iteration is per-item I/O and stays silent; the same file opened
+	// twice in one loop body (fixed target) is the N+1 shape and fires.
+	if len(ioInLoop["cmd/app.closeInsideLoopNoDefer"]) != 0 {
+		t.Errorf("closeInsideLoopNoDefer: io-in-loop = %d, want 0 (range-bound target, per-item class)", len(ioInLoop["cmd/app.closeInsideLoopNoDefer"]))
+	}
+	if len(ioInLoop["cmd/app.repeatTargetInLoop"]) != 2 {
+		t.Errorf("repeatTargetInLoop: io-in-loop = %d, want 2 (fixed target ReadFile+Stat)", len(ioInLoop["cmd/app.repeatTargetInLoop"]))
+	}
+	if len(ioInLoop["cmd/app.distinctTargetsInLoop"]) != 0 {
+		t.Errorf("distinctTargetsInLoop: io-in-loop = %d, want 0 (range-bound target)", len(ioInLoop["cmd/app.distinctTargetsInLoop"]))
 	}
 	if obs := ioInLoop["cmd/app.deferOutsideLoop"]; len(obs) != 0 {
 		t.Errorf("deferOutsideLoop: io-in-loop must stay silent, got %+v", obs)

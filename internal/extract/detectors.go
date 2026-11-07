@@ -405,6 +405,15 @@ func detectIOInLoop(e *extractor, c *capture) []Observation {
 	if !c.inLoop || c.sel == "" || c.shape == shapeDeferred {
 		return nil
 	}
+	// Same-path refinement (superb T16): per-item I/O — the target printed
+	// form IS a range iteration identifier and occurs once per loop — is the
+	// fleet's dominant non-actionable class and stays silent. Everything
+	// else fires: fixed targets (every iteration re-opens the same file),
+	// repeated targets within one loop, and unkeyable calls (no argument to
+	// key on).
+	if c.targetKey != "" && c.perItem && c.loopSeen <= 1 {
+		return nil
+	}
 
 	return []Observation{e.emit(c, RuleIOInLoop, evidenceOf(&e.fset, c.node)+" — I/O inside a loop (N+1 shape); consider hoisting or batching")}
 }

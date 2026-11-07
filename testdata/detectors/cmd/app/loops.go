@@ -169,3 +169,18 @@ func onceTinyBuffer(path string) error {
 }
 
 func errEOF(err error) bool { return err != nil && err.Error() == "EOF" }
+
+func repeatTargetInLoop(path string) {
+	for i := 0; i < 10; i++ {
+		data, _ := os.ReadFile(path)
+		_, _ = os.Stat(path)
+		_ = len(data)
+	}
+}
+
+func distinctTargetsInLoop(paths []string) {
+	for _, p := range paths {
+		data, _ := os.ReadFile(p)
+		_ = len(data)
+	}
+}

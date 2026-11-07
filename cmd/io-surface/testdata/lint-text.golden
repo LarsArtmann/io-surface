@@ -28,18 +28,22 @@ info    io-surface/io-in-loop            cmd/app.tinyBufferReadFull  cmd/app/loo
         io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching
 info    io-surface/tiny-buffer           cmd/app.tinyBufferReadFull  cmd/app/loops.go:116
         buf = make([]byte, 512) feeds io.ReadFull — 512-byte reads amplify syscalls; size to >= 4096 (or use bufio.Scanner)
-info    io-surface/io-in-loop            cmd/app.deferCloseInLoop  cmd/app/loops.go:13
-        os.Open(p) — I/O inside a loop (N+1 shape); consider hoisting or batching
 info    io-surface/io-in-loop            cmd/app.bigBufferReadFull  cmd/app/loops.go:136
         io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching
 info    io-surface/defer-in-loop         cmd/app.deferCloseInLoop  cmd/app/loops.go:17
         f.Close() — defers run at function exit, so earlier loop iterations' resources stay open until then
+info    io-surface/err-dropped           cmd/app.repeatTargetInLoop  cmd/app/loops.go:175
+        data, _ := os.ReadFile(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`
+info    io-surface/io-in-loop            cmd/app.repeatTargetInLoop  cmd/app/loops.go:175
+        os.ReadFile(path) — I/O inside a loop (N+1 shape); consider hoisting or batching
+info    io-surface/io-in-loop            cmd/app.repeatTargetInLoop  cmd/app/loops.go:176
+        os.Stat(path) — I/O inside a loop (N+1 shape); consider hoisting or batching
+info    io-surface/err-dropped           cmd/app.distinctTargetsInLoop  cmd/app/loops.go:183
+        data, _ := os.ReadFile(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`
 info    io-surface/defer-in-loop         cmd/app.deferIOInLoop  cmd/app/loops.go:24
         os.MkdirAll(dir, 0o755) — defers run at function exit, so earlier loop iterations' resources stay open until then
 info    io-surface/err-dropped           cmd/app.closeInsideLoopNoDefer  cmd/app/loops.go:34
         f, _ := os.Open(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`
-info    io-surface/io-in-loop            cmd/app.closeInsideLoopNoDefer  cmd/app/loops.go:34
-        os.Open(p) — I/O inside a loop (N+1 shape); consider hoisting or batching
 info    io-surface/stat-then-open        cmd/app.statThenReadFile  cmd/app/loops.go:46
         os.ReadFile of path (stat'd at cmd/app/loops.go:42) — double syscall and a TOCTOU window; open and handle the error instead
 info    io-surface/stat-then-open        cmd/app.statLstatThenWrite  cmd/app/loops.go:57
@@ -76,4 +80,4 @@ info    io-surface/closer-missing        internal/store.leakUsedNotClosed  inter
         f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership
 info    io-surface/write-non-atomic      internal/store.negativeBlank  internal/store/closers.go:77
         os.Create(path) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file
-io-surface lint: 54 sites (52 resolved, 2 token) — 0 errors, 0 warnings, 39 infos (report only; pass --enforce to fail on errors)
+io-surface lint: 56 sites (54 resolved, 2 token) — 0 errors, 0 warnings, 41 infos (report only; pass --enforce to fail on errors)

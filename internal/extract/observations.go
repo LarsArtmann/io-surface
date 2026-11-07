@@ -69,6 +69,15 @@ type capture struct {
 	blanks   []int // assign shape: LHS positions bound to _
 	inLoop   bool  // inside a for/range BODY subtree (loop heads stay false)
 	ctxParam bool  // enclosing func has a context.Context parameter
+	// io-in-loop same-path refinement (superb T16): the innermost enclosing
+	// loop, the call's printed first-argument key, and how often that key
+	// has occurred in the SAME loop so far. Together they separate true N+1
+	// (fixed or repeated target) from per-item I/O (target bound to the
+	// range variables), the fleet's dominant non-actionable class.
+	loopRef   ast.Node
+	targetKey string
+	loopSeen  int
+	perItem   bool
 }
 
 // ExtractWithObservations walks root exactly like Extract and additionally
@@ -94,6 +103,11 @@ type captureTracker struct {
 	inLoop   map[ast.Node]bool
 	stack    []ast.Node
 	loops    int
+	// loopTargets counts, per loop node, the printed first-arg key of every
+	// watched call; loopRangeIdents caches each range statement's iteration
+	// identifiers (key/value) so per-item targets can be recognized.
+	loopTargets     map[ast.Node]map[string]int
+	loopRangeIdents map[ast.Node]map[string]bool
 }
 
 func (t *captureTracker) Visit(n ast.Node) ast.Visitor {
@@ -112,6 +126,12 @@ func (t *captureTracker) Visit(n ast.Node) ast.Visitor {
 	}
 	t.parents[n] = parent
 	t.inLoop[n] = t.loops > 0
+	if rng, ok := n.(*ast.RangeStmt); ok {
+		if t.loopRangeIdents == nil {
+			t.loopRangeIdents = map[ast.Node]map[string]bool{}
+		}
+		t.loopRangeIdents[n] = rangeIdents(rng)
+	}
 	if isLoopNode(n) {
 		t.loops++
 	}
@@ -123,6 +143,19 @@ func (t *captureTracker) Visit(n ast.Node) ast.Visitor {
 	return t
 }
 
+// rangeIdents names the iteration identifiers of a range statement (key and
+// value); nil when neither is bound to an identifier.
+func rangeIdents(rng *ast.RangeStmt) map[string]bool {
+	out := map[string]bool{}
+	for _, expr := range []ast.Expr{rng.Key, rng.Value} {
+		if ident, ok := expr.(*ast.Ident); ok && ident.Name != "_" {
+			out[ident.Name] = true
+		}
+	}
+
+	return out
+}
+
 func isLoopNode(n ast.Node) bool {
 	switch n.(type) {
 	case *ast.ForStmt, *ast.RangeStmt:
@@ -130,6 +163,18 @@ func isLoopNode(n ast.Node) bool {
 	}
 
 	return false
+}
+
+// innermostLoop walks the parent chain to the nearest enclosing loop node,
+// nil when the node sits outside any loop body subtree.
+func innermostLoop(parents map[ast.Node]ast.Node, n ast.Node) ast.Node {
+	for cur := n; cur != nil; cur = parents[cur] {
+		if cur != n && isLoopNode(cur) {
+			return cur
+		}
+	}
+
+	return nil
 }
 
 // record computes the statement-level shape of one call and stores its
@@ -146,6 +191,25 @@ func (t *captureTracker) record(call *ast.CallExpr) {
 		inLoop:   t.inLoop[call],
 		ctxParam: t.ctxParam,
 		location: t.e.locOf(call),
+	}
+	if c.inLoop {
+		c.loopRef = innermostLoop(t.parents, call)
+		if len(call.Args) > 0 {
+			c.targetKey = evidenceOf(&t.e.fset, call.Args[0])
+		}
+		if c.loopRef != nil {
+			if t.loopTargets == nil {
+				t.loopTargets = map[ast.Node]map[string]int{}
+			}
+			counts := t.loopTargets[c.loopRef]
+			if counts == nil {
+				counts = map[string]int{}
+				t.loopTargets[c.loopRef] = counts
+			}
+			counts[c.targetKey]++
+			c.loopSeen = counts[c.targetKey]
+			c.perItem = t.loopRangeIdents[c.loopRef][c.targetKey]
+		}
 	}
 	switch st := parent.(type) {
 	case *ast.ExprStmt:

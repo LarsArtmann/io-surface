@@ -479,37 +479,6 @@
           "ruleId": "io-surface/io-in-loop",
           "level": "note",
           "message": {
-            "text": "os.Open(p) — I/O inside a loop (N+1 shape); consider hoisting or batching"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 13,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:13",
-            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/io-in-loop",
-          "level": "note",
-          "message": {
             "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
           },
           "locations": [
@@ -564,6 +533,130 @@
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:17",
             "go-finding/meta/ruleDescription": "a deferred close or I/O call runs inside a loop but executes at function exit",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "data, _ := os.ReadFile(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 175,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:175",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/io-in-loop",
+          "level": "note",
+          "message": {
+            "text": "os.ReadFile(path) — I/O inside a loop (N+1 shape); consider hoisting or batching"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 175,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:175",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/io-in-loop",
+          "level": "note",
+          "message": {
+            "text": "os.Stat(path) — I/O inside a loop (N+1 shape); consider hoisting or batching"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 176,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:176",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "data, _ := os.ReadFile(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 183,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:183",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -626,37 +719,6 @@
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:34",
             "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/io-in-loop",
-          "level": "note",
-          "message": {
-            "text": "os.Open(p) — I/O inside a loop (N+1 shape); consider hoisting or batching"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 34,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:34",
-            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
