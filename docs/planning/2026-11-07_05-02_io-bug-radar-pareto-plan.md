@@ -99,6 +99,81 @@ below are therefore honest _authored-code_ lower bounds.
 - **D8 — Deliberate-ignore is respected**: `_ = os.Remove(...)` (explicit
   acknowledgment) is NOT `err-dropped`; `x, _ := os.ReadFile(...)` IS.
 
+### §5.1 Finalized design (T1 output, 2026-11-07)
+
+**Observation type + parallel channel** (`internal/extract/observations.go`):
+
+```go
+type Observation struct {
+	SiteID   string `json:"siteId"`   // enclosing symbol anchor (Site.ID space)
+	Rule     string `json:"rule"`     // "err-dropped" — no io-surface/ prefix
+	Call     string `json:"call"`     // watched call, e.g. "os.ReadFile"
+	Location string `json:"location"` // repo-relative "path:line" of the call
+	Evidence string `json:"evidence"` // human clause, e.g. `x, _ := os.ReadFile(path)`
+}
+
+func ExtractWithObservations(root string, opts Options) ([]*Site, []Observation, error)
+```
+
+`Extract` keeps its exact behavior byte-for-byte (facts contract untouched);
+the observation machinery is dormant unless the observing entrypoint runs.
+
+**Capture context** (one per call, built by a `captureTracker` over
+`ast.Walk` — its pre-order `Visit` + post-order `Visit(nil)` give exact
+parent/loop stack discipline):
+
+```go
+type capture struct {
+	id       string
+	node     *ast.CallExpr
+	fn       *ast.FuncDecl
+	imports  map[string]string
+	sel      string // resolved key, e.g. "os.ReadFile"
+	family   string
+	location string
+	shape    string // "bare" | "assign" | "returned" | "deferred" | "expression"
+	blanks   []int  // assign shape: LHS positions bound to _
+	inLoop   bool   // inside a for/range BODY subtree (loop heads stay false)
+	ctxParam bool   // enclosing func has a context.Context param
+}
+```
+
+Shape rules: `ExprStmt` → bare; `AssignStmt` with `len(Lhs)==len(Rhs)` →
+assign (blank positions recorded), otherwise expression; `ReturnStmt` →
+returned (error propagates — never flagged); `DeferStmt`/`GoStmt` → deferred
+(cleanup defers legitimately ignore — never flagged for err-dropped); any
+other parent → expression (conservative: not flagged). Composite-literal
+field sets (`http.Client{Timeout}`) are NOT in the capture: detectors that
+need them (T13) walk `c.fn` locally. `methodToken`/seam sites never get
+captures → **D3 enforced structurally**.
+
+**Registry** (`internal/extract/detectors.go`): one table, both halves:
+
+```go
+var detectors = []detector{{rule: RuleErrDropped, run: detectErrDropped}, ...}
+var detectorRules = []ruleDef{{Name: "err-dropped", Severity: "info", Description, Message func(Observation) string}, ...}
+```
+
+Rule name constants in extract (`RuleErrDropped = "err-dropped"`); lint
+composes the stable finding ID `"io-surface/" + name` (D7). A parity test
+pins registry ↔ metadata (no rule without metadata, no metadata without a
+detector). Severity promotion (T17) = edit the one `Severity` string.
+
+**lint face** (`internal/lint`): `lint.Run(root, lint.Options) (*check.Report, error)`
+— reuses `check.Finding`/`Stats` and `emit` for free. `Enforcement: "lint"`,
+`Stats{Extracted, Resolved, Token, Errors, Warnings, Infos}`. CLI:
+`io-surface lint [--enforce] [--format text|json|sarif]` + root flags; exit
+0 unless `--enforce` and error findings exist (D5).
+
+**Fixtures**: `testdata/detectors/` — a SECOND miniature tree, deliberately
+bug-shaped code kept OUT of `testdata/extract` so the manifest contract and
+the scaffold round-trip stay untouched; detector tests walk it directly.
+
+**Instrumentation points in `scanFunc`** (T1.5 walk): `captureContexts(fn)`
+runs at function entry when observing; the resolved-call branch calls
+`e.detect(id, node, key+"."+Sel, fam)` right after `record`. `record` gains
+nothing — site JSON is frozen.
+
 ## 6. Level-1 plan — tasks of 30–100 min (sorted: tier, then impact/effort/value)
 
 | ID  | Tier | Task                                                                                                                                                 | Impact | Effort | Depends | Done when                                                              |
