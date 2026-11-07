@@ -1,0 +1,1416 @@
+{
+ "generatedBy": "scripts/fleetscan.sh (io-surface lint face)",
+ "discovered": 160,
+ "scanned": 160,
+ "scanFailures": [],
+ "reposWithFindings": 91,
+ "findingsByRule": {
+  "io-surface/io-in-loop": 351,
+  "io-surface/write-non-atomic": 340,
+  "io-surface/stat-then-open": 50,
+  "io-surface/client-no-timeout": 13,
+  "io-surface/err-dropped": 11,
+  "io-surface/ctx-dropped": 3,
+  "io-surface/defer-in-loop": 1
+ },
+ "repos": [
+  {
+   "project": "AI-von-Art-Bench",
+   "path": "/home/lars/projects/AI-von-Art-Bench",
+   "sites": 6,
+   "resolved": 5,
+   "findings": {
+    "io-surface/client-no-timeout": 1,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "ArtCode",
+   "path": "/home/lars/projects/ArtCode",
+   "sites": 3,
+   "resolved": 3,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "AI-Speed-Test",
+   "path": "/home/lars/projects/AI-Speed-Test",
+   "sites": 1,
+   "resolved": 1,
+   "findings": {}
+  },
+  {
+   "project": "BerryBig",
+   "path": "/home/lars/projects/BerryBig",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "AutoCart",
+   "path": "/home/lars/projects/AutoCart",
+   "sites": 18,
+   "resolved": 3,
+   "findings": {}
+  },
+  {
+   "project": "ActaFlow",
+   "path": "/home/lars/projects/ActaFlow",
+   "sites": 4,
+   "resolved": 3,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "ChastityAPI",
+   "path": "/home/lars/projects/ChastityAPI",
+   "sites": 41,
+   "resolved": 12,
+   "findings": {
+    "io-surface/io-in-loop": 2
+   }
+  },
+  {
+   "project": "Code-Quality-Agent",
+   "path": "/home/lars/projects/Code-Quality-Agent",
+   "sites": 1,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "Code-To-CV-Agent",
+   "path": "/home/lars/projects/Code-To-CV-Agent",
+   "sites": 22,
+   "resolved": 20,
+   "findings": {
+    "io-surface/io-in-loop": 3,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "BuildFlow-pr44",
+   "path": "/home/lars/projects/BuildFlow-pr44",
+   "sites": 61,
+   "resolved": 57,
+   "findings": {
+    "io-surface/io-in-loop": 17,
+    "io-surface/write-non-atomic": 6,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "Cyberdom",
+   "path": "/home/lars/projects/Cyberdom",
+   "sites": 41,
+   "resolved": 20,
+   "findings": {
+    "io-surface/io-in-loop": 3,
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "Domination",
+   "path": "/home/lars/projects/Domination",
+   "sites": 30,
+   "resolved": 26,
+   "findings": {
+    "io-surface/io-in-loop": 2,
+    "io-surface/write-non-atomic": 4
+   }
+  },
+  {
+   "project": "GmbH",
+   "path": "/home/lars/projects/GmbH",
+   "sites": 1,
+   "resolved": 1,
+   "findings": {}
+  },
+  {
+   "project": "GoReleaser-Wizard",
+   "path": "/home/lars/projects/GoReleaser-Wizard",
+   "sites": 54,
+   "resolved": 54,
+   "findings": {
+    "io-surface/io-in-loop": 7,
+    "io-surface/write-non-atomic": 6,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "BuildFlow",
+   "path": "/home/lars/projects/BuildFlow",
+   "sites": 65,
+   "resolved": 61,
+   "findings": {
+    "io-surface/io-in-loop": 18,
+    "io-surface/write-non-atomic": 6,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "DiscordSync",
+   "path": "/home/lars/projects/DiscordSync",
+   "sites": 294,
+   "resolved": 88,
+   "findings": {
+    "io-surface/write-non-atomic": 8,
+    "io-surface/io-in-loop": 9,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "Polish-Customs",
+   "path": "/home/lars/projects/Polish-Customs",
+   "sites": 10,
+   "resolved": 10,
+   "findings": {
+    "io-surface/io-in-loop": 2
+   }
+  },
+  {
+   "project": "KeyHolderAI",
+   "path": "/home/lars/projects/KeyHolderAI",
+   "sites": 8,
+   "resolved": 3,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "Rolls-Royce-mtuGoHelpCenter-golang",
+   "path": "/home/lars/projects/Rolls-Royce-mtuGoHelpCenter-golang",
+   "sites": 28,
+   "resolved": 25,
+   "findings": {
+    "io-surface/io-in-loop": 4
+   }
+  },
+  {
+   "project": "SQLC-Wizzard",
+   "path": "/home/lars/projects/SQLC-Wizzard",
+   "sites": 22,
+   "resolved": 22,
+   "findings": {
+    "io-surface/io-in-loop": 1,
+    "io-surface/write-non-atomic": 4
+   }
+  },
+  {
+   "project": "Standup-Killer",
+   "path": "/home/lars/projects/Standup-Killer",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "StopTube",
+   "path": "/home/lars/projects/StopTube",
+   "sites": 22,
+   "resolved": 21,
+   "findings": {
+    "io-surface/write-non-atomic": 4,
+    "io-surface/io-in-loop": 3,
+    "io-surface/err-dropped": 2
+   }
+  },
+  {
+   "project": "accounting-pitch-deck",
+   "path": "/home/lars/projects/accounting-pitch-deck",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "Zlota44",
+   "path": "/home/lars/projects/Zlota44",
+   "sites": 43,
+   "resolved": 22,
+   "findings": {
+    "io-surface/io-in-loop": 2,
+    "io-surface/write-non-atomic": 4
+   }
+  },
+  {
+   "project": "ai-router-implementation",
+   "path": "/home/lars/projects/ai-router-implementation",
+   "sites": 9,
+   "resolved": 3,
+   "findings": {}
+  },
+  {
+   "project": "RedditParse",
+   "path": "/home/lars/projects/RedditParse",
+   "sites": 62,
+   "resolved": 11,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "ai-task-prioritizer",
+   "path": "/home/lars/projects/ai-task-prioritizer",
+   "sites": 80,
+   "resolved": 62,
+   "findings": {
+    "io-surface/io-in-loop": 4,
+    "io-surface/write-non-atomic": 19
+   }
+  },
+  {
+   "project": "architecture-diagrams",
+   "path": "/home/lars/projects/architecture-diagrams",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "artmann-holding-website",
+   "path": "/home/lars/projects/artmann-holding-website",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "artmann-technologies-design-system",
+   "path": "/home/lars/projects/artmann-technologies-design-system",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "auto-deduplicate",
+   "path": "/home/lars/projects/auto-deduplicate",
+   "sites": 110,
+   "resolved": 106,
+   "findings": {
+    "io-surface/io-in-loop": 8,
+    "io-surface/write-non-atomic": 23,
+    "io-surface/stat-then-open": 8,
+    "io-surface/err-dropped": 3
+   }
+  },
+  {
+   "project": "bimi-lens",
+   "path": "/home/lars/projects/bimi-lens",
+   "sites": 4,
+   "resolved": 3,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "blog",
+   "path": "/home/lars/projects/blog",
+   "sites": 20,
+   "resolved": 9,
+   "findings": {
+    "io-surface/stat-then-open": 2,
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "book-me",
+   "path": "/home/lars/projects/book-me",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "artmann-technologies-website",
+   "path": "/home/lars/projects/artmann-technologies-website",
+   "sites": 6,
+   "resolved": 4,
+   "findings": {}
+  },
+  {
+   "project": "branching-flow",
+   "path": "/home/lars/projects/branching-flow",
+   "sites": 8,
+   "resolved": 8,
+   "findings": {
+    "io-surface/write-non-atomic": 5
+   }
+  },
+  {
+   "project": "code-duplicate-analyzer",
+   "path": "/home/lars/projects/code-duplicate-analyzer",
+   "sites": 14,
+   "resolved": 14,
+   "findings": {
+    "io-surface/io-in-loop": 6,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "company-master-data",
+   "path": "/home/lars/projects/company-master-data",
+   "sites": 9,
+   "resolved": 5,
+   "findings": {
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "crm",
+   "path": "/home/lars/projects/crm",
+   "sites": 37,
+   "resolved": 24,
+   "findings": {
+    "io-surface/io-in-loop": 1,
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "crm-stage-t13b",
+   "path": "/home/lars/projects/crm-stage-t13b",
+   "sites": 37,
+   "resolved": 24,
+   "findings": {
+    "io-surface/write-non-atomic": 1,
+    "io-surface/io-in-loop": 1,
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "darknet-monitor",
+   "path": "/home/lars/projects/darknet-monitor",
+   "sites": 28,
+   "resolved": 15,
+   "findings": {
+    "io-surface/write-non-atomic": 4,
+    "io-surface/io-in-loop": 1,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "dependabot-auto-configure",
+   "path": "/home/lars/projects/dependabot-auto-configure",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "docs-gates",
+   "path": "/home/lars/projects/docs-gates",
+   "sites": 25,
+   "resolved": 25,
+   "findings": {
+    "io-surface/io-in-loop": 7,
+    "io-surface/stat-then-open": 3,
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "docs-organizer",
+   "path": "/home/lars/projects/docs-organizer",
+   "sites": 13,
+   "resolved": 13,
+   "findings": {
+    "io-surface/io-in-loop": 3,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "dynamic-markdown-site",
+   "path": "/home/lars/projects/dynamic-markdown-site",
+   "sites": 19,
+   "resolved": 15,
+   "findings": {
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 2,
+    "io-surface/io-in-loop": 2
+   }
+  },
+  {
+   "project": "e-invoicing",
+   "path": "/home/lars/projects/e-invoicing",
+   "sites": 29,
+   "resolved": 27,
+   "findings": {
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 4
+   }
+  },
+  {
+   "project": "erraudit",
+   "path": "/home/lars/projects/erraudit",
+   "sites": 30,
+   "resolved": 28,
+   "findings": {
+    "io-surface/io-in-loop": 12,
+    "io-surface/write-non-atomic": 5
+   }
+  },
+  {
+   "project": "file-and-image-renamer",
+   "path": "/home/lars/projects/file-and-image-renamer",
+   "sites": 10,
+   "resolved": 8,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "german-business-contract-automation",
+   "path": "/home/lars/projects/german-business-contract-automation",
+   "sites": 8,
+   "resolved": 5,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "gh-constellation",
+   "path": "/home/lars/projects/gh-constellation",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "github-local-sync",
+   "path": "/home/lars/projects/github-local-sync",
+   "sites": 36,
+   "resolved": 4,
+   "findings": {
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "go-aichat",
+   "path": "/home/lars/projects/go-aichat",
+   "sites": 2,
+   "resolved": 1,
+   "findings": {}
+  },
+  {
+   "project": "go-appkit",
+   "path": "/home/lars/projects/go-appkit",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-atomic-write",
+   "path": "/home/lars/projects/go-atomic-write",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-auto-upgrade",
+   "path": "/home/lars/projects/go-auto-upgrade",
+   "sites": 26,
+   "resolved": 26,
+   "findings": {
+    "io-surface/io-in-loop": 8,
+    "io-surface/write-non-atomic": 2,
+    "io-surface/err-dropped": 1
+   }
+  },
+  {
+   "project": "go-bilanz",
+   "path": "/home/lars/projects/go-bilanz",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-branded-id",
+   "path": "/home/lars/projects/go-branded-id",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-business-rules",
+   "path": "/home/lars/projects/go-business-rules",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-checker-helpers",
+   "path": "/home/lars/projects/go-checker-helpers",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-codec",
+   "path": "/home/lars/projects/go-codec",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-commit",
+   "path": "/home/lars/projects/go-commit",
+   "sites": 2,
+   "resolved": 2,
+   "findings": {}
+  },
+  {
+   "project": "go-composable-business-types",
+   "path": "/home/lars/projects/go-composable-business-types",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-cqrs-lite",
+   "path": "/home/lars/projects/go-cqrs-lite",
+   "sites": 60,
+   "resolved": 57,
+   "findings": {
+    "io-surface/io-in-loop": 12,
+    "io-surface/write-non-atomic": 12,
+    "io-surface/stat-then-open": 3
+   }
+  },
+  {
+   "project": "go-credentials-store",
+   "path": "/home/lars/projects/go-credentials-store",
+   "sites": 14,
+   "resolved": 9,
+   "findings": {
+    "io-surface/write-non-atomic": 1,
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "go-crush-data",
+   "path": "/home/lars/projects/go-crush-data",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-daemon",
+   "path": "/home/lars/projects/go-daemon",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-dag-app",
+   "path": "/home/lars/projects/go-dag-app",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-datastar",
+   "path": "/home/lars/projects/go-datastar",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-error-family",
+   "path": "/home/lars/projects/go-error-family",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-etag",
+   "path": "/home/lars/projects/go-etag",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-filewatcher",
+   "path": "/home/lars/projects/go-filewatcher",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-finding",
+   "path": "/home/lars/projects/go-finding",
+   "sites": 5,
+   "resolved": 5,
+   "findings": {
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "go-flightrecorder",
+   "path": "/home/lars/projects/go-flightrecorder",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-github-kit",
+   "path": "/home/lars/projects/go-github-kit",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-graph-rag",
+   "path": "/home/lars/projects/go-graph-rag",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-health",
+   "path": "/home/lars/projects/go-health",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-health-dashboard",
+   "path": "/home/lars/projects/go-health-dashboard",
+   "sites": 5,
+   "resolved": 4,
+   "findings": {
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "go-hotspot",
+   "path": "/home/lars/projects/go-hotspot",
+   "sites": 6,
+   "resolved": 6,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "go-humanize-linter",
+   "path": "/home/lars/projects/go-humanize-linter",
+   "sites": 4,
+   "resolved": 4,
+   "findings": {
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "go-idempotency",
+   "path": "/home/lars/projects/go-idempotency",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-linter-sdk",
+   "path": "/home/lars/projects/go-linter-sdk",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-localsync",
+   "path": "/home/lars/projects/go-localsync",
+   "sites": 2,
+   "resolved": 2,
+   "findings": {}
+  },
+  {
+   "project": "go-must",
+   "path": "/home/lars/projects/go-must",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-ndjson",
+   "path": "/home/lars/projects/go-ndjson",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-paperless",
+   "path": "/home/lars/projects/go-paperless",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-plugin-mvp",
+   "path": "/home/lars/projects/go-plugin-mvp",
+   "sites": 4,
+   "resolved": 4,
+   "findings": {
+    "io-surface/io-in-loop": 2,
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "go-policy-dsl",
+   "path": "/home/lars/projects/go-policy-dsl",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-retry",
+   "path": "/home/lars/projects/go-retry",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-sqlitestore",
+   "path": "/home/lars/projects/go-sqlitestore",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-sse",
+   "path": "/home/lars/projects/go-sse",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-structure-linter",
+   "path": "/home/lars/projects/go-structure-linter",
+   "sites": 76,
+   "resolved": 72,
+   "findings": {
+    "io-surface/io-in-loop": 12,
+    "io-surface/write-non-atomic": 10
+   }
+  },
+  {
+   "project": "go-taskqueue",
+   "path": "/home/lars/projects/go-taskqueue",
+   "sites": 230,
+   "resolved": 150,
+   "findings": {
+    "io-surface/io-in-loop": 32,
+    "io-surface/write-non-atomic": 20,
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "go-version-auto-configure",
+   "path": "/home/lars/projects/go-version-auto-configure",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "go-website-template",
+   "path": "/home/lars/projects/go-website-template",
+   "sites": 9,
+   "resolved": 9,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "go-wizard-sdk",
+   "path": "/home/lars/projects/go-wizard-sdk",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "golangci-lint-auto-configure",
+   "path": "/home/lars/projects/golangci-lint-auto-configure",
+   "sites": 11,
+   "resolved": 10,
+   "findings": {
+    "io-surface/write-non-atomic": 3,
+    "io-surface/stat-then-open": 2
+   }
+  },
+  {
+   "project": "gomend",
+   "path": "/home/lars/projects/gomend",
+   "sites": 10,
+   "resolved": 9,
+   "findings": {
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "graph-features-language",
+   "path": "/home/lars/projects/graph-features-language",
+   "sites": 1,
+   "resolved": 1,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "httputil",
+   "path": "/home/lars/projects/httputil",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "invoices",
+   "path": "/home/lars/projects/invoices",
+   "sites": 115,
+   "resolved": 40,
+   "findings": {
+    "io-surface/write-non-atomic": 16,
+    "io-surface/stat-then-open": 1,
+    "io-surface/io-in-loop": 4,
+    "io-surface/err-dropped": 2
+   }
+  },
+  {
+   "project": "io-surface",
+   "path": "/home/lars/projects/io-surface",
+   "sites": 16,
+   "resolved": 16,
+   "findings": {
+    "io-surface/io-in-loop": 4
+   }
+  },
+  {
+   "project": "journal",
+   "path": "/home/lars/projects/journal",
+   "sites": 19,
+   "resolved": 13,
+   "findings": {
+    "io-surface/write-non-atomic": 2,
+    "io-surface/err-dropped": 1
+   }
+  },
+  {
+   "project": "knowledge-graph",
+   "path": "/home/lars/projects/knowledge-graph",
+   "sites": 19,
+   "resolved": 19,
+   "findings": {
+    "io-surface/io-in-loop": 8,
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "ksef-sandbox",
+   "path": "/home/lars/projects/ksef-sandbox",
+   "sites": 29,
+   "resolved": 27,
+   "findings": {
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 4
+   }
+  },
+  {
+   "project": "lars.software",
+   "path": "/home/lars/projects/lars.software",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "lean-business-plan",
+   "path": "/home/lars/projects/lean-business-plan",
+   "sites": 17,
+   "resolved": 16,
+   "findings": {
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "legal-graph-ai-system",
+   "path": "/home/lars/projects/legal-graph-ai-system",
+   "sites": 27,
+   "resolved": 18,
+   "findings": {
+    "io-surface/write-non-atomic": 5
+   }
+  },
+  {
+   "project": "learnings",
+   "path": "/home/lars/projects/learnings",
+   "sites": 51,
+   "resolved": 45,
+   "findings": {
+    "io-surface/write-non-atomic": 10,
+    "io-surface/io-in-loop": 7,
+    "io-surface/stat-then-open": 1,
+    "io-surface/defer-in-loop": 1
+   }
+  },
+  {
+   "project": "library-policy",
+   "path": "/home/lars/projects/library-policy",
+   "sites": 17,
+   "resolved": 16,
+   "findings": {
+    "io-surface/write-non-atomic": 7
+   }
+  },
+  {
+   "project": "licenseforge",
+   "path": "/home/lars/projects/licenseforge",
+   "sites": 1,
+   "resolved": 1,
+   "findings": {}
+  },
+  {
+   "project": "linter-autoconfigure-sdk",
+   "path": "/home/lars/projects/linter-autoconfigure-sdk",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "media-atlas",
+   "path": "/home/lars/projects/media-atlas",
+   "sites": 18,
+   "resolved": 13,
+   "findings": {
+    "io-surface/stat-then-open": 1,
+    "io-surface/io-in-loop": 1,
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "mr-sync",
+   "path": "/home/lars/projects/mr-sync",
+   "sites": 48,
+   "resolved": 45,
+   "findings": {
+    "io-surface/io-in-loop": 6,
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "overview",
+   "path": "/home/lars/projects/overview",
+   "sites": 27,
+   "resolved": 24,
+   "findings": {
+    "io-surface/io-in-loop": 2,
+    "io-surface/client-no-timeout": 2,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "oxlint-auto-configure",
+   "path": "/home/lars/projects/oxlint-auto-configure",
+   "sites": 3,
+   "resolved": 3,
+   "findings": {}
+  },
+  {
+   "project": "pbx-artmann",
+   "path": "/home/lars/projects/pbx-artmann",
+   "sites": 159,
+   "resolved": 139,
+   "findings": {
+    "io-surface/write-non-atomic": 12,
+    "io-surface/client-no-timeout": 1,
+    "io-surface/io-in-loop": 20,
+    "io-surface/stat-then-open": 4,
+    "io-surface/err-dropped": 1
+   }
+  },
+  {
+   "project": "pbx-lens",
+   "path": "/home/lars/projects/pbx-lens",
+   "sites": 25,
+   "resolved": 14,
+   "findings": {
+    "io-surface/write-non-atomic": 1,
+    "io-surface/io-in-loop": 2,
+    "io-surface/client-no-timeout": 2
+   }
+  },
+  {
+   "project": "pim-sync",
+   "path": "/home/lars/projects/pim-sync",
+   "sites": 22,
+   "resolved": 14,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "pingen-spike",
+   "path": "/home/lars/projects/pingen-spike",
+   "sites": 1,
+   "resolved": 1,
+   "findings": {}
+  },
+  {
+   "project": "playlist-intel",
+   "path": "/home/lars/projects/playlist-intel",
+   "sites": 16,
+   "resolved": 14,
+   "findings": {
+    "io-surface/io-in-loop": 3,
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "plugmarket",
+   "path": "/home/lars/projects/plugmarket",
+   "sites": 4,
+   "resolved": 4,
+   "findings": {
+    "io-surface/io-in-loop": 2,
+    "io-surface/write-non-atomic": 2
+   }
+  },
+  {
+   "project": "project-dependency-graph",
+   "path": "/home/lars/projects/project-dependency-graph",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "project-discovery-daemon",
+   "path": "/home/lars/projects/project-discovery-daemon",
+   "sites": 11,
+   "resolved": 11,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "project-discovery-sdk",
+   "path": "/home/lars/projects/project-discovery-sdk",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "project-meta",
+   "path": "/home/lars/projects/project-meta",
+   "sites": 56,
+   "resolved": 56,
+   "findings": {
+    "io-surface/write-non-atomic": 4,
+    "io-surface/io-in-loop": 13,
+    "io-surface/err-dropped": 1
+   }
+  },
+  {
+   "project": "projects-management-automation",
+   "path": "/home/lars/projects/projects-management-automation",
+   "sites": 123,
+   "resolved": 118,
+   "findings": {
+    "io-surface/write-non-atomic": 16,
+    "io-surface/io-in-loop": 23
+   }
+  },
+  {
+   "project": "prompt-crusher",
+   "path": "/home/lars/projects/prompt-crusher",
+   "sites": 26,
+   "resolved": 26,
+   "findings": {
+    "io-surface/write-non-atomic": 4,
+    "io-surface/io-in-loop": 3,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "quotaboard",
+   "path": "/home/lars/projects/quotaboard",
+   "sites": 10,
+   "resolved": 9,
+   "findings": {}
+  },
+  {
+   "project": "rules",
+   "path": "/home/lars/projects/rules",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "samber-linter",
+   "path": "/home/lars/projects/samber-linter",
+   "sites": 5,
+   "resolved": 5,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "securitymd",
+   "path": "/home/lars/projects/securitymd",
+   "sites": 2,
+   "resolved": 2,
+   "findings": {
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "setup-github-repo",
+   "path": "/home/lars/projects/setup-github-repo",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "smart-configs",
+   "path": "/home/lars/projects/smart-configs",
+   "sites": 8,
+   "resolved": 8,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "sperrmuell-direct",
+   "path": "/home/lars/projects/sperrmuell-direct",
+   "sites": 27,
+   "resolved": 17,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "ssh-key-monitor",
+   "path": "/home/lars/projects/ssh-key-monitor",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "storbi",
+   "path": "/home/lars/projects/storbi",
+   "sites": 21,
+   "resolved": 4,
+   "findings": {}
+  },
+  {
+   "project": "superb-gh-milestone-extention",
+   "path": "/home/lars/projects/superb-gh-milestone-extention",
+   "sites": 5,
+   "resolved": 3,
+   "findings": {
+    "io-surface/client-no-timeout": 1
+   }
+  },
+  {
+   "project": "templ",
+   "path": "/home/lars/projects/templ",
+   "sites": 47,
+   "resolved": 38,
+   "findings": {
+    "io-surface/io-in-loop": 11,
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 6,
+    "io-surface/ctx-dropped": 3
+   }
+  },
+  {
+   "project": "templ-components",
+   "path": "/home/lars/projects/templ-components",
+   "sites": 18,
+   "resolved": 18,
+   "findings": {
+    "io-surface/io-in-loop": 8,
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "template-AUTHORS",
+   "path": "/home/lars/projects/template-AUTHORS",
+   "sites": 8,
+   "resolved": 8,
+   "findings": {
+    "io-surface/write-non-atomic": 1,
+    "io-surface/stat-then-open": 2,
+    "io-surface/io-in-loop": 2
+   }
+  },
+  {
+   "project": "template-CONTRIBUTING",
+   "path": "/home/lars/projects/template-CONTRIBUTING",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "template-air",
+   "path": "/home/lars/projects/template-air",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "template-arch-lint",
+   "path": "/home/lars/projects/template-arch-lint",
+   "sites": 9,
+   "resolved": 5,
+   "findings": {}
+  },
+  {
+   "project": "template-github-actions",
+   "path": "/home/lars/projects/template-github-actions",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "template-CLI",
+   "path": "/home/lars/projects/template-CLI",
+   "sites": 17,
+   "resolved": 17,
+   "findings": {
+    "io-surface/write-non-atomic": 3,
+    "io-surface/stat-then-open": 2,
+    "io-surface/io-in-loop": 1
+   }
+  },
+  {
+   "project": "template-graphs",
+   "path": "/home/lars/projects/template-graphs",
+   "sites": 81,
+   "resolved": 79,
+   "findings": {
+    "io-surface/write-non-atomic": 9,
+    "io-surface/io-in-loop": 6,
+    "io-surface/stat-then-open": 2
+   }
+  },
+  {
+   "project": "template-sqlc",
+   "path": "/home/lars/projects/template-sqlc",
+   "sites": 27,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "template-readme",
+   "path": "/home/lars/projects/template-readme",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "terraform-diagrams-aggregator",
+   "path": "/home/lars/projects/terraform-diagrams-aggregator",
+   "sites": 43,
+   "resolved": 42,
+   "findings": {
+    "io-surface/io-in-loop": 4,
+    "io-surface/stat-then-open": 2,
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "terraform-to-d2",
+   "path": "/home/lars/projects/terraform-to-d2",
+   "sites": 11,
+   "resolved": 11,
+   "findings": {
+    "io-surface/write-non-atomic": 2,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "templates",
+   "path": "/home/lars/projects/templates",
+   "sites": 21,
+   "resolved": 21,
+   "findings": {
+    "io-surface/io-in-loop": 8,
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "testing",
+   "path": "/home/lars/projects/testing",
+   "sites": 28,
+   "resolved": 11,
+   "findings": {
+    "io-surface/io-in-loop": 1,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "timesheets",
+   "path": "/home/lars/projects/timesheets",
+   "sites": 49,
+   "resolved": 32,
+   "findings": {
+    "io-surface/write-non-atomic": 11,
+    "io-surface/io-in-loop": 2,
+    "io-surface/stat-then-open": 2
+   }
+  },
+  {
+   "project": "todo-list-ai-go",
+   "path": "/home/lars/projects/todo-list-ai-go",
+   "sites": 15,
+   "resolved": 15,
+   "findings": {
+    "io-surface/write-non-atomic": 3,
+    "io-surface/io-in-loop": 2,
+    "io-surface/stat-then-open": 1
+   }
+  },
+  {
+   "project": "ucr-archive",
+   "path": "/home/lars/projects/ucr-archive",
+   "sites": 21,
+   "resolved": 21,
+   "findings": {
+    "io-surface/io-in-loop": 7,
+    "io-surface/write-non-atomic": 8
+   }
+  },
+  {
+   "project": "universal-workflow",
+   "path": "/home/lars/projects/universal-workflow",
+   "sites": 13,
+   "resolved": 12,
+   "findings": {
+    "io-surface/io-in-loop": 6,
+    "io-surface/write-non-atomic": 3
+   }
+  },
+  {
+   "project": "vision-review-agent",
+   "path": "/home/lars/projects/vision-review-agent",
+   "sites": 29,
+   "resolved": 26,
+   "findings": {
+    "io-surface/write-non-atomic": 3,
+    "io-surface/io-in-loop": 4
+   }
+  },
+  {
+   "project": "wise-go",
+   "path": "/home/lars/projects/wise-go",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "wise-transaction-visualization",
+   "path": "/home/lars/projects/wise-transaction-visualization",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "yt-history-intel",
+   "path": "/home/lars/projects/yt-history-intel",
+   "sites": 18,
+   "resolved": 3,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  }
+ ]
+}
