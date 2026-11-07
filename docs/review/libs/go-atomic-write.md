@@ -68,7 +68,7 @@ only if a scheduled `render --doc` job ever appears.
 ## How to verify
 
 ```bash
-rg -n 'atomicwrite\.' cmd/ internal/ --glob '!*_test.go'   # 5 sites, all listed above
+rg -n 'atomicwrite\.' cmd/ internal/ --glob '!*_test.go'   # 8 call sites (5 writes + fingerprint/read companions) + 3 extractor table keys
 go list -m github.com/larsartmann/go-atomic-write           # v0.6.0 pinned
 go list -m github.com/larsartmann/go-atomic-write@latest    # v0.6.2
 awk '/^## \[0.6.1\]/,/^## \[0.6.0\]/' /home/lars/projects/go-atomic-write/CHANGELOG.md

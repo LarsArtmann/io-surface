@@ -60,7 +60,7 @@ changes the core API io-surface consumes; no migration needed.
 ## How to verify
 
 ```bash
-rg -n 'cmdguard' --glob '*.go' cmd/                 # 2 files, core v4 only
+rg -n 'cmdguard' --glob '*.go' cmd/                 # 4 files mention; 2 import core v4
 go list -m github.com/larsartmann/cmdguard/v4        # pinned vs @latest
 git -C /home/lars/projects/cmdguard log --oneline v4.2.0..v4.2.1
 go run ./cmd/io-surface --help && go run ./cmd/io-surface doctor

@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>io-surface Library Utilization Audit — 2026-11-07</title>
+    <style>
+      /* =========================================================================
+         BAUHAUS DARK — Dashboard template
+         Design language: form follows function. Primary colors on graphite.
+         Zero external dependencies: system fonts, no CDN, no build step.
+         Token architecture: see references/bauhaus-tokens.md
+         ========================================================================= */
+
+      :root {
+        /* --- Primitive palette (Bauhaus Dark) --- */
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+
+        /* --- Semantic layer (shared vocabulary with editorial template) --- */
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        /* --- Backward-compatible aliases (do not break consumer skills) --- */
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --bg-code: var(--surface-sunken);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --rose-glow: color-mix(in srgb, var(--problem) 15%, transparent);
+        --emerald: var(--solution);
+        --emerald-glow: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --coral: var(--problem);
+        --coral-light: color-mix(in srgb, var(--problem) 15%, transparent);
+        --teal: var(--solution);
+        --teal-light: color-mix(in srgb, var(--solution) 15%, transparent);
+        --amber-light: color-mix(in srgb, var(--warning) 20%, transparent);
+
+        /* --- Shape --- */
+        --radius: 0px; /* Bauhaus default: sharp corners */
+        --radius-sm: 0px;
+
+        /* --- Type stacks (system only — zero external fonts) --- */
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      /* Sticky-header offset for anchor jumps */
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* --- Accessibility: keyboard focus --- */
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      /* --- Full-bleed top bar --- */
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* --- Layout: optional sticky sidebar TOC --- */
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      /* --- Headings --- */
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+
+      /* --- Hero --- */
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+
+      /* Bauhaus signature: geometric shape cluster (optional) */
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+
+      /* --- General cards --- */
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
+      }
+
+      /* --- Issue cards --- */
+      .issue {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* --- Severity badges (used inside issue cards) --- */
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      /* --- Inline badges (used in tables) --- */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
+
+      /* --- Callouts (used inside issues or standalone) --- */
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+
+      /* --- Stat cards / scorecards (aliased vocabulary) --- */
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card,
+      .score-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before,
+      .score-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-bad,
+      .score-bad {
+        /* default top bar already set */
+      }
+      .stat-bad::before,
+      .score-bad::before {
+        background: var(--problem);
+      }
+      .stat-good::before,
+      .score-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before,
+      .score-warn::before {
+        background: var(--warning);
+      }
+      .stat-value,
+      .score {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-bad .stat-value,
+      .score-bad .score {
+        color: var(--problem);
+      }
+      .stat-good .stat-value,
+      .score-good .score {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value,
+      .score-warn .score {
+        color: var(--warning);
+      }
+      .stat-label,
+      .score-card .label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+
+      /* --- Strengths list --- */
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--solution);
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      /* --- Tables --- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+
+      /* --- Before/After comparison --- */
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      /* --- Code blocks + syntax highlighting --- */
+      pre {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--accent);
+      } /* func, type, struct, if, return */
+      .tok-type {
+        color: var(--warning);
+      } /* int, string, bool, error */
+      .tok-string {
+        color: var(--solution);
+      } /* "quoted strings" */
+      .tok-comment {
+        color: var(--text-faint);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #74a9ff;
+      } /* function names */
+      .tok-number {
+        color: var(--accent);
+      } /* 42, 3.14 */
+      .tok-generic {
+        color: var(--problem);
+      } /* T, ID in generics */
+      .tok-builtin {
+        color: #4dd9ff;
+      } /* make, len, append */
+      .tok-punct {
+        color: var(--text-muted);
+      } /* { } ( ) ; = : */
+      .tok-attr {
+        color: var(--accent);
+      } /* Nix attribute names */
+
+      /* --- Dependency tree / ASCII diagrams --- */
+      .dep-tree {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.7;
+        white-space: pre;
+        overflow-x: auto;
+      }
+      .dep-tree .root {
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .dep-tree .ok {
+        color: var(--solution);
+      }
+      .dep-tree .unwanted {
+        color: var(--problem);
+      }
+
+      /* --- Inline node-and-arrow diagrams --- */
+      .diagram {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+      }
+      .node {
+        display: inline-block;
+        padding: 0.35rem 0.7rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: var(--surface-sunken);
+        border: 1px solid var(--border-strong);
+      }
+      .node-core {
+        background: var(--accent);
+        color: var(--surface);
+        border-color: var(--accent);
+      }
+      .node-problem {
+        background: var(--problem);
+        color: var(--surface);
+        border-color: var(--problem);
+      }
+      .node-good {
+        background: var(--solution);
+        color: var(--surface);
+        border-color: var(--solution);
+      }
+      .arrow {
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Grids (responsive) --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      /* --- Inline TOC (alternative to sidebar) --- */
+      .toc {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        padding: 1rem 1.3rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .toc h3 {
+        margin-bottom: 0.5rem;
+      }
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+      .toc li {
+        margin: 0.25rem 0;
+      }
+      .toc a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .toc a:hover {
+        color: var(--accent);
+      }
+
+      /* --- Migration / numbered steps --- */
+      .migration-step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      /* --- Footer --- */
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      /* --- Responsive --- */
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .stat-grid,
+        .scorecard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Full-bleed top bar -->
+    <div class="top-bar">
+      <span>LIBRARY UTILIZATION AUDIT</span>
+      <span>2026-11-07</span>
+      <span>io-surface &middot; docs/review/libs/</span>
+    </div>
+
+    <div class="layout">
+      <!-- Sidebar TOC (hidden below 1024px; use inline .toc if you prefer) -->
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#verdicts">Verdict Matrix</a>
+          <a href="#findings">Findings</a>
+          <a href="#actions">Actions</a>
+          <a href="#graph">Module Graph</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="hero-badge">Library Utilization Audit</div>
+          <h1>io-surface &times; the LarsArtmann library fleet</h1>
+          <p class="hero-subtitle">
+            22 libraries, one question each: does io-surface use it, and if
+            not, should it? A detailed report per library sits next to this
+            index; every verdict there cites code or commands.
+          </p>
+        </div>
+
+        <!-- Stats Dashboard -->
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value">22</div>
+            <div class="stat-label">Libraries audited</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">2</div>
+            <div class="stat-label">Adopted (direct deps)</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">2</div>
+            <div class="stat-label">In graph, unused (correct)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">18</div>
+            <div class="stat-label">Correctly rejected</div>
+          </div>
+        </div>
+
+        <p>
+          io-surface is a hermetic, deliberately-minimal gate CLI: a
+          stdlib-only AST walk, an in-process CUE load, findings to stdout,
+          exit 0/1/2. That shape decides every verdict below. The two adopted
+          libraries (<a href="cmdguard.md">cmdguard</a> 93/100,
+          <a href="go-atomic-write.md">go-atomic-write</a> 80/100) are used
+          at or near their ceiling for this kind of tool. Two more
+          (<a href="go-error-family.md">go-error-family</a>,
+          <a href="go-output.md">go-output</a>) are already compiled into the
+          binary via go-finding and cmdguard, and are still correctly left
+          unimported. Everything else is server, CQRS, UI, or lifecycle
+          machinery for a process io-surface deliberately is not.
+        </p>
+
+        <!-- Findings as Cards -->
+        <h2 id="findings"><span class="num">01</span>Findings</h2>
+
+        <div class="card card-solution">
+          <h4>The dependency doctrine is winning</h4>
+          <p>
+            Four direct dependencies for a tool that parses Go trees, unifies
+            CUE, and emits SARIF — and the two house libraries among them are
+            used at or near their ceiling. cmdguard usage covers the full core
+            surface (typed flags, batteries, parent commands, positional
+            args, consumer-owned exit codes); go-atomic-write usage includes
+            the advanced optimistic-concurrency path
+            (<code>FingerprintFromBytes</code> + <code>WriteVerified</code> +
+            <code>ErrConcurrentModification</code> handling) on both in-place
+            rewrite paths.
+          </p>
+        </div>
+
+        <div class="card card-problem">
+          <h4>Two free patch bumps are pending</h4>
+          <p>
+            cmdguard v4.2.0 &rarr; v4.2.1 (fixes ExitCode(0) on errorfamily
+            failures and flag leaks on reused CLIs) and go-atomic-write
+            v0.6.0 &rarr; v0.6.2 (v0.6.1 stops temp-file leaks when the final
+            rename fails). No API changes in either gap; both are pure
+            hygiene. See <a href="#actions">Actions</a>.
+          </p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>Zero-cost availability is not a reason to adopt</h4>
+          <p>
+            go-error-family and go-output are already in the module graph
+            (via go-finding and cmdguard), so importing them adds no new
+            module. Both reports still conclude <em>do not adopt</em>:
+            error-family's exit codes would break the pinned 0/1/2 contract,
+            and go-output would churn byte-pinned golden output for no
+            requested capability.
+          </p>
+        </div>
+
+        <!-- Verdict Matrix -->
+        <h2 id="verdicts"><span class="num">02</span>Verdict Matrix</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Library</th>
+              <th>Latest</th>
+              <th>Status</th>
+              <th>Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="cmdguard.md">cmdguard/v4</a></td>
+              <td>v4.2.1</td>
+              <td><span class="badge badge-fixed">Used &middot; direct</span></td>
+              <td>93/100 very high &mdash; bump to v4.2.1</td>
+            </tr>
+            <tr>
+              <td><a href="go-atomic-write.md">go-atomic-write</a></td>
+              <td>v0.6.2</td>
+              <td><span class="badge badge-fixed">Used &middot; direct</span></td>
+              <td>80/100 high &mdash; bump to v0.6.2</td>
+            </tr>
+            <tr>
+              <td><a href="go-error-family.md">go-error-family</a></td>
+              <td>v0.12.0</td>
+              <td><span class="badge badge-medium">In graph &middot; indirect</span></td>
+              <td>Correctly not adopted (would break exit contract)</td>
+            </tr>
+            <tr>
+              <td><a href="go-output.md">go-output</a></td>
+              <td>v0.38.7</td>
+              <td><span class="badge badge-medium">In graph &middot; indirect</span></td>
+              <td>Correctly not adopted (byte-pinned output wins)</td>
+            </tr>
+            <tr>
+              <td><a href="go-filewatcher.md">go-filewatcher/v2</a></td>
+              <td>v2.5.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject now &mdash; recorded trigger: a future
+                <code>check --watch</code></td>
+            </tr>
+            <tr>
+              <td><a href="go-retry.md">go-retry</a></td>
+              <td>v0.9.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; nothing retries; determinism is the product</td>
+            </tr>
+            <tr>
+              <td><a href="go-idempotency.md">go-idempotency</a></td>
+              <td>v0.3.2</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; no delivery, no commands, no store</td>
+            </tr>
+            <tr>
+              <td><a href="go-etag.md">go-etag</a></td>
+              <td>v0.7.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; zero HTTP in either direction</td>
+            </tr>
+            <tr>
+              <td><a href="httputil.md">httputil</a></td>
+              <td>v1.8.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; no server middleware to wrap</td>
+            </tr>
+            <tr>
+              <td><a href="httputil-server-timing.md">httputil/server_timing</a></td>
+              <td>v1.0.3</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; no handler to time</td>
+            </tr>
+            <tr>
+              <td><a href="httputil-endpoints.md">httputil/endpoints</a></td>
+              <td>v0.1.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; CLI subcommands, not routes
+                (<code>describe</code> already covers it)</td>
+            </tr>
+            <tr>
+              <td><a href="go-codec.md">go-codec</a></td>
+              <td>v0.3.3</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; JSON via encoding/json, manifest via CUE</td>
+            </tr>
+            <tr>
+              <td><a href="go-sse.md">go-sse</a></td>
+              <td>v0.7.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; streams nothing, holds no connections</td>
+            </tr>
+            <tr>
+              <td><a href="go-datastar.md">go-datastar</a></td>
+              <td>v0.7.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; no browser-facing surface</td>
+            </tr>
+            <tr>
+              <td><a href="go-daemon.md">go-daemon</a></td>
+              <td>v0.4.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; one-shot CLI owns no socket</td>
+            </tr>
+            <tr>
+              <td><a href="go-health.md">go-health</a></td>
+              <td>v0.10.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; exit code is the health contract</td>
+            </tr>
+            <tr>
+              <td><a href="go-health-dashboard.md">go-health-dashboard</a></td>
+              <td>v0.13.2</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; doubly inapplicable (no probes, no UI)</td>
+            </tr>
+            <tr>
+              <td><a href="go-credentials-store.md">go-credentials-store</a></td>
+              <td>v0.2.1</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; zero secrets by design</td>
+            </tr>
+            <tr>
+              <td><a href="templ-components.md">templ-components</a></td>
+              <td>v1.27.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; terminal + markdown, no component tree</td>
+            </tr>
+            <tr>
+              <td><a href="go-appkit.md">go-appkit</a></td>
+              <td>v0.12.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; io-surface gates appkit apps, not builds on one</td>
+            </tr>
+            <tr>
+              <td><a href="go-cqrs-lite.md">go-cqrs-lite</a></td>
+              <td>system/v4.17.0</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; stateless gate; it audits CQRS, not runs on it</td>
+            </tr>
+            <tr>
+              <td><a href="cqrs-htmx.md">cqrs-htmx</a></td>
+              <td>v4.18.1</td>
+              <td><span class="badge badge-low">Not used</span></td>
+              <td>Reject &mdash; no web app, no users, no sessions</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Strengths -->
+        <h2>Strengths</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Every write is atomic, both in-place rewrites are
+                concurrency-guarded</strong>
+              <span>Five write sites, zero raw file writes; the baseline-add
+                path even remaps ErrConcurrentModification into a domain error
+                with re-run guidance (internal/manifest/baseline_write.go:63).</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>The exit-code contract stays owned by the tool</strong>
+              <span>cmdguard prints errors once; io-surface maps 0/1/2 itself
+                (cmd/io-surface/main.go:39-51) and pins it in tests &mdash; the
+                reason error-family's exit codes were rejected, not
+                overlooked.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Tool-to-target relationships instead of couplings</strong>
+              <span>go-cqrs-lite, go-appkit and httputil appear in the
+                extractor's classification tables, not its go.mod &mdash;
+                io-surface understands the fleet without depending on it.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ASCII Diagram -->
+        <h2 id="graph">Module Graph</h2>
+        <div class="dep-tree">
+          <span class="root">io-surface</span> &middot; 22 audited libs, 4
+          direct deps &middot; house libs in the graph:<br />
+          &nbsp;&nbsp;direct &mdash;
+          <span class="ok">cmdguard/v4 v4.2.0</span> &middot;
+          <span class="ok">go-atomic-write v0.6.0</span> &middot;
+          <span class="ok">go-finding v1.15.1 + toolsdk v1.16.0</span> (not on
+          the audit list, adjacent)<br />
+          &nbsp;&nbsp;indirect &mdash;
+          <span class="unwanted">go-error-family v0.12.0</span> via
+          go-finding &middot;
+          <span class="unwanted">go-output v0.38.4</span> + go-branded-id +
+          go-ndjson + samber-do-auditlog via cmdguard<br />
+          &nbsp;&nbsp;absent &mdash; the remaining 18 audited libraries
+        </div>
+
+        <!-- Numbered Steps -->
+        <h2 id="actions"><span class="num">03</span>Actions</h2>
+        <div class="migration-step">
+          <div class="migration-num">1</div>
+          <div class="migration-content">
+            <h4>Bump the two direct house deps (hygiene)</h4>
+            <p>
+              <code>go get github.com/larsartmann/cmdguard/v4@v4.2.1
+              github.com/larsartmann/go-atomic-write@v0.6.2 &amp;&amp; go mod
+              tidy</code>, then the full gate (build, vet, test, self-check,
+              lint). No API changes in either gap.
+            </p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">2</div>
+          <div class="migration-content">
+            <h4>Honor the two recorded triggers, nothing more</h4>
+            <p>
+              Build <code>check --watch</code> on go-filewatcher/v2 if a pilot
+              asks for a live dev loop; revisit go-error-family only if a
+              networked mode ever exists (it is not planned). Every other
+              library stays rejected.
+            </p>
+          </div>
+        </div>
+
+        <h2 id="verify">How to Verify</h2>
+        <p>
+          Every per-library report ends with its own verify block. For this
+          index:
+        </p>
+        <div class="compare-row">
+          <div>
+            <pre><code>ls docs/review/libs/*.md | wc -l   # 22
+rg -n 'larsartmann' go.mod          # direct + indirect lines
+go mod why -m github.com/larsartmann/go-error-family
+go list -m github.com/larsartmann/cmdguard/v4@latest
+go list -m github.com/larsartmann/go-atomic-write@latest
+go run ./cmd/io-surface check --root .   # gate green at audit HEAD</code></pre>
+          </div>
+        </div>
+
+        <footer class="footer">
+          Generated 2026-11-07 &middot; Library utilization audit series &middot;
+          per-library reports: cmdguard.md, go-atomic-write.md,
+          go-error-family.md, go-output.md + 18 rejection reports in this
+          directory &middot; all claims cite code paths or verify commands
+        </footer>
+      </main>
+    </div>
+
+    <!-- Progressive-enhancement scrollspy. Nav still works without JS via anchor links. -->
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>
