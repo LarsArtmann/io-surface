@@ -941,6 +941,156 @@
           }
         },
         {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:24",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/ignore-invalid",
+          "level": "note",
+          "message": {
+            "text": "io-surface:ignore err-dropped — grammar: //io-surface:ignore <rule> <reason…>; missing reason, so nothing was suppressed"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 28,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:28",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 29,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:29",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/ignore-invalid",
+          "level": "note",
+          "message": {
+            "text": "io-surface:ignore no-such-rule whatever — grammar: //io-surface:ignore <rule> <reason…>; unknown rule name, so nothing was suppressed"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/ignore-invalid:cmd/app/suppress.go:33",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:34",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
           "ruleId": "io-surface/closer-missing",
           "level": "note",
           "message": {

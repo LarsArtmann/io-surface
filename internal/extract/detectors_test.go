@@ -89,6 +89,9 @@ func TestDetectorRegistry_ParityPinsMetadata(t *testing.T) {
 		}
 	}
 	for _, r := range DetectorRules() {
+		if r.MetadataOnly {
+			continue
+		}
 		found := false
 		for _, d := range detectors {
 			if d.rule == r.Name {
