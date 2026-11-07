@@ -1,0 +1,106 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "io-surface",
+          "version": "0.2.0"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/main.go"
+                },
+                "region": {
+                  "startLine": 12,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/main.go:12",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "data, _ := os.ReadFile(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/main.go"
+                },
+                "region": {
+                  "startLine": 16,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/main.go:16",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "info, _ := os.Stat(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/main.go"
+                },
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/main.go:22",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        }
+      ]
+    }
+  ]
+}
