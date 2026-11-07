@@ -33,7 +33,10 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 | `init` — scaffold manifest                 | 🟢 `FULLY_FUNCTIONAL` | `internal/scaffold/scaffold.go`; `scaffold_test.go` (93.1% cov)                      | Green-by-construction; `--force` refreshes `facts.cue` only — claims/baseline/schema survive (plant-a-claim test) |
 | `render` — inventory markdown              | 🟢 `FULLY_FUNCTIONAL` | `internal/render/render.go`; CI self-render step                                     | Claims-aware (facts table + judgments prose); no golden test yet (TODO 10)                                        |
 | `extract` — raw JSON dump                  | 🟢 `FULLY_FUNCTIONAL` | `cmd/io-surface/commands.go`; `extract_test.go` (81.5% cov)                          | Debugging/counting face                                                                                           |
-| `version`                                  | 🟢 `FULLY_FUNCTIONAL` | cmdguard `VersionCommand` (batteries); `TestExecute_VersionAndUnknownCommand`        | Prints `io-surface 0.1.0`; no `--json` (TODO 30)                                                                  |
+| `lint` — detector face, no manifest        | 🟢 `FULLY_FUNCTIONAL` | `internal/lint/lint.go`; `TestExecute_LintFace` e2e; `TestGolden_LintOutput`         | 8 rules, exit 0 unless `--enforce`; claims-based severity modulation when a manifest exists (v1.2)                |
+| `absorb` — Capslock capabilities (v1.1)    | 🟢 `FULLY_FUNCTIONAL` | `internal/absorb/absorb.go`; `--check` advisory drift                                | Writes `capabilities.cue` ONLY; never fails the gate                                                              |
+| `baseline add` — surgical grandfathering   | 🟢 `FULLY_FUNCTIONAL` | `internal/manifest/baseline_write.go`; plant tests                                   | Refuses duplicates/empty notes; the one sanctioned write into a judgment file                                     |
+| `version`                                  | 🟢 `FULLY_FUNCTIONAL` | `runVersion` in `commands.go`; `TestVersionJSON`                                     | Prints `io-surface 0.3.0`; `--json` adds commit/date provenance                                                   |
 | `doctor` / `describe` (cmdguard batteries) | 🟢 `FULLY_FUNCTIONAL` | cmdguard auto-registration at Execute                                                | `doctor` trivially green (no DI checks); `describe` hidden JSON contract                                          |
 | Exit-code contract 0/1/2                   | 🟢 `FULLY_FUNCTIONAL` | `exitCode` in `cmd/io-surface/main.go`; `TestExitCode` + e2e in `main_test.go`       | 0 clean, 1 gate findings, 2 usage/internal                                                                        |
 | CLI framework — cmdguard v4                | 🟢 `FULLY_FUNCTIONAL` | `cmd/io-surface/main.go` (`newApp`); cmdguard-lint: 0 findings                       | Typed flag structs, batteries, styled help/errors; output contract byte-preserved                                 |
@@ -62,11 +65,27 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 
 ## Renderer (`internal/render`)
 
-| Feature                            | Status                | Evidence                          | Notes                                          |
-| ---------------------------------- | --------------------- | --------------------------------- | ---------------------------------------------- |
-| Family summary + per-site table    | 🟢 `FULLY_FUNCTIONAL` | `internal/render/render.go:20-66` | Claimed/rationale counts per family            |
-| Judgments section (verbatim prose) | 🟢 `FULLY_FUNCTIONAL` | `render.go:68-89`                 | Exception + rationale passed through untouched |
-| BEGIN/END generated blocks         | ⚪ `PLANNED`          | README "Status" section           | For embedding in hand-written docs (TODO 5)    |
+| Feature                            | Status                | Evidence                                                        | Notes                                          |
+| ---------------------------------- | --------------------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| Family summary + per-site table    | 🟢 `FULLY_FUNCTIONAL` | `internal/render/render.go:20-66`                               | Claimed/rationale counts per family            |
+| Judgments section (verbatim prose) | 🟢 `FULLY_FUNCTIONAL` | `render.go:68-89`                                               | Exception + rationale passed through untouched |
+| BEGIN/END generated blocks         | 🟢 `FULLY_FUNCTIONAL` | `render.CheckDoc`/`ApplyToDoc`; CI inventory-doc freshness step | Drift exits 1 with a stored-vs-fresh diff      |
+
+## Detector layer (`internal/extract` detectors, `internal/lint`, v0.3.0)
+
+| Feature                                         | Status                | Evidence                                                                         | Notes                                                                                                 |
+| ----------------------------------------------- | --------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Observation channel (`ExtractWithObservations`) | 🟢 `FULLY_FUNCTIONAL` | `internal/extract/observations.go`; `TestExtractWithObservations_SitesIdentical` | Site JSON byte-identical to plain `Extract` (D1); token tier structurally excluded (D3)               |
+| `err-dropped`                                   | 🟢 `FULLY_FUNCTIONAL` | `TestDetectErrDropped_ShapeTable`                                                | Deliberate `_ =` respected (D8); fleet carve-outs: io.ReadAll, filepath.Glob, rand.Read               |
+| `closer-missing` (+`resp.Body` variant)         | 🟢 `FULLY_FUNCTIONAL` | `TestDetectCloserMissing_OwnershipTable`, `TestDetectCloserMissing_HttpBody`     | Ownership classifier: return/arg/storage = hand-off; found a real fd leak in InboxClean (fixed there) |
+| `ctx-dropped`                                   | 🟢 `FULLY_FUNCTIONAL` | `TestDetectCtxDropped_ScopeGate`                                                 | Fires only when a context.Context is in scope                                                         |
+| `defer-in-loop` / `io-in-loop`                  | 🟢 `FULLY_FUNCTIONAL` | `TestDetectLoopAndTimeoutRules`                                                  | io-in-loop sampled 0/3 actionable fleet-wide — info forever candidate                                 |
+| `client-no-timeout` (helper + literal)          | 🟢 `FULLY_FUNCTIONAL` | `TestDetectLoopAndTimeoutRules`; 13 fleet hits                                   | 3/4 sampled true                                                                                      |
+| `stat-then-open`                                | 🟢 `FULLY_FUNCTIONAL` | `TestDetectLoopAndTimeoutRules`                                                  | Printer-keyed exact path-expr pairs; both locations in the message                                    |
+| `write-non-atomic` / `tiny-buffer`              | 🟢 `FULLY_FUNCTIONAL` | `TestDetectWriteNonAtomic`, `TestDetectTinyBuffer`                               | Seam functions exempt; durability claims escalate/suppress at lint                                    |
+| `lint` severity modulation (claims v1.2)        | 🟢 `FULLY_FUNCTIONAL` | `TestRun_ClaimSeverityModulation`                                                | `criticality: critical` escalates one step; `durability: ephemeral` drops write-non-atomic            |
+| `claim-conflict` gate rule                      | 🟢 `FULLY_FUNCTIONAL` | `TestClaimConflict`                                                              | `atomic-write` on a `file-read` site = lying claim (warning)                                          |
+| Fleet harness                                   | 🟢 `FULLY_FUNCTIONAL` | `scripts/fleetscan.sh`                                                           | 160/160 repos, one command; verdict table in the 2026-11-07 status report                             |
 
 ## Planned features (no code yet)
 

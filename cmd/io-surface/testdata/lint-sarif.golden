@@ -404,7 +404,7 @@
           "ruleId": "io-surface/io-in-loop",
           "level": "note",
           "message": {
-            "text": "os.Open(p) — I/O inside a loop (N+1 shape); consider hoisting or batching"
+            "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
           },
           "locations": [
             {
@@ -413,7 +413,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 11,
+                  "startLine": 116,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -425,16 +425,16 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:11",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:116",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
         },
         {
-          "ruleId": "io-surface/defer-in-loop",
+          "ruleId": "io-surface/tiny-buffer",
           "level": "note",
           "message": {
-            "text": "f.Close() — defers run at function exit, so earlier loop iterations' resources stay open until then"
+            "text": "buf = make([]byte, 512) feeds io.ReadFull — 512-byte reads amplify syscalls; size to >= 4096 (or use bufio.Scanner)"
           },
           "locations": [
             {
@@ -443,7 +443,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 15,
+                  "startLine": 116,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -455,67 +455,7 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:15",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/defer-in-loop",
-          "level": "note",
-          "message": {
-            "text": "os.MkdirAll(dir, 0o755) — defers run at function exit, so earlier loop iterations' resources stay open until then"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 22,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:22",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/err-dropped",
-          "level": "note",
-          "message": {
-            "text": "f, _ := os.Open(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 32,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:32",
+            "go-finding/id": "io-surface:io-surface/tiny-buffer:cmd/app/loops.go:116",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -533,7 +473,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 32,
+                  "startLine": 13,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -545,16 +485,16 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:32",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:13",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
         },
         {
-          "ruleId": "io-surface/stat-then-open",
+          "ruleId": "io-surface/io-in-loop",
           "level": "note",
           "message": {
-            "text": "os.ReadFile of path (stat'd at cmd/app/loops.go:40) — double syscall and a TOCTOU window; open and handle the error instead"
+            "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
           },
           "locations": [
             {
@@ -563,7 +503,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 44,
+                  "startLine": 136,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -575,16 +515,16 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:44",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:136",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
         },
         {
-          "ruleId": "io-surface/stat-then-open",
+          "ruleId": "io-surface/defer-in-loop",
           "level": "note",
           "message": {
-            "text": "os.WriteFile of path (stat'd at cmd/app/loops.go:48) — double syscall and a TOCTOU window; open and handle the error instead"
+            "text": "f.Close() — defers run at function exit, so earlier loop iterations' resources stay open until then"
           },
           "locations": [
             {
@@ -593,7 +533,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 55,
+                  "startLine": 17,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -605,7 +545,187 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:55",
+            "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:17",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/defer-in-loop",
+          "level": "note",
+          "message": {
+            "text": "os.MkdirAll(dir, 0o755) — defers run at function exit, so earlier loop iterations' resources stay open until then"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 24,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:24",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "f, _ := os.Open(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:34",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/io-in-loop",
+          "level": "note",
+          "message": {
+            "text": "os.Open(p) — I/O inside a loop (N+1 shape); consider hoisting or batching"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:34",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/stat-then-open",
+          "level": "note",
+          "message": {
+            "text": "os.ReadFile of path (stat'd at cmd/app/loops.go:42) — double syscall and a TOCTOU window; open and handle the error instead"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 46,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:46",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/stat-then-open",
+          "level": "note",
+          "message": {
+            "text": "os.WriteFile of path (stat'd at cmd/app/loops.go:50) — double syscall and a TOCTOU window; open and handle the error instead"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:57",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/write-non-atomic",
+          "level": "note",
+          "message": {
+            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/loops.go:57",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -623,7 +743,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 67,
+                  "startLine": 69,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -635,7 +755,7 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:67",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:69",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -653,7 +773,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 71,
+                  "startLine": 73,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -665,7 +785,7 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:71",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:73",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -683,7 +803,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 79,
+                  "startLine": 81,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -695,7 +815,7 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:79",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:81",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -791,6 +911,36 @@
           }
         },
         {
+          "ruleId": "io-surface/write-non-atomic",
+          "level": "note",
+          "message": {
+            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/main.go"
+                },
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/main.go:56",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
           "ruleId": "io-surface/closer-missing",
           "level": "note",
           "message": {
@@ -846,6 +996,36 @@
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
             "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:21",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/write-non-atomic",
+          "level": "note",
+          "message": {
+            "text": "os.Create(path) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "internal/store/closers.go"
+                },
+                "region": {
+                  "startLine": 77,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/write-non-atomic:internal/store/closers.go:77",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }

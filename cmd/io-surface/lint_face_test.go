@@ -48,11 +48,11 @@ func TestExecute_LintFace(t *testing.T) {
 	if rep.Enforcement != "lint" {
 		t.Errorf("enforcement = %q, want lint", rep.Enforcement)
 	}
-	if rep.Stats.Infos != 28 || rep.Stats.Errors != 0 {
-		t.Errorf("stats = %+v, want 28 infos / 0 errors", rep.Stats)
+	if rep.Stats.Infos != 34 || rep.Stats.Errors != 0 {
+		t.Errorf("stats = %+v, want 34 infos / 0 errors", rep.Stats)
 	}
-	if len(rep.Findings) != 28 {
-		t.Errorf("findings = %d, want 28", len(rep.Findings))
+	if len(rep.Findings) != 34 {
+		t.Errorf("findings = %d, want 34", len(rep.Findings))
 	}
 
 	out, err = runApp(t, "lint", "--root", "../../testdata/detectors", "--format", "sarif")
