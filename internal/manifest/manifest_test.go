@@ -570,8 +570,18 @@ scope: {in: [], out: []}
 // validation failure reports the CUE path (sites."X".field), not just a
 // bare disjunction count.
 func TestLoad_BadDisciplineNamesCUEPath(t *testing.T) {
+	closedSchema := `package io_surface
+
+sites: {[string]: {
+	location: [...string]
+	family:   string
+	claims: {resource: string, trigger: string, discipline: [...#Discipline]}
+}}
+
+#Discipline: "atomic-write" | "fsync" | "no-fsync"
+`
 	dir := writeManifest(t, map[string]string{
-		"schema.cue": schemaBody,
+		"schema.cue": closedSchema,
 		"facts.cue": `package io_surface
 
 sites: "a.B": {location: ["a.go:1"], family: "file-read", facts: {call: []}}

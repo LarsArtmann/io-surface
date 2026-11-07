@@ -76,6 +76,26 @@ is closest (16.7% → needs the five mechanical FP classes carved out, then a
 re-sample). The promotion-policy ledger (`docs/planning/2026-11-07_promotion-policy.md` §9)
 is updated with these rows in the same commit.
 
+## c3) go-taskqueue triage (plan T12 — the biggest untriaged pool)
+
+Verified how: `/tmp`-built lint binary over `--root ~/projects/go-taskqueue`,
+locations + context hand-read for 12 io-in-loop + 6 write-non-atomic + 1
+client-no-timeout (the pool grew 37 → 53 findings with the 10-rule ruleset;
+the sample follows the plan's batch shape).
+
+- **io-in-loop 12/12 sampled are non-actionable** (classes: per-repo/per-item
+  I/O, ticker polling, supervisor/retry loops, SSE reconnect, lockfile slot
+  probing, cleanup sweeps). Confirms the earlier 0/3: the rule's fleet value
+  is as a _shape lens_, not a bug finder — T16's same-path refinement is the
+  right size, and go-taskqueue has no repeat-target hits to gain.
+- **write-non-atomic 4/6 TRUE** (marker/config/state files whose tearing
+  corrupts dispatch state) + 2 mechanical FP (O_APPEND evidence log, doctor
+  probe scratch) — same classes as the fleet table above.
+- **client-no-timeout 1/1 TRUE** (unix-socket client sans timeout).
+
+Net: nothing in go-taskqueue changes a verdict; the per-item I/O class is now
+the dominant documented io-in-loop FP class (rule card updated in T8).
+
 ## d) Evidence hygiene (plan T4)
 
 - `docs/evidence/README.md` records the provenance contract: fleet-scanned
