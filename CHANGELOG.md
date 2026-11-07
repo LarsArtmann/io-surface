@@ -9,7 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Nothing yet.
+- **Every file write the tool performs is crash-safe.** Scaffolding
+  (`init`), `baseline.cue` appends, `capabilities.cue`, rendered `--out`
+  files and the doc-embed path now write through `go-atomic-write`
+  (unique temp file, fsync, atomic rename). The two read-modify-write
+  paths (baseline append, doc embed) additionally fingerprint-verify the
+  file: a concurrent writer now fails the command with a re-run hint
+  instead of silently clobbering the file.
+- The extractor resolves `github.com/larsartmann/go-atomic-write` calls
+  at the resolved tier (`Write*`/`WriteFunc*` = `file-write`,
+  `FingerprintFile` = `file-read`), so repos adopting the library keep
+  full gate coverage and its sites never fire `write-non-atomic`.
 
 ### Fixed
 

@@ -5,9 +5,10 @@ call site from a Go tree via a stdlib-only AST walk, compares it against a CUE
 manifest, and fails the build on I/O nobody documented — AND (since v0.3.0,
 io-bug-radar) a detector layer that finds bad I/O via `io-surface lint`
 (manifestless, exit 0 unless `--enforce`; rules ship at info, promotion is
-evidence-gated). Single Go module (`go 1.27`), three direct dependencies
+evidence-gated). Single Go module (`go 1.27`), four direct dependencies
 (`cuelang.org/go` for the manifest, `cmdguard/v4` for the CLI, `go-finding`
-for SARIF — the gate core `internal/extract` itself stays stdlib-only), no
+for SARIF, `go-atomic-write` for the tool's own file writes — the gate core
+`internal/extract` itself stays stdlib-only), no
 `flake.nix` (deliberately withheld — status report §g-Q2), no Makefile/justfile.
 
 `README.md` documents the tool for users. This file documents the repo for
@@ -258,6 +259,12 @@ while working here:
   lands via the auto-commit daemon). Re-run
   `go run ./cmd/io-surface check --root .` yourself before acting on stale
   output, and never revert in-flight changes you didn't author.
+- A running `buildflow --fix` loop can revert uncommitted working-tree files
+  mid-edit (observed 2026-11-07: a committed adoption was reverted, then the
+  daemon committed the revert; the stash it leaves behind can also leave
+  conflict markers in TODO_LIST.md). When a buildflow process is live
+  (`pgrep -af buildflow`), re-read files before editing, verify edits landed
+  on disk immediately, and wait out the loop before judging gate output.
 
 The birth status report
 (`docs/status/archived/2026-11-06_00-14_io-surface-birth-bench-matrix-and-first-pilot.md`)
