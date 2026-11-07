@@ -5,9 +5,9 @@
 package io_surface
 
 audit: {
-	commit: "e803210-dirty"
+	commit: "36fd6e7-dirty"
 	date:   "2026-11-07"
-	claims: 24
+	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -34,31 +34,31 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:300",
-			"cmd/io-surface/commands.go:336",
+			"cmd/io-surface/commands.go:301",
+			"cmd/io-surface/commands.go:338",
 		]
 		family: "file-write"
 		facts: {
-			call: ["os.ReadFile", "os.WriteFile"]
+			call: ["atomicwrite.WriteVerified", "os.ReadFile"]
 		}
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:214",
-			"cmd/io-surface/commands.go:243",
+			"cmd/io-surface/commands.go:215",
+			"cmd/io-surface/commands.go:244",
 		]
 		family: "file-write"
 		facts: {
-			call: ["os.ReadFile", "os.WriteFile"]
+			call: ["atomicwrite.WriteWithPerm", "os.ReadFile"]
 		}
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:293",
+			"cmd/io-surface/commands.go:294",
 		]
 		family: "file-write"
 		facts: {
-			call: ["os.WriteFile"]
+			call: ["atomicwrite.WriteWithPerm"]
 		}
 	}
 	"internal/absorb.ModulePath": {
@@ -128,12 +128,12 @@ sites: {
 	}
 	"internal/manifest.AppendBaseline": {
 		location: [
-			"internal/manifest/baseline_write.go:39",
-			"internal/manifest/baseline_write.go:59",
+			"internal/manifest/baseline_write.go:41",
+			"internal/manifest/baseline_write.go:62",
 		]
 		family: "file-write"
 		facts: {
-			call: ["os.ReadFile", "os.WriteFile"]
+			call: ["atomicwrite.WriteVerified", "os.ReadFile"]
 		}
 	}
 	"internal/manifest.Load": {
@@ -156,19 +156,18 @@ sites: {
 	}
 	"internal/scaffold.Write": {
 		location: [
-			"internal/scaffold/scaffold.go:59",
-			"internal/scaffold/scaffold.go:62",
-			"internal/scaffold/scaffold.go:74",
-			"internal/scaffold/scaffold.go:78",
+			"internal/scaffold/scaffold.go:61",
+			"internal/scaffold/scaffold.go:64",
+			"internal/scaffold/scaffold.go:76",
 		]
 		family: "file-write"
 		facts: {
-			call: ["os.MkdirAll", "os.Stat", "os.WriteFile"]
+			call: ["os.MkdirAll", "os.Stat"]
 		}
 	}
 	"internal/scaffold.git": {
 		location: [
-			"internal/scaffold/scaffold.go:226",
+			"internal/scaffold/scaffold.go:228",
 		]
 		family: "ipc-subprocess"
 		facts: {
@@ -177,7 +176,7 @@ sites: {
 	}
 	"internal/scaffold.schemaCUE": {
 		location: [
-			"internal/scaffold/scaffold.go:31",
+			"internal/scaffold/scaffold.go:33",
 		]
 		family: "embed"
 		facts: {

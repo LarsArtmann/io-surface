@@ -14,6 +14,7 @@ import (
 	"runtime/debug"
 
 	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	atomicwrite "github.com/larsartmann/go-atomic-write"
 	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/emit"
@@ -240,7 +241,7 @@ func runAbsorb(_ context.Context, root *rootFlags, flags absorbFlags) error {
 	}
 
 	path := filepath.Join(dir, "capabilities.cue")
-	if err = os.WriteFile(path, absorb.CUE(res, audit), 0o644); err != nil {
+	if err = atomicwrite.WriteWithPerm(path, absorb.CUE(res, audit), 0o644); err != nil {
 		return err
 	}
 	fmt.Fprintf(stdout, "io-surface: wrote %s (%d packages, audit %s@%s of %s, %d unmapped edges dropped)\n",
@@ -290,7 +291,7 @@ func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
 		return nil
 	}
 
-	return os.WriteFile(flags.Out, []byte(docStr), 0o644)
+	return atomicwrite.WriteWithPerm(flags.Out, []byte(docStr), 0o644)
 }
 
 // applyDoc is the doc-embedding path: rewrite the block in place, or verify
@@ -301,6 +302,7 @@ func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
 	if err != nil {
 		return err
 	}
+	fp := atomicwrite.FingerprintFromBytes(data)
 	if checkOnly {
 		stored, fresh, err := render.CheckDoc(string(data), m)
 		if err != nil {
@@ -333,7 +335,11 @@ func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
 		return err
 	}
 
-	return os.WriteFile(path, []byte(updated), 0o644)
+	if err := atomicwrite.WriteVerified(path, []byte(updated), fp); err != nil {
+		return fmt.Errorf("writing %s: %w", path, err)
+	}
+
+	return nil
 }
 
 func storedLines(s string) []string {

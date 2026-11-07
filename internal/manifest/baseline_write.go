@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	atomicwrite "github.com/larsartmann/go-atomic-write"
 )
 
 // ErrBaseline is the sentinel for baseline.cue update failures (missing file,
@@ -40,6 +42,7 @@ func AppendBaseline(dir, id, note, date string) error {
 	if err != nil {
 		return fmt.Errorf("%w: %s (run `io-surface init` to scaffold one)", ErrNotInitialized, dir)
 	}
+	fp := atomicwrite.FingerprintFromBytes(raw)
 
 	text := string(raw)
 	if dup := entryLine(text, id); dup >= 0 {
@@ -56,7 +59,10 @@ func AppendBaseline(dir, id, note, date string) error {
 
 	entry := fmt.Sprintf("\t{\n\t\tid:   %q\n\t\tnote: %q\n\t\tdate: %q\n\t},\n", id, note, date)
 	updated := text[:closer] + entry + text[closer:]
-	if err := os.WriteFile(path, []byte(updated), 0o644); err != nil {
+	if err := atomicwrite.WriteVerified(path, []byte(updated), fp); err != nil {
+		if errors.Is(err, atomicwrite.ErrConcurrentModification) {
+			return fmt.Errorf("%w: %s changed since read (re-run the command to merge)", ErrBaseline, path)
+		}
 		return fmt.Errorf("%w: writing %s: %v", ErrBaseline, path, err)
 	}
 
