@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/larsartmann/io-surface/internal/scaffold"
 )
 
 // writeManifest scaffolds a CUE package in a temp dir from the given files.
@@ -68,11 +70,13 @@ sites: "internal/store.LoadConfig": {
 		"claims.cue": `package io_surface
 
 sites: "internal/store.LoadConfig": claims: {
-	resource:   "service config file"
-	trigger:    "process start"
-	discipline: ["bounded"]
-	exception:  "wrapped"
-	rationale:  "read once at boot"
+	resource:    "service config file"
+	trigger:     "process start"
+	discipline:  ["bounded"]
+	exception:   "wrapped"
+	rationale:   "read once at boot"
+	criticality: "critical"
+	durability:  "durable"
 }
 `,
 		"baseline.cue": `package io_surface
@@ -101,6 +105,9 @@ scope: {in: ["file reads"], out: ["timers"]}
 	}
 	if s.Claims.Resource != "service config file" || s.Claims.Rationale != "read once at boot" {
 		t.Errorf("claims decoded wrong: %+v", s.Claims)
+	}
+	if s.Claims.Criticality != "critical" || s.Claims.Durability != "durable" {
+		t.Errorf("v1.2 severity-modulation claims decoded wrong: %+v", s.Claims)
 	}
 	if len(s.Claims.Discipline) != 1 || s.Claims.Discipline[0] != "bounded" {
 		t.Errorf("discipline decoded wrong: %+v", s.Claims.Discipline)
@@ -491,5 +498,61 @@ func TestValidate_CapabilityInvariants(t *testing.T) {
 			m.Capabilities = tt.caps
 			tt.check(t, m.Validate())
 		})
+	}
+}
+
+// TestLoad_V12ClosedSchema pins the v1.2 severity vocabulary (plan T19):
+// the REAL embedded schema accepts the new claims fields and rejects values
+// outside the closed enums — a typo like "critcal" must fail unification,
+// not silently decode.
+func TestLoad_V12ClosedSchema(t *testing.T) {
+	base := map[string]string{
+		"schema.cue": string(scaffold.Files(".", nil, "")["schema.cue"]),
+		"facts.cue": `package io_surface
+
+sites: "internal/store.LoadConfig": {
+	location: ["internal/store/store.go:9"]
+	family:   "file-read"
+}
+`,
+		"meta.cue": `package io_surface
+
+audit: {commit: "abc1234", date: "2026-11-07", claims: 1, method: "test audit"}
+scope: {in: [], out: []}
+`,
+	}
+	withClaims := func(claims string) map[string]string {
+		m := map[string]string{}
+		for k, v := range base {
+			m[k] = v
+		}
+		m["claims.cue"] = "package io_surface\n\nsites: \"internal/store.LoadConfig\": claims: " + claims + "\n"
+
+		return m
+	}
+	valid := writeManifest(t, withClaims(`{criticality: "critical", durability: "ephemeral"}`))
+	m, err := Load(valid)
+	if err != nil {
+		t.Fatalf("v1.2 claims rejected by the real schema: %v", err)
+	}
+	if s := m.Sites["internal/store.LoadConfig"]; s.Claims.Criticality != "critical" || s.Claims.Durability != "ephemeral" {
+		t.Errorf("v1.2 claims decoded wrong: %+v", s.Claims)
+	}
+
+	invalid := writeManifest(t, withClaims(`{criticality: "critcal", durability: "whenever"}`))
+	if _, err := Load(invalid); err == nil {
+		t.Fatal("out-of-vocabulary claims unified — the closed enums are broken")
+	}
+
+	defaults := writeManifest(t, withClaims(`{rationale: "defaults only"}`))
+	m, err = Load(defaults)
+	if err != nil {
+		t.Fatalf("v1.1-style claims must keep unifying: %v", err)
+	}
+	// The schema defaults materialize on unification: unclaimed fields read
+	// as normal/recoverable — the exact values the severity modulation
+	// would have assumed anyway.
+	if s := m.Sites["internal/store.LoadConfig"]; s.Claims.Criticality != "normal" || s.Claims.Durability != "recoverable" {
+		t.Errorf("unclaimed fields must decode to the schema defaults, got %+v", s.Claims)
 	}
 }

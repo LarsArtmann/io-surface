@@ -19,16 +19,16 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 ## `file-read` (8)
 
-| Site                                         | Location                            | Resource                                                  | Trigger                                  | Discipline |
-| -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- |
-| `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          |
-| `internal/check.symbolVisible`               | `internal/check/location.go:23`     | —                                                         | —                                        | —          |
-| `internal/extract.Extract`                   | `internal/extract/tables.go:85`     | —                                                         | —                                        | —          |
-| `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:161`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    |
-| `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:224`   | —                                                         | —                                        | —          |
-| `internal/extract.extractor.walk`            | `internal/extract/extract.go:84`    | —                                                         | —                                        | —          |
-| `internal/manifest.Load`                     | `internal/manifest/manifest.go:170` | —                                                         | —                                        | —          |
-| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:380` | —                                                         | —                                        | —          |
+| Site                                         | Location                            | Resource                                                  | Trigger                                  | Discipline | Crit | Durab |
+| -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- | ---- | ----- |
+| `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          | —    | —     |
+| `internal/check.symbolVisible`               | `internal/check/location.go:23`     | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:165`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    | —    | —     |
+| `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:228`   | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.extractor.walk`            | `internal/extract/extract.go:88`    | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.runExtract`                | `internal/extract/tables.go:106`    | —                                                         | —                                        | —          | —    | —     |
+| `internal/manifest.Load`                     | `internal/manifest/manifest.go:170` | —                                                         | —                                        | —          | —    | —     |
+| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:380` | —                                                         | —                                        | —          | —    | —     |
 
 ### Judgments
 
@@ -37,13 +37,13 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 ## `file-write` (5)
 
-| Site                               | Location                                 | Resource                                   | Trigger                             | Discipline |
-| ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- |
-| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:299`         | —                                          | —                                   | —          |
-| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:213`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    |
-| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:292`         | —                                          | —                                   | —          |
-| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:39` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          |
-| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:56`       | —                                          | —                                   | —          |
+| Site                               | Location                                 | Resource                                   | Trigger                             | Discipline | Crit | Durab |
+| ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- | ---- | ----- |
+| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:299`         | —                                          | —                                   | —          | —    | —     |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:213`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    | —    | —     |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:292`         | —                                          | —                                   | —          | —    | —     |
+| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:39` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          | —    | —     |
+| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:56`       | —                                          | —                                   | —          | —    | —     |
 
 ### Judgments
 
@@ -52,16 +52,16 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 ## `embed` (1)
 
-| Site                          | Location                           | Resource | Trigger | Discipline |
-| ----------------------------- | ---------------------------------- | -------- | ------- | ---------- |
-| `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:30` | —        | —       | —          |
+| Site                          | Location                           | Resource | Trigger | Discipline | Crit | Durab |
+| ----------------------------- | ---------------------------------- | -------- | ------- | ---------- | ---- | ----- |
+| `internal/scaffold.schemaCUE` | `internal/scaffold/scaffold.go:30` | —        | —       | —          | —    | —     |
 
 ## `ipc-subprocess` (2)
 
-| Site                      | Location                            | Resource                                        | Trigger                                           | Discipline |
-| ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- |
-| `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          |
-| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:223` | —                                               | —                                                 | —          |
+| Site                      | Location                            | Resource                                        | Trigger                                           | Discipline | Crit | Durab |
+| ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- | ---- | ----- |
+| `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          | —    | —     |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:223` | —                                               | —                                                 | —          | —    | —     |
 
 ### Judgments
 
