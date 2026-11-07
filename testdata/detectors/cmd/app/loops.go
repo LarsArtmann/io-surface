@@ -85,3 +85,70 @@ func defaultsInFunc(url string) error {
 func seconds(n int) timeDuration { return timeDuration(n) }
 
 type timeDuration int
+
+func atomicWriteDoneRight(path string, data []byte) error {
+	tmp := path + ".tmp"
+	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+		return err
+	}
+
+	return os.Rename(tmp, path)
+}
+
+func seamAtomicWrite(path string, data []byte) error {
+	return atomicWriteFile(path, data)
+}
+
+func atomicWriteFile(path string, data []byte) error {
+	return os.WriteFile(path, data, 0o644)
+}
+
+func tinyBufferReads(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	buf := make([]byte, 512)
+	for {
+		if _, err := f.Read(buf); err != nil {
+			break
+		}
+	}
+
+	return nil
+}
+
+func bigBufferReads(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	buf := make([]byte, 65536)
+	for {
+		if _, err := f.Read(buf); err != nil {
+			break
+		}
+	}
+
+	return nil
+}
+
+func tinyBufferScanner(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	scanner := newScanner(f)
+	buf := make([]byte, 128)
+	_ = buf
+
+	return scanAll(scanner)
+}
+
+type scanner = int
+
+func newScanner(f *os.File) scanner  { return 0 }
+func scanAll(s scanner) error        { return nil }

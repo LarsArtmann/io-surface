@@ -215,6 +215,25 @@ The ten families: `file-read`, `file-write`, `embed`, `database`, `listener`,
 `outbound`, `stream-copy`, `entropy`, `ipc-subprocess`, `env`. A site has exactly
 one (its dominant role); secondary roles go in `claims.rationale`.
 
+### Severity modulation: `criticality` and `durability` (v1.2)
+
+Two optional claims fields turn detector findings into weighted signals:
+
+```cue
+sites: "internal/queue.companion.reads": claims: {
+	criticality: "critical"   // low | normal | critical — default normal
+	durability:  "durable"    // ephemeral | recoverable | durable — default recoverable
+}
+```
+
+When a manifest is present, `lint` escalates findings one severity step on
+`critical` sites (the message says `[escalated: claims.criticality=critical]`);
+no manifest means no modulation. Claims that cannot hold on their family are
+rejected by the gate itself: rule `io-surface/claim-conflict` (warning) flags
+`atomic-write` on a `file-read` site — a lying claim, not a judgment.
+`criticality`/`durability` are schema v1.2; v1.1 manifests keep unifying
+unchanged (the fields default to `normal`/`recoverable`).
+
 ### ID conventions
 
 ```text

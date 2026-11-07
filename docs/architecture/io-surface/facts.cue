@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "b47450a-dirty"
+	commit: "5b27a4d"
 	date:   "2026-11-07"
 	claims: 24
 	method: "io-surface extract (AST, stdlib-only)"
@@ -34,8 +34,8 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:299",
-			"cmd/io-surface/commands.go:335",
+			"cmd/io-surface/commands.go:300",
+			"cmd/io-surface/commands.go:336",
 		]
 		family: "file-write"
 		facts: {
@@ -44,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:213",
-			"cmd/io-surface/commands.go:242",
+			"cmd/io-surface/commands.go:214",
+			"cmd/io-surface/commands.go:243",
 		]
 		family: "file-write"
 		facts: {
@@ -54,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:292",
+			"cmd/io-surface/commands.go:293",
 		]
 		family: "file-write"
 		facts: {
@@ -82,7 +82,7 @@ sites: {
 	}
 	"internal/check.symbolVisible": {
 		location: [
-			"internal/check/location.go:23",
+			"internal/check/location.go:28",
 		]
 		family: "file-read"
 		facts: {
@@ -91,7 +91,7 @@ sites: {
 	}
 	"internal/extract.extractor.collectSeamDecl": {
 		location: [
-			"internal/extract/extract.go:165",
+			"internal/extract/extract.go:167",
 		]
 		family: "file-read"
 		facts: {
@@ -100,7 +100,7 @@ sites: {
 	}
 	"internal/extract.extractor.parseFile": {
 		location: [
-			"internal/extract/extract.go:228",
+			"internal/extract/extract.go:230",
 		]
 		family: "file-read"
 		facts: {
@@ -109,7 +109,7 @@ sites: {
 	}
 	"internal/extract.extractor.walk": {
 		location: [
-			"internal/extract/extract.go:88",
+			"internal/extract/extract.go:90",
 		]
 		family: "file-read"
 		facts: {
@@ -138,7 +138,7 @@ sites: {
 	}
 	"internal/manifest.Load": {
 		location: [
-			"internal/manifest/manifest.go:170",
+			"internal/manifest/manifest.go:192",
 		]
 		family: "file-read"
 		facts: {
@@ -147,7 +147,7 @@ sites: {
 	}
 	"internal/manifest.Manifest.Validate": {
 		location: [
-			"internal/manifest/manifest.go:380",
+			"internal/manifest/manifest.go:402",
 		]
 		family: "file-read"
 		facts: {
@@ -156,10 +156,10 @@ sites: {
 	}
 	"internal/scaffold.Write": {
 		location: [
-			"internal/scaffold/scaffold.go:56",
 			"internal/scaffold/scaffold.go:59",
-			"internal/scaffold/scaffold.go:71",
-			"internal/scaffold/scaffold.go:75",
+			"internal/scaffold/scaffold.go:62",
+			"internal/scaffold/scaffold.go:74",
+			"internal/scaffold/scaffold.go:78",
 		]
 		family: "file-write"
 		facts: {
@@ -168,7 +168,7 @@ sites: {
 	}
 	"internal/scaffold.git": {
 		location: [
-			"internal/scaffold/scaffold.go:223",
+			"internal/scaffold/scaffold.go:226",
 		]
 		family: "ipc-subprocess"
 		facts: {
@@ -177,7 +177,7 @@ sites: {
 	}
 	"internal/scaffold.schemaCUE": {
 		location: [
-			"internal/scaffold/scaffold.go:30",
+			"internal/scaffold/scaffold.go:31",
 		]
 		family: "embed"
 		facts: {
