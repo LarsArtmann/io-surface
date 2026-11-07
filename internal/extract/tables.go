@@ -6,6 +6,7 @@ package extract
 // editing these maps plus a testdata fixture row, never control flow.
 
 import (
+	"go/ast"
 	"maps"
 	"os"
 	"path/filepath"
@@ -66,10 +67,23 @@ type Options struct {
 
 // Extract walks root and returns sites ordered by ID.
 func Extract(root string, opts Options) ([]*Site, error) {
+	sites, _, err := runExtract(root, opts, false)
+
+	return sites, err
+}
+
+// runExtract is the single walk behind both entrypoints; observing selects
+// whether the detector capture machinery runs. Plain Extract must stay
+// byte-identical to its pre-detector behavior (D1).
+func runExtract(root string, opts Options, observing bool) ([]*Site, []Observation, error) {
 	seams := make(map[string]string, len(seamIdent)+len(opts.Seams))
 	maps.Copy(seams, seamIdent)
 	maps.Copy(seams, opts.Seams)
 	e := &extractor{root: root, sites: map[string]*Site{}, seams: seams, seamDecls: map[string]map[string]string{}}
+	if observing {
+		e.observations = []Observation{}
+		e.captures = map[ast.Node]*capture{}
+	}
 	dirs := opts.Dirs
 	if len(dirs) == 0 {
 		dirs = []string{"cmd", "internal"}
@@ -84,7 +98,7 @@ func Extract(root string, opts Options) ([]*Site, error) {
 			continue
 		}
 		if err = e.walk(path, opts, true); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 	for _, dir := range dirs {
@@ -94,11 +108,11 @@ func Extract(root string, opts Options) ([]*Site, error) {
 			continue
 		}
 		if err = e.walk(path, opts, false); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
-	return e.sortedSites(), nil
+	return e.sortedSites(), sortedObservations(e.observations), nil
 }
 
 // pkgOf maps an import path to the canonical package key we classify by.

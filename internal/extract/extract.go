@@ -72,6 +72,10 @@ type extractor struct {
 	// currentImports is the alias list of the file being parsed (per-file,
 	// unlike the watched-package imports map).
 	currentImports []importAlias
+	// observations/captures are the detector channel (D1): non-nil only when
+	// ExtractWithObservations runs, never touched by plain Extract.
+	observations []Observation
+	captures     map[ast.Node]*capture
 }
 
 // importAlias pairs a file's local package alias with its full import path.
@@ -299,6 +303,9 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 		return
 	}
 	id := symbolID(pkg, fn)
+	if e.captures != nil {
+		e.captureContexts(fn, imports)
+	}
 	ast.Inspect(fn.Body, func(n ast.Node) bool {
 		switch node := n.(type) {
 		case *ast.CallExpr:
@@ -316,6 +323,9 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 				if key, imported := imports[xIdent.Name]; imported {
 					if fam, watched := callFamily[key][call.Sel.Name]; watched {
 						e.record(id, node, testinfra, key+"."+call.Sel.Name, fam, ConfidenceResolved, "")
+						if e.captures != nil {
+							e.detect(id, node, key+"."+call.Sel.Name, fam)
+						}
 
 						return true
 					}
@@ -342,12 +352,7 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 
 func (e *extractor) record(id string, n ast.Node, testinfra bool, call, family, confidence, via string) {
 	s := e.site(id, testinfra)
-	pos := e.fset.Position(n.Pos())
-	rel := pos.Filename
-	if r, err := filepath.Rel(e.root, pos.Filename); err == nil {
-		rel = filepath.ToSlash(r)
-	}
-	loc := rel + ":" + strconv.Itoa(pos.Line)
+	loc := e.locOf(n)
 	if !contains(s.Locations, loc) {
 		s.Locations = append(s.Locations, loc)
 	}
