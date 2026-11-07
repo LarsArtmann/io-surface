@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json/v2"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -660,5 +661,50 @@ func TestExecute_LintFace(t *testing.T) {
 	}
 	if !strings.Contains(out, "io-surface/err-dropped") || !strings.Contains(out, `"version"`) {
 		t.Errorf("lint SARIF lost rule IDs or version:\n%.200s", out)
+	}
+}
+
+var updateGoldens = flag.Bool("update", false, "rewrite the lint golden files")
+
+// TestGolden_LintOutput byte-pins the lint face's two machine-relevant
+// outputs (plan T4): the text report users read and the SARIF document
+// pipelines consume (rule IDs + severities + version are the suppression
+// contract — D7). Intentional output changes re-run with -update.
+func TestGolden_LintOutput(t *testing.T) {
+	out, err := runApp(t, "lint", "--root", "../../testdata/detectors")
+	if err != nil {
+		t.Fatalf("lint: %v\n%s", err, out)
+	}
+	goldenPath := "testdata/lint-text.golden"
+	if *updateGoldens {
+		if err := os.WriteFile(goldenPath, []byte(out), 0o644); err != nil {
+			t.Fatalf("update golden: %v", err)
+		}
+	}
+	want, err := os.ReadFile(goldenPath)
+	if err != nil {
+		t.Fatalf("read golden: %v", err)
+	}
+	if out != string(want) {
+		t.Errorf("lint text output drifted from the golden (re-run `go test ./cmd/io-surface -run TestGolden_LintOutput -update` after an intentional change):\n--- want ---\n%s\n--- got ---\n%s", want, out)
+	}
+
+	sarifOut, err := runApp(t, "lint", "--root", "../../testdata/detectors", "--format", "sarif")
+	if err != nil {
+		t.Fatalf("lint sarif: %v\n%s", err, sarifOut)
+	}
+	sarifOut += "\n"
+	sarifPath := "testdata/lint-sarif.golden"
+	if *updateGoldens {
+		if err := os.WriteFile(sarifPath, []byte(sarifOut), 0o644); err != nil {
+			t.Fatalf("update golden: %v", err)
+		}
+	}
+	wantSarif, err := os.ReadFile(sarifPath)
+	if err != nil {
+		t.Fatalf("read sarif golden: %v", err)
+	}
+	if sarifOut != string(wantSarif) {
+		t.Errorf("lint SARIF output drifted from the golden (re-run with -update):\n--- want (first 400) ---\n%.400s\n--- got (first 400) ---\n%.400s", wantSarif, sarifOut)
 	}
 }

@@ -1,0 +1,7 @@
+info    io-surface/err-dropped           cmd/app.positiveBare  cmd/app/main.go:12
+        os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`
+info    io-surface/err-dropped           cmd/app.positiveBlank  cmd/app/main.go:16
+        data, _ := os.ReadFile(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`
+info    io-surface/err-dropped           cmd/app.positiveBlankStat  cmd/app/main.go:22
+        info, _ := os.Stat(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`
+io-surface lint: 10 sites (10 resolved, 0 token) — 0 errors, 0 warnings, 3 infos (report only; pass --enforce to fail on errors)

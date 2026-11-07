@@ -9,6 +9,7 @@ import (
 
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
+	"github.com/larsartmann/io-surface/internal/lint"
 	"github.com/larsartmann/io-surface/internal/manifest"
 	"github.com/larsartmann/io-surface/internal/render"
 )
@@ -80,6 +81,17 @@ func TestWrite_ThenLoadCheckRenderRoundTrip(t *testing.T) {
 	if rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
 		t.Errorf("fresh scaffold should be clean, got %d errors / %d warnings: %+v",
 			rep.Stats.Errors, rep.Stats.Warnings, rep.Findings)
+	}
+
+	// Green by construction extends to the detector face (plan T4.1): the
+	// clean fixture tree must produce zero lint findings — a scaffold can
+	// never hand a repo a red lint day one.
+	lintRep, err := lint.Run(root, lint.Options{})
+	if err != nil {
+		t.Fatalf("lint: %v", err)
+	}
+	if len(lintRep.Findings) != 0 {
+		t.Errorf("fresh scaffold produced detector findings: %+v", lintRep.Findings)
 	}
 
 	doc := render.Markdown(m)
