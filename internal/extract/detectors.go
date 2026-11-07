@@ -56,6 +56,14 @@ var detectorRules = []RuleDef{
 			return o.Evidence + " — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
 		},
 	},
+	{
+		Name:        RuleCtxDropped,
+		Severity:    "info",
+		Description: "a context.Context is in scope but the call uses the context-blind variant",
+		Message: func(o Observation) string {
+			return o.Evidence
+		},
+	},
 }
 
 // DetectorRule returns the published metadata for a detector rule name —

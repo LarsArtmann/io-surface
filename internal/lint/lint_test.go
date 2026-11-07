@@ -17,18 +17,23 @@ func TestRun_FixtureReport(t *testing.T) {
 	if rep.Enforcement != "lint" {
 		t.Errorf("enforcement = %q, want lint", rep.Enforcement)
 	}
-	if rep.Stats.Infos != 7 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
-		t.Errorf("stats = %+v, want 7 infos", rep.Stats)
+	if rep.Stats.Infos != 11 || rep.Stats.Errors != 0 || rep.Stats.Warnings != 0 {
+		t.Errorf("stats = %+v, want 11 infos", rep.Stats)
 	}
-	if rep.Stats.Extracted != 25 || rep.Stats.Resolved != 25 {
-		t.Errorf("stats = %+v, want 25 extracted / 25 resolved", rep.Stats)
+	if rep.Stats.Extracted != 32 || rep.Stats.Resolved != 31 {
+		t.Errorf("stats = %+v, want 32 extracted / 31 resolved", rep.Stats)
 	}
-	if len(rep.Findings) != 7 {
+	if len(rep.Findings) != 11 {
 		t.Fatalf("findings = %d, want 3", len(rep.Findings))
 	}
+	allowed := map[string]bool{
+		RuleID("err-dropped"):    true,
+		RuleID("closer-missing"): true,
+		RuleID("ctx-dropped"):    true,
+	}
 	for _, f := range rep.Findings {
-		if f.Rule != RuleID("err-dropped") && f.Rule != RuleID("closer-missing") {
-			t.Errorf("rule = %q, want %q", f.Rule, RuleID("err-dropped"))
+		if !allowed[f.Rule] {
+			t.Errorf("unexpected rule %q (vocabulary drift)", f.Rule)
 		}
 		if f.Severity != check.SeverityInfo {
 			t.Errorf("severity = %q, want info (D4: rules ship at info)", f.Severity)
