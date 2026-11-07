@@ -105,7 +105,7 @@ _(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked
 24. #60 `constraintError` single deterministic conjunct walk.
 25. #62 docs/status index (README.md pattern from dnsblockd).
 26. #57 README: the `init --force` + git-restore ritual for judgment files (verify the new contract block covers it or extend).
-27. #28 `.Do`/`.Close` token ambiguity classification.
+27. ~~#28 `.Do`/`.Close` token ambiguity classification.~~ RESOLVED 2026-11-06: TODO_LIST #28 DONE — bare `.Do` records no family (`methodToken["Do"] = ""`, the manifest claim decides); the 0.3.0 detector line classifies `Close` calls structurally (closer-missing), independent of family tokenization.
 28. #29 `extract --stats` per-package histogram.
 29. ~~#30 `version --json` with commit + build date.~~ RESOLVED same day: shipped with the enforcement/CLI batch — `versionFlags` + `runVersion` in `cmd/io-surface/commands.go`, pinned by `TestVersionJSON`; TODO_LIST #30 marked DONE.
 30. #35 fleet family distribution across ~10 repos.
