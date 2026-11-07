@@ -122,7 +122,7 @@ func TestDetectorRegistry_ParityPinsMetadata(t *testing.T) {
 func TestErrResults_CoversWatchedFamilies(t *testing.T) {
 	for _, call := range []string{
 		"os.ReadFile", "os.Stat", "os.WriteFile", "os.MkdirAll", "os.Create",
-		"io.ReadAll", "http.Get", "sql.Open", "net.Listen", "net.Dial", "filepath.WalkDir",
+		"io.ReadFull", "http.Get", "sql.Open", "net.Listen", "net.Dial", "filepath.WalkDir",
 	} {
 		if _, ok := errResults[call]; !ok {
 			t.Errorf("errResults missing %q", call)
@@ -130,6 +130,9 @@ func TestErrResults_CoversWatchedFamilies(t *testing.T) {
 	}
 	if _, ok := errResults["os.TempDir"]; ok {
 		t.Errorf("os.TempDir returns no error and must not be in errResults")
+	}
+	if _, ok := errResults["io.ReadAll"]; ok {
+		t.Errorf("io.ReadAll must stay out of errResults (T11 evidence: capped-LimitReader best-effort reads dominate)")
 	}
 }
 

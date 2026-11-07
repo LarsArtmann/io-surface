@@ -25,13 +25,14 @@ func symbolVisible(root string, locations []string, symbol string) bool {
 		}
 		src, cached := read[path]
 		if !cached {
-			src, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+			data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 			if err != nil {
 				read[path] = nil
 
 				continue
 			}
-			read[path] = src
+			read[path] = data
+			src = data
 		}
 		if src != nil && strings.Contains(string(src), symbol) {
 			return true
