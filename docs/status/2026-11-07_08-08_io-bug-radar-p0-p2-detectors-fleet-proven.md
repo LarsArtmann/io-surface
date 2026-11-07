@@ -35,12 +35,16 @@ composition/SARIF ADR (ROADMAP Theme 5, TODO #61 decided), docs sync.
   loop, deliberate stat-guard) recorded below. Verified how: re-run lint post-fix.
 - **Fleet harness (T16):** `scripts/fleetscan.sh` (pma discovery → per-repo lint JSON →
   aggregate). One command reproduces the run:
-  `./scripts/fleetscan.sh /tmp/fleetscan-final.json`.
+  `./scripts/fleetscan.sh docs/evidence/fleetscan-<date>.json` (the original
+  run wrote to /tmp; the committed superseding evidence with the final
+  10-rule ruleset lives at `docs/evidence/fleetscan-2026-11-07-v031.json`).
 
 ## Fleet evidence (2026-11-07, final numbers after carve-outs)
 
 Verified how: `./scripts/fleetscan.sh /tmp/fleetscan-final.json` → 160/160 repos scanned,
-72 with findings.
+72 with findings. (Superseded 2026-11-07: the standing evidence home is
+`docs/evidence/` — see the 21-12 superb re-scan report; per-rule counts for
+the shared 7 rules are identical, confirming reproducibility.)
 
 | Rule                | Fleet | Pilot-verified | FP classes found (evidence-acted)                                              |
 | ------------------- | ----- | -------------- | ------------------------------------------------------------------------------ |

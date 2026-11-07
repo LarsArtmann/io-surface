@@ -1,3 +1,5 @@
+> **Live remainder:** routed into TODO_LIST at creation (rows #1-36 era); nothing open remains. Archived 2026-11-07 (cadence 15/15).
+
 # Status Report — Self-Dogfood, filepath Extraction, and `init --force` Safety
 
 **Date:** 2026-11-06 02:33 CET

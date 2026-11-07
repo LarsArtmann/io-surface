@@ -274,8 +274,9 @@ The detector-suite evidence report
 records the v0.3.0 line: fleet numbers, FP classes and carve-outs, the T17
 severity verdicts (nothing promoted — D4 bar is FP≈0), and the pilot retro
 (InboxClean/gogenfilter onboarded, dnsblockd migration pending). Fleet runs
-reproduce via `./scripts/fleetscan.sh /tmp/fleetscan-report.json` (pma
-discovery → per-repo lint JSON → aggregate).
+reproduce via `./scripts/fleetscan.sh docs/evidence/fleetscan-<date>.json`
+(pma discovery → per-repo lint JSON → aggregate; committed outputs live in
+`docs/evidence/`, never /tmp).
 
 ## Conventions
 

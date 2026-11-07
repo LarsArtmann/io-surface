@@ -113,7 +113,7 @@
 > Policy: detectors fire on the resolved tier only; every rule ships at info
 > severity; promotion to warning/error only after fleet FP evidence (T17).
 > Fleet baseline: 2026-11-07 scan, 182 projects, 5,802 production sites
-> (`/tmp/io-surface-portfolio-stats.json`, report at repo root).
+> (`docs/evidence/fleetscan-2026-11-07-v031.json`, report at repo root).
 
 
 | #  | Task                                                                                                                                    | Status               | Impact | Effort | Evidence                                                                                                                                                                                                            |

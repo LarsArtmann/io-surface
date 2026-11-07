@@ -101,17 +101,17 @@ table in §9), but the severity flip is owner-gated.
 
 ## 9. Standing promotion ledger
 
-| Rule              | Current | Evidence run            | N   | FPs                  | FP rate          | Verdict under this policy    |
-| ----------------- | ------- | ----------------------- | --- | -------------------- | ---------------- | ---------------------------- |
-| err-dropped       | info    | 2026-11-07 fleet        | 11  | ~2 (post-carve)      | ~18%*            | stays info (W1 volume unmet) |
-| closer-missing    | info    | 2026-11-07 pilots       | 2   | 0                    | 0% (N too small) | stays info (W1/W4 unmet)     |
-| ctx-dropped       | info    | 2026-11-07 fleet        | 3   | 3 (force-kill class) | 100%*            | stays info (W1/W2 unmet)     |
-| defer-in-loop     | info    | 2026-11-07 fleet        | 1   | 0                    | 0% (N too small) | stays info (W1/W4 unmet)     |
-| client-no-timeout | info    | 2026-11-07 fleet+triage | 13+ | TBD T3/T12           | TBD              | decided by T3/T12 evidence   |
-| stat-then-open    | info    | 2026-11-07 fleet        | 50  | TBD T3/T12           | TBD              | decided by T3/T12 evidence   |
-| io-in-loop        | info    | 2026-11-07 fleet        | 349 | 3/3 sampled FP       | TBD              | refinement first (T16)       |
-| write-non-atomic  | info    | none (postdates scan)   | —   | —                    | —                | T2/T3 evidence pending       |
-| tiny-buffer       | info    | none (postdates scan)   | —   | —                    | —                | T2/T3 evidence pending       |
+| Rule              | Current | Evidence run                                | N           | FPs                  | FP rate          | Verdict under this policy                                                                                                        |
+| ----------------- | ------- | ------------------------------------------- | ----------- | -------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| err-dropped       | info    | 2026-11-07 fleet                            | 11          | ~2 (post-carve)      | ~18%*            | stays info (W1 volume unmet)                                                                                                     |
+| closer-missing    | info    | 2026-11-07 pilots                           | 2           | 0                    | 0% (N too small) | stays info (W1/W4 unmet)                                                                                                         |
+| ctx-dropped       | info    | 2026-11-07 fleet                            | 3           | 3 (force-kill class) | 100%*            | stays info (W1/W2 unmet)                                                                                                         |
+| defer-in-loop     | info    | 2026-11-07 fleet                            | 1           | 0                    | 0% (N too small) | stays info (W1/W4 unmet)                                                                                                         |
+| client-no-timeout | info    | 2026-11-07 T3 protocol                      | 13          | 10                   | 76.9%            | stays info (W2 unmet; classes: test harnesses, documented ctx-deadline/stream designs, one post-construction Timeout assignment) |
+| stat-then-open    | info    | 2026-11-07 T3 protocol                      | 30          | 17                   | 56.7%            | stays info (W2 unmet; dominant class: redundant existence pre-checks)                                                            |
+| io-in-loop        | info    | 2026-11-07 fleet                            | 351         | 3/3 sampled FP       | TBD              | refinement first (T16)                                                                                                           |
+| write-non-atomic  | info    | 2026-11-07 T3 protocol                      | 30          | 5                    | 16.7%            | stays info (W2 unmet; 5 mechanical classes pending carve-out)                                                                    |
+| tiny-buffer       | info    | 2026-11-07 fleet (0 hits) + mutation corpus | 10 mutators | 0                    | recall 100%      | stays info (preventive value)                                                                                                    |
 
 \* small-N rates are estimates; the ledger keeps them only for trend
 visibility, never for a decision on their own (W4 blocks that).
