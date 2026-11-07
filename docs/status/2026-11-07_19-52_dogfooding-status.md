@@ -13,24 +13,24 @@ the full repo snapshot lives in the 09:09 retrospective of today.
 
 ## a) Fully done
 
-| Item | Verified how |
-| --- | --- |
-| Self-gate green: 16 declared / 16 extracted (16 resolved, 0 token), 2 baselined, 0 err/0 warn/0 info | `check --root .` → exit 0 |
+| Item                                                                                                                                                                          | Verified how                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Self-gate green: 16 declared / 16 extracted (16 resolved, 0 token), 2 baselined, 0 err/0 warn/0 info                                                                          | `check --root .` → exit 0                                                                    |
 | Real CI green ON THE LAST PUSHED commit (5b4432b): all 9 gate steps incl. facts-freshness, doc-fresh+dprint, self-SARIF, docs-gates, capslock absorb, public-install tripwire | `gh run list -R LarsArtmann/io-surface` → run 42353726369, success, 2026-11-07T08:02Z, 1m21s |
-| Facts manifest fresh: refresh drifts only the tolerated `commit:` audit line | `init --force`; `git diff -I'^commit:' -I'^date:' …` quiet |
-| Inventory doc freshness + gofmt clean | `render --doc … --check` exit 0; `gofmt -l .` empty |
-| T10 dogfood bug is genuinely fixed: `symbolVisible` N+1 → per-unique-path read cache | `internal/check/location.go:20-36`; the retro's "FIXED" claim matches the code |
-| gogenfilter pilot landed: gate step + manifest committed by daemon | `git -C gogenfilter show a6e78aa --stat` (ci.yml + docs/architecture/); clean tree |
-| Fleet-scale self-use: 182-repo fleetscan, 5,802 production sites | `scripts/fleetscan.sh`; evidence report 2026-11-07_08-08 |
+| Facts manifest fresh: refresh drifts only the tolerated `commit:` audit line                                                                                                  | `init --force`; `git diff -I'^commit:' -I'^date:' …` quiet                                   |
+| Inventory doc freshness + gofmt clean                                                                                                                                         | `render --doc … --check` exit 0; `gofmt -l .` empty                                          |
+| T10 dogfood bug is genuinely fixed: `symbolVisible` N+1 → per-unique-path read cache                                                                                          | `internal/check/location.go:20-36`; the retro's "FIXED" claim matches the code               |
+| gogenfilter pilot landed: gate step + manifest committed by daemon                                                                                                            | `git -C gogenfilter show a6e78aa --stat` (ci.yml + docs/architecture/); clean tree           |
+| Fleet-scale self-use: 182-repo fleetscan, 5,802 production sites                                                                                                              | `scripts/fleetscan.sh`; evidence report 2026-11-07_08-08                                     |
 
 ## b) Partially done
 
-| Item | Gap |
-| --- | --- |
-| InboxClean pilot | ALL FOUR pilot files sit **uncommitted** in its working tree (ci.yml pin v0.1.0→v0.3.0, claims.cue, schema.cue, pdf.go fd-leak fix). "Done" is true only on disk. Verified: `git -C InboxClean status --porcelain`. |
-| Self-lint dogfood | 11 infos on our own tree, exit 0 (info-only by design): 5 write-non-atomic, 5 io-in-loop, 1 stat-then-open. None tracked as TODO rows. One is a post-fix residual the detector cannot see through (`location.go:28` flags the loop despite the read cache — loop-shape, not dataflow). |
-| lint in CI | ABSENT. The detector layer never runs on io-surface in CI; T10 was a one-off session act. Retro §f2 names it; no TODO row exists yet. The SARIF-artifact-only policy (TODO #61, T24 ADR) already decided the shape — one step to wire. |
-| gogenfilter gate observation | Wired but never seen running: GitHub CI's last workflow run is 2026-11-04; the pilot commit is unpushed (Forgejo runs no workflows). Verified: `gh run list -R LarsArtmann/gogenfilter`. |
+| Item                         | Gap                                                                                                                                                                                                                                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| InboxClean pilot             | ALL FOUR pilot files sit **uncommitted** in its working tree (ci.yml pin v0.1.0→v0.3.0, claims.cue, schema.cue, pdf.go fd-leak fix). "Done" is true only on disk. Verified: `git -C InboxClean status --porcelain`.                                                                    |
+| Self-lint dogfood            | 11 infos on our own tree, exit 0 (info-only by design): 5 write-non-atomic, 5 io-in-loop, 1 stat-then-open. None tracked as TODO rows. One is a post-fix residual the detector cannot see through (`location.go:28` flags the loop despite the read cache — loop-shape, not dataflow). |
+| lint in CI                   | ABSENT. The detector layer never runs on io-surface in CI; T10 was a one-off session act. Retro §f2 names it; no TODO row exists yet. The SARIF-artifact-only policy (TODO #61, T24 ADR) already decided the shape — one step to wire.                                                 |
+| gogenfilter gate observation | Wired but never seen running: GitHub CI's last workflow run is 2026-11-04; the pilot commit is unpushed (Forgejo runs no workflows). Verified: `gh run list -R LarsArtmann/gogenfilter`.                                                                                               |
 
 ## c) Not started
 

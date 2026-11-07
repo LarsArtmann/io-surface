@@ -24,19 +24,19 @@ waited out both buildflow pids, re-applied, and repaired the fallout
 
 ## a) FULLY DONE
 
-| Item | Verified how |
-| --- | --- |
-| Dogfooding status report, every claim named its command | `docs/status/2026-11-07_19-52_dogfooding-status.md` |
-| Push to both remotes on explicit order; sync proven | `5b4432b..0d78ec5`, `rev-list --count` = 0 both sides; CI green (run 42403657881) |
-| go-atomic-write adopted as direct dep (v0.6.0) | `go.mod` require without `// indirect`; already in the binary via cmdguard→samber-do-auditlog before |
-| All 5 write sites swapped: `WriteWithPerm` (scaffold, capabilities.cue, render --out), `WriteVerified`+fingerprint (baseline append, doc embed) | `commands.go:243,293,301,337`; `baseline_write.go:62`; `scaffold.go:78` |
-| Extractor taught the library (resolved tier): pkgOf + callFamily (`Write*`→file-write, `FingerprintFile`→file-read) + errResults (slot 0; WriteIfChanged slot 1) | `internal/extract/tables.go`; fixture `testdata/extract/internal/store/atomicwrite.go`; cases in extract_test + check fixture |
-| Self-dogfood improved: lint 11 → 4 infos (all 5 write-non-atomic + stat-then-open gone) | `lint --root .` output before/after this session |
-| Concurrent-modification UX: baseline append / doc embed now fail with a re-run hint instead of clobbering | `errors.Is(err, ErrConcurrentModification)` branch, `baseline_write.go` |
-| Storm recovery: diagnosed daemon/buildflow/second-session interplay, waited out pids, re-applied, zero data loss | reflog, `git show 36fd6e7 --stat`, pgrep output |
-| TODO_LIST conflict-marker repair (buildflow stash fallout): kept upstream side incl. the other session's new SUPERB section, dropped the duplicated stale table | `rg '^(<<<<<<<\|>>>>>>>)' TODO_LIST.md` → no matches |
-| Docs: AGENTS dep posture 3→4 deps; AGENTS sharp edge "buildflow --fix can revert uncommitted edits"; CHANGELOG [Unreleased] Added ×2; TODO #92 → PARTIAL with 6-of-11 accounted | file diffs, absorbed by daemon (`7adb441`, `1fbcd66`) |
-| Facts + INVENTORY fresh; CI-facts-fresh filter quiet | `init --force`; `git diff -I… ` quiet; `render --doc --check` exit 0 |
+| Item                                                                                                                                                                            | Verified how                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Dogfooding status report, every claim named its command                                                                                                                         | `docs/status/2026-11-07_19-52_dogfooding-status.md`                                                                           |
+| Push to both remotes on explicit order; sync proven                                                                                                                             | `5b4432b..0d78ec5`, `rev-list --count` = 0 both sides; CI green (run 42403657881)                                             |
+| go-atomic-write adopted as direct dep (v0.6.0)                                                                                                                                  | `go.mod` require without `// indirect`; already in the binary via cmdguard→samber-do-auditlog before                          |
+| All 5 write sites swapped: `WriteWithPerm` (scaffold, capabilities.cue, render --out), `WriteVerified`+fingerprint (baseline append, doc embed)                                 | `commands.go:243,293,301,337`; `baseline_write.go:62`; `scaffold.go:78`                                                       |
+| Extractor taught the library (resolved tier): pkgOf + callFamily (`Write*`→file-write, `FingerprintFile`→file-read) + errResults (slot 0; WriteIfChanged slot 1)                | `internal/extract/tables.go`; fixture `testdata/extract/internal/store/atomicwrite.go`; cases in extract_test + check fixture |
+| Self-dogfood improved: lint 11 → 4 infos (all 5 write-non-atomic + stat-then-open gone)                                                                                         | `lint --root .` output before/after this session                                                                              |
+| Concurrent-modification UX: baseline append / doc embed now fail with a re-run hint instead of clobbering                                                                       | `errors.Is(err, ErrConcurrentModification)` branch, `baseline_write.go`                                                       |
+| Storm recovery: diagnosed daemon/buildflow/second-session interplay, waited out pids, re-applied, zero data loss                                                                | reflog, `git show 36fd6e7 --stat`, pgrep output                                                                               |
+| TODO_LIST conflict-marker repair (buildflow stash fallout): kept upstream side incl. the other session's new SUPERB section, dropped the duplicated stale table                 | `rg '^(<<<<<<<\|>>>>>>>)' TODO_LIST.md` → no matches                                                                          |
+| Docs: AGENTS dep posture 3→4 deps; AGENTS sharp edge "buildflow --fix can revert uncommitted edits"; CHANGELOG [Unreleased] Added ×2; TODO #92 → PARTIAL with 6-of-11 accounted | file diffs, absorbed by daemon (`7adb441`, `1fbcd66`)                                                                         |
+| Facts + INVENTORY fresh; CI-facts-fresh filter quiet                                                                                                                            | `init --force`; `git diff -I…` quiet; `render --doc --check` exit 0                                                           |
 
 ## b) PARTIALLY DONE
 
@@ -129,6 +129,7 @@ waited out both buildflow pids, re-applied, and repaired the fallout
 ## f) Up to 50 things to get done next (session-derived; most are ROADMAP fuel)
 
 **Direct follow-ups (this week):**
+
 1. Push the current HEAD (daemon commits since 0d78ec5 incl. adoption) — user order or standing rule (§g).
 2. Watch one CI run on a HEAD that contains the adoption + row 91's self-lint step together; record the link.
 3. Confirm row 91's CI lint step on disk matches the current 4-info state (no stale count assertions).
