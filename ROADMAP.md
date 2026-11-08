@@ -162,6 +162,16 @@ bridge deferred until a consumer exists; golangci composition rejected.
   (taxonomy freeze applies) vs "permanently out-of-scope" gates whether
   `absorb` stores or drops them. First-class would also answer MODIFY/READ
   _SYSTEM_STATE for systemd-hardening consumers (Theme 2).
+  - **Decision recorded 2026-11-08 (owner, via session question batch):
+    FIRST-CLASS — the runtime-power set joins as package-level vocabulary in
+    a schema-v1.3 session.** Scope: `absorb` stores them as package-level
+    facts (never per-site disciplines — the transitive-everywhere noise
+    class stays out of the site contract); the shadow-capability rule may
+    gain advisory direct-edge tiers for them. Cost accepted: schema version
+    bump + taxonomy-freeze process (the #CapabilityName enum and the
+    `internal/capability` mapping grow together, same train as Q6's
+    ownership field — one v1.3 session can carry both). Implementation is
+    unscheduled; tracked as TODO row #136.
 - **Q6 (ADR, superb plan T18) — should claims grow an `ownership` field
   (v1.3) so `closer-missing` understands handle hand-off?** The closer-missing
   detector already suppresses the obvious transfer shapes (passing the handle

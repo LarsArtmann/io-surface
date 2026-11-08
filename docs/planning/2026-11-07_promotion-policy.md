@@ -117,5 +117,22 @@ table in §9), but the severity flip is owner-gated.
 \* small-N rates are estimates; the ledger keeps them only for trend
 visibility, never for a decision on their own (W4 blocks that).
 
+**W3 self-gate status (2026-11-08, N21.3):** GREEN —
+`io-surface lint --root . --enforce` exits 0 (17 sites, 17 resolved, 0 token,
+0 findings) on the post-M10/M11 ruleset (`.Listen`/`.ListenPacket` token-tier
+entries + site-level ignore directives).
+
+**Re-scan owed (2026-11-08, N21.1 — plan for the next evidence run):** the
+M10/M11 rule changes (new token-tier entries; ignore-directive suppression)
+shift fleet numbers, so the 2026-11-07 ledger rows above are stale for
+trend purposes. Re-scan protocol: `./scripts/fleetscan.sh
+docs/evidence/fleetscan-2026-11-XX.json` (pma discovery → per-repo v0.5.0
+lint JSON → aggregate; committed outputs live in docs/evidence/, never
+/tmp). Expected shifts to verify: io-in-loop volume (go-taskqueue alone went
+37 → 53 findings under the final ruleset), write-non-atomic classes after
+the durability modulation, and the first ignore-directive suppression counts
+(the self-tree carries 2+). When it runs, refresh the N/FP columns above and
+re-sample FP classes N ≥ 30 per §7 before any promotion decision.
+
 The ledger is updated by every evidence run. It is the single table the owner
 reads to see whether anything _could_ promote.
