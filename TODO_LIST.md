@@ -204,3 +204,19 @@
 | 125 | Verify BuildFlow picked up provider v0.4.0 (sdk_imports pin; run one detect end-to-end)                                     | 🔴 `TODO` | Med    | 30min  | status report §f.15; release protocol requires both halves shipped                                  |
 | 126 | Series sweep: `docs/reviews/` + `docs/research/` overlap check + supersedes convention for the audit series                 | 🔴 `TODO` | Low    | 30min  | status report §c.5; pareto plan M22                                                                 |
 | 127 | Audit rendering checks: mobile check (render index.html at 320 px; only 1280 px was screenshotted) + visual pass of the 22 .md report files on GitHub (tables/badges render) | 🔴 `TODO` | Low | 30min | status report §f.19+20; pareto plan M21 |
+
+## Remainder plan (harvested 2026-11-08, superb-remainder plan)
+
+> Source: pareto plan remainder M13.2–M24 + execution report
+> `docs/status/2026-11-08_06-16_post-audit-pareto-m1-m12-execution.md` §f.
+> Full ranking: `docs/planning/2026-11-08_06-27_superb-remainder-plan.md` (N1–N22).
+
+| #   | Task                                                                                                                        | Status    | Impact | Effort | Evidence                                                                                            |
+| --- | --------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | --------------------------------------------------------------------------------------------------- |
+| 128 | Push the 13 unpushed master commits to BOTH remotes (origin + github); confirm CI triggered on the new HEAD                  | 🔴 `TODO` | High   | 30min  | `git log origin/master..HEAD --oneline \| wc -l` = 13 (2026-11-08 06:16); execution report §d.1     |
+| 129 | Cut v0.5.0: version const + CHANGELOG heading + README status line + full gates + tags to both remotes + proxy check         | 🔴 `TODO` | High   | 60min  | CHANGELOG [Unreleased] holds version refusal, SARIF posture, ListenConfig, writeDocVerified remap   |
+| 130 | M14 dnsblockd migration decision packet from the T19 runbook + session schedule; map unblock path for #27                     | 🔴 `TODO` | Med    | 30min  | owner scheduled the session 2026-11-08 (M1 batch); pareto plan M14                                  |
+| 131 | M15 baseline shrink: inspect the 2 baselined sites; declare or remove; shrink-or-justify                                     | 🔴 `TODO` | Low    | 30min  | check reports "2 baselined" every run; pareto plan M15                                              |
+| 132 | M20 ROADMAP Q5 decision input: capability promotion evidence summary → owner decision → ROADMAP update                        | 🔴 `TODO` | Med    | 60min  | ROADMAP Q5 open; policy ratified 2026-11-08 makes promotion executable                              |
+| 133 | File the go-finding capability request: run-level SARIF propertyBag (`runs[].properties`); then migrate emit's enforcement key | 🔴 `TODO` | Low    | 30min  | emit.go doc comment cites a "TODO row" that did not exist — created here; verify-before-filing applies |
+| 134 | InboxClean: run on-demand gates their hook skipped (nix flake check/lint/test) + push decision for commit `418ff69d`          | 🔴 `TODO` | Med    | 30min  | InboxClean pre-commit load-skipped BuildFlow on the pin bump; cross-repo                             |
