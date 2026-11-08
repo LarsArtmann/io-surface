@@ -1,9 +1,9 @@
 # cmdguard — adoption & utilization review
 
-> **Status: USED — direct dependency** (`github.com/larsartmann/cmdguard/v4 v4.2.0`)
-> **Verdict: fully leveraged for what this CLI is; one free patch bump pending.**
-> **Adoption score: 93/100 (very high)** — 6.5 of 7 applicable capabilities fully leveraged
-> Latest version: **v4.2.1** (2026-11-04, module proxy confirms) · io-surface pins **v4.2.0**
+> **Status: USED — direct dependency** (`github.com/larsartmann/cmdguard/v4 v4.2.1`)
+> **Verdict: fully leveraged for what this CLI is; bump SHIPPED 2026-11-08 (was the one free patch pending).**
+> **Adoption score: 100/100 (re-scored at the 2026-11-08 bump; was 93 pre-bump)** — all 7 applicable capabilities fully leveraged
+> Latest version: **v4.2.1** (2026-11-04, module proxy confirms) · io-surface pins **v4.2.1** (bumped from v4.2.0, plan M2)
 > Reviewed: 2026-11-07 · io-surface `docs/review/libs/` series
 
 ## What the library offers
@@ -39,21 +39,22 @@ commands/flags), `doctor`, and seven satellite modules (`prompts`, `spinner`,
 | 4  | Parent commands + positional args                                                                    | 🟢 Fully leveraged | `baseline add`, main.go:149, commands.go:458                                                                                                                                                              |
 | 5  | Consumer-owned exit-code contract                                                                    | 🟢 Fully leveraged | 0/1/2 mapping, main.go:39-51, pinned by `main_test.go`                                                                                                                                                    |
 | 6  | Custom command overriding auto-registered ones                                                       | 🟢 Fully leveraged | `version --json`, commands.go:48-75                                                                                                                                                                       |
-| 7  | Version currency                                                                                     | 🟡 Partially used  | v4.2.0 vs v4.2.1; v4.2.1 ships `887dcae` "Fix ExitCode(0) on errorfamily failures and flag leaks on reused CLIs" — low impact here (single Execute per process) but the bump is free                      |
+| 7  | Version currency                                                                                     | ✅ Fully used      | Pinned **v4.2.1** since 2026-11-08 (plan M2 bump, gates green). v4.2.1 ships `887dcae` "Fix ExitCode(0) on errorfamily failures and flag leaks on reused CLIs"                                      |
 | 8  | Config files / env precedence / `config explain`                                                     | ⚪ N/A             | io-surface is repo-driven: no config file concept; flags+defaults are the whole surface (deliberate)                                                                                                      |
 | 9  | Machine error envelope (`--output json…` + `error_code`)                                             | ⚪ N/A             | io-surface's machine contract is its own `--format json/sarif` stdout, byte-pinned by goldens; usage errors are cmdguard's domain already                                                                 |
 | 10 | Dynamic completion (`WithCompletion`)                                                                | ⚪ N/A             | only candidate would be `--format` value completion; no dynamic data exists today                                                                                                                         |
 | 11 | Satellite modules (`prompts`, `spinner`, `telemetry`, `lint`, `glamour`, `flightrecorder`, `schema`) | ⚪ N/A             | no interactivity by design, sub-second runs (no spinner), telemetry deliberately absent, `lint` targets cmdguard-API linters, `schema` emits JSON Schema for config-file consumers (no config files here) |
 
-Score derivation (skill rubric): N=11 rows, A=7 applicable, fully=6, partial=1 → round(100 × 6.5/7) = **93**.
+Score derivation (skill rubric): N=11 rows, A=7 applicable, fully=7, partial=0 → round(100 × 7/7) = **100**
+(re-scored 2026-11-08 when the pin reached @latest via plan M2; was 93 with the
+v4.2.0 pin lagging).
 
 ## Recommendation
 
-**Keep, bump to v4.2.1.** io-surface uses exactly the core surface the
+**Bumped to v4.2.1 on 2026-11-08** (plan M2, full gates green) — the pin-gap
+row is closed. io-surface uses exactly the core surface the
 framework recommends for gate CLIs and nothing it shouldn't. The satellite
-modules stay out for honest reasons, not neglect. Action item (hygiene, not
-urgency): `go get github.com/larsartmann/cmdguard/v4@v4.2.1 && go mod tidy`,
-then run the full gate. Master is 8 commits ahead of v4.2.1 with unreleased
+modules stay out for honest reasons, not neglect. Master is 8 commits ahead of v4.2.1 with unreleased
 work (strict config keys, `config explain`, stable error codes) — none of it
 changes the core API io-surface consumes; no migration needed.
 
@@ -61,7 +62,7 @@ changes the core API io-surface consumes; no migration needed.
 
 ```bash
 rg -n 'cmdguard' --glob '*.go' cmd/                 # 4 files mention; 2 import core v4
-go list -m github.com/larsartmann/cmdguard/v4        # pinned vs @latest
+go list -m github.com/larsartmann/cmdguard/v4        # v4.2.1 pinned (bumped 2026-11-08, plan M2); @latest also v4.2.1
 git -C /home/lars/projects/cmdguard log --oneline v4.2.0..v4.2.1
 go run ./cmd/io-surface --help && go run ./cmd/io-surface doctor
 ```

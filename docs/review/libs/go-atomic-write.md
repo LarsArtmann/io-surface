@@ -1,9 +1,9 @@
 # go-atomic-write — adoption & utilization review
 
-> **Status: USED — direct dependency** (`github.com/larsartmann/go-atomic-write v0.6.0`)
-> **Verdict: leveraged to the max, including the advanced verified-write path; two free patch bumps pending.**
-> **Adoption score: 80/100 (high)** — 3 of 5 applicable capabilities fully leveraged, 2 partial (both opportunistic)
-> Latest version: **v0.6.2** (2026-11-04, module proxy confirms) · io-surface pins **v0.6.0**
+> **Status: USED — direct dependency** (`github.com/larsartmann/go-atomic-write v0.6.2`)
+> **Verdict: leveraged to the max, including the advanced verified-write path; bump SHIPPED 2026-11-08 (were two free patch bumps).**
+> **Adoption score: 90/100 (high, re-scored at the 2026-11-08 bump; was 80 pre-bump)** — 4 of 5 applicable capabilities fully leveraged, 1 partial (opportunistic)
+> Latest version: **v0.6.2** (2026-11-04, module proxy confirms) · io-surface pins **v0.6.2** (bumped from v0.6.0, plan M2)
 > Reviewed: 2026-11-07 · io-surface `docs/review/libs/` series
 
 ## What the library offers
@@ -50,17 +50,19 @@ message — exactly the library's intended contract.
 | 3 | `ErrConcurrentModification` sentinel handling                     | 🟢 Fully leveraged | baseline_write.go:63 remaps to `ErrBaseline` with re-run guidance                                                                                                                                                                                                         |
 | 4 | Streaming writers (`WriteFunc`, unreleased `WriteFuncWithPerm`)   | ⚪ N/A             | every write source is an in-memory `[]byte` (CUE builder / markdown string); nothing streams                                                                                                                                                                              |
 | 5 | `WriteIfChanged` (skip identical content)                         | 🟡 Partially used  | `render --doc` rewrites identical bytes when fresh==stored… actually the `--check` path (CI) compares before writing; the write path only runs on demand. Residual impact: mtime-only churn. The variant is worth adopting only if `--doc` rewrites ever become scheduled |
-| 6 | Version currency                                                  | 🟡 Partially used  | v0.6.0 vs v0.6.2: v0.6.1's temp-leak fix (staged `.tmp` not removed when rename fails) is real robustness for `render --out` into adversarial paths; the unreleased MkdirAll fix is irrelevant here (scaffold MkdirAlls the manifest dir itself, scaffold.go:66)          |
+| 6 | Version currency                                                  | 🟢 Fully leveraged | Pinned **v0.6.2** since 2026-11-08 (plan M2 bump, gates green). v0.6.1's temp-leak fix (staged `.tmp` not removed when rename fails) now hardens the `render --out` paths; the unreleased MkdirAll fix is irrelevant here (scaffold MkdirAlls the manifest dir itself, scaffold.go:66) |
 
 Score derivation (skill rubric): N=6 rows, row 4 excluded as N/A → A=5
-applicable; fully=3 (rows 1,2,3), partial=2 (rows 5,6) →
-round(100 × (3 + 2×0.5)/5) = **80 (high)**. The two partials are the only
-headroom, and both are opportunistic, not corrective.
+applicable; fully=4 (rows 1,2,3,6), partial=1 (row 5) →
+round(100 × (4 + 0.5)/5) = **90 (high; re-scored 2026-11-08 at the M2 bump —
+was 80 while the pin lagged)**. The one partial is opportunistic, not
+corrective.
 
 ## Recommendation
 
-**Keep; bump v0.6.0 → v0.6.2** (`go get github.com/larsartmann/go-atomic-write@v0.6.2 && go mod tidy`) — the temp-leak fix costs nothing and hardens the
-`--out`/`--doc` paths. No API changes in the gap. Beyond that, usage is at
+**Bumped v0.6.0 → v0.6.2 on 2026-11-08** (plan M2, full gates green) — the
+temp-leak fix now protects the `--out`/`--doc` paths. No API changes in the
+gap. Beyond that, usage is at
 the library's ceiling for this kind of tool: every write it should own, it
 owns, with the strongest correct variant per site. Revisit `WriteIfChanged`
 only if a scheduled `render --doc` job ever appears.
@@ -69,7 +71,7 @@ only if a scheduled `render --doc` job ever appears.
 
 ```bash
 rg -n 'atomicwrite\.' cmd/ internal/ --glob '!*_test.go'   # 8 call sites (5 writes + fingerprint/read companions) + 3 extractor table keys
-go list -m github.com/larsartmann/go-atomic-write           # v0.6.0 pinned
+go list -m github.com/larsartmann/go-atomic-write           # v0.6.2 pinned (bumped 2026-11-08, plan M2)
 go list -m github.com/larsartmann/go-atomic-write@latest    # v0.6.2
 awk '/^## \[0.6.1\]/,/^## \[0.6.0\]/' /home/lars/projects/go-atomic-write/CHANGELOG.md
 go test ./internal/manifest/ -run AppendBaseline -v          # concurrent-modification path is tested

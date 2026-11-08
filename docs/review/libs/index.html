@@ -888,8 +888,8 @@
           io-surface is a hermetic, deliberately-minimal gate CLI: a
           stdlib-only AST walk, an in-process CUE load, findings to stdout,
           exit 0/1/2. That shape decides every verdict below. The two adopted
-          libraries (<a href="cmdguard.md">cmdguard</a> 93/100,
-          <a href="go-atomic-write.md">go-atomic-write</a> 80/100) are used
+          libraries (<a href="cmdguard.md">cmdguard</a> 100/100,
+          <a href="go-atomic-write.md">go-atomic-write</a> 90/100) are used
           at or near their ceiling for this kind of tool. Two more
           (<a href="go-error-family.md">go-error-family</a>,
           <a href="go-output.md">go-output</a>) are already compiled into the
@@ -917,13 +917,13 @@
         </div>
 
         <div class="card card-problem">
-          <h4>Two free patch bumps are pending</h4>
+          <h4>Two free patch bumps &mdash; SHIPPED 2026-11-08</h4>
           <p>
             cmdguard v4.2.0 &rarr; v4.2.1 (fixes ExitCode(0) on errorfamily
             failures and flag leaks on reused CLIs) and go-atomic-write
             v0.6.0 &rarr; v0.6.2 (v0.6.1 stops temp-file leaks when the final
-            rename fails). No API changes in either gap; both are pure
-            hygiene. See <a href="#actions">Actions</a>.
+            rename fails) landed via plan M2 with all gates green. No API
+            changes in either gap; both reports re-scored.
           </p>
         </div>
 
@@ -955,13 +955,13 @@
               <td><a href="cmdguard.md">cmdguard/v4</a></td>
               <td>v4.2.1</td>
               <td><span class="badge badge-fixed">Used &middot; direct</span></td>
-              <td>93/100 very high &mdash; bump to v4.2.1</td>
+              <td>100/100 &mdash; bumped to v4.2.1 (2026-11-08)</td>
             </tr>
             <tr>
               <td><a href="go-atomic-write.md">go-atomic-write</a></td>
               <td>v0.6.2</td>
               <td><span class="badge badge-fixed">Used &middot; direct</span></td>
-              <td>80/100 high &mdash; bump to v0.6.2</td>
+              <td>90/100 high &mdash; bumped to v0.6.2 (2026-11-08)</td>
             </tr>
             <tr>
               <td><a href="go-error-family.md">go-error-family</a></td>
@@ -1128,8 +1128,8 @@
           <span class="root">io-surface</span> &middot; 22 audited libs, 4
           direct deps &middot; house libs in the graph:<br />
           &nbsp;&nbsp;direct &mdash;
-          <span class="ok">cmdguard/v4 v4.2.0</span> &middot;
-          <span class="ok">go-atomic-write v0.6.0</span> &middot;
+          <span class="ok">cmdguard/v4 v4.2.1</span> &middot;
+          <span class="ok">go-atomic-write v0.6.2</span> &middot;
           <span class="ok">go-finding v1.15.1 + toolsdk v1.16.0</span> (not on
           the audit list, adjacent)<br />
           &nbsp;&nbsp;indirect &mdash;
@@ -1145,12 +1145,13 @@
         <div class="migration-step">
           <div class="migration-num">1</div>
           <div class="migration-content">
-            <h4>Bump the two direct house deps (hygiene)</h4>
+            <h4>Bump the two direct house deps (hygiene) &mdash; DONE 2026-11-08</h4>
             <p>
               <code>go get github.com/larsartmann/cmdguard/v4@v4.2.1
               github.com/larsartmann/go-atomic-write@v0.6.2 &amp;&amp; go mod
               tidy</code>, then the full gate (build, vet, test, self-check,
-              lint). No API changes in either gap.
+              lint). No API changes in either gap. <strong>Executed</strong>
+              (plan M2): pins at v4.2.1/v0.6.2, gates green.
             </p>
           </div>
         </div>
