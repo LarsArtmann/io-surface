@@ -102,7 +102,7 @@
   - Long-term / unrefined ideas live in ROADMAP.md, not here.
 -->
 
-| 64 | Split the oversized core files to fleet-default 350 lines (extract tables/pairing/handlers) | 🔴 `TODO` | Low | 2h | STARTED 2026-11-06: detection tables split to `internal/extract/tables.go` (extract.go 657→449); remaining: check.go pairing split + test-file topical splits |
+| 64 | Split the oversized core files to fleet-default 350 lines (extract tables/pairing/handlers) | ✅ `DONE` (2026-11-08) | Low | 2h | pairing loop → `internal/check/pairing.go` (check.go 648→519+182, `pairer` struct, zero semantic change — same findings, all tests green); `check_test.go` 559→151+207+216 (pairing/rules topics); extract tests were already topical (5 files). Final sweep: largest file 622 (manifest_test.go), every file under the repo-pinned 650 budget; goldens byte-identical without -update; fleet-default 350 stays rejected per the pinned rationale in .buildflow.yml |
 
 | 63 | Wire cmdguard-lint into CI once the lint module ships without a go.mod replace | 🔵 `BLOCKED` | Low | 30min | `go run github.com/larsartmann/cmdguard/lint/cmd/cmdguard-lint@v0.1.0` fails: the module's go.mod carries replace directives (buildflow/file-or-fix verified 2026-11-06); fix belongs in the cmdguard repo's release flow, then the CI step is one `go run` line |
 
