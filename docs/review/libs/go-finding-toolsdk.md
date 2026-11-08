@@ -27,12 +27,12 @@ The whole integration is `provider/provider.go` (one file) plus the blank
 import in BuildFlow's `tools/providers/sdk_imports.go` (the other). Four
 symbols total (`rg 'toolsdk\.' provider/`):
 
-| Symbol                  | Where                        | What it buys                                                                                              |
-| ----------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `toolsdk.Register(Spec{...})` | `provider/provider.go:47` | self-registration at init — zero BuildFlow-side per-tool code beyond the blank import                      |
-| `toolsdk.OnGoModule()`  | `provider/provider.go:53`    | trigger: exactly once per Go module, the fleet-sweep granularity                                            |
-| `toolsdk.Spec` fields   | `provider/provider.go:47-77` | `ModuleFanOut: true` (per-module gating in workspaces), `Inputs: ["**/*.go", "docs/architecture/io-surface/*.cue"]` (cache keys), `Detect` as a `finding.NamedDetectorFunc`, `Repair: nil` (gate never mutates user code) |
-| `toolsdk.All()`         | (BuildFlow side, not ours)   | discovery — listed here because the contract's other half lives in `sdk_registry.go`, which we do not own     |
+| Symbol                        | Where                        | What it buys                                                                                                                                                                                                              |
+| ----------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `toolsdk.Register(Spec{...})` | `provider/provider.go:47`    | self-registration at init — zero BuildFlow-side per-tool code beyond the blank import                                                                                                                                     |
+| `toolsdk.OnGoModule()`        | `provider/provider.go:53`    | trigger: exactly once per Go module, the fleet-sweep granularity                                                                                                                                                          |
+| `toolsdk.Spec` fields         | `provider/provider.go:47-77` | `ModuleFanOut: true` (per-module gating in workspaces), `Inputs: ["**/*.go", "docs/architecture/io-surface/*.cue"]` (cache keys), `Detect` as a `finding.NamedDetectorFunc`, `Repair: nil` (gate never mutates user code) |
+| `toolsdk.All()`               | (BuildFlow side, not ours)   | discovery — listed here because the contract's other half lives in `sdk_registry.go`, which we do not own                                                                                                                 |
 
 The consumer contract for `ModuleFanOut` is honored verbatim: the provider's
 Detect reads the working directory from `finding.WorkingDirFromContext(ctx)`
@@ -51,16 +51,16 @@ granularity: one run per module, not per file).
 
 ## Capability inventory
 
-| # | Capability                                      | Status             | Evidence / reason                                                                                       |
-| - | ----------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------- |
-| 1 | Self-registration (`Register` at init)          | 🟢 Fully leveraged | `provider/provider.go:47`; one-file integration proof; `go vet` + panic-on-invalid keeps the spec honest  |
-| 2 | Trigger correctness (`OnGoModule`)              | 🟢 Fully leveraged | v1.16.0's Trigger validation now guards the exact silent-miss failure mode; io-surface's trigger is valid by construction |
-| 3 | `ModuleFanOut` + WorkDir agreement              | 🟢 Fully leveraged | `ModuleFanOut: true`; Detect reads the context dir only; verified end-to-end 2026-11-08 (both-fires evidence, TODO #125: gate + radar faces through `buildflow -s io-surface`) |
-| 4 | `Inputs` globs as cache keys                    | 🟢 Fully leveraged | both glob sets declared; result cache hits observed (57% → 100% across runs) — the cache keys on exactly these |
-| 5 | Detect capability (finding.Detector)            | 🟢 Fully leveraged | `NamedDetectorFunc` returning gate+radar findings merged under one enforcement policy                     |
-| 6 | Version currency                                | 🟢 Fully leveraged | v1.16.0 = `@latest` (proxy check 2026-11-08); same train as go-finding v1.15.1                            |
-| 7 | Options channel (`WithOption`/typed accessors)  | ⚪ N/A             | flag-free step; CLI flags own configuration — adding Options would split one config surface into two      |
-| 8 | `DependsOn` / `SwitchCases` / `Repair`          | ⚪ N/A             | read-only gate by doctrine; conditional-repair topology has no consumer here                              |
+| # | Capability                                     | Status             | Evidence / reason                                                                                                                                                              |
+| - | ---------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | Self-registration (`Register` at init)         | 🟢 Fully leveraged | `provider/provider.go:47`; one-file integration proof; `go vet` + panic-on-invalid keeps the spec honest                                                                       |
+| 2 | Trigger correctness (`OnGoModule`)             | 🟢 Fully leveraged | v1.16.0's Trigger validation now guards the exact silent-miss failure mode; io-surface's trigger is valid by construction                                                      |
+| 3 | `ModuleFanOut` + WorkDir agreement             | 🟢 Fully leveraged | `ModuleFanOut: true`; Detect reads the context dir only; verified end-to-end 2026-11-08 (both-fires evidence, TODO #125: gate + radar faces through `buildflow -s io-surface`) |
+| 4 | `Inputs` globs as cache keys                   | 🟢 Fully leveraged | both glob sets declared; result cache hits observed (57% → 100% across runs) — the cache keys on exactly these                                                                 |
+| 5 | Detect capability (finding.Detector)           | 🟢 Fully leveraged | `NamedDetectorFunc` returning gate+radar findings merged under one enforcement policy                                                                                          |
+| 6 | Version currency                               | 🟢 Fully leveraged | v1.16.0 = `@latest` (proxy check 2026-11-08); same train as go-finding v1.15.1                                                                                                 |
+| 7 | Options channel (`WithOption`/typed accessors) | ⚪ N/A             | flag-free step; CLI flags own configuration — adding Options would split one config surface into two                                                                           |
+| 8 | `DependsOn` / `SwitchCases` / `Repair`         | ⚪ N/A             | read-only gate by doctrine; conditional-repair topology has no consumer here                                                                                                   |
 
 Score derivation (skill rubric): N=8 rows, rows 7–8 excluded as N/A → A=6
 applicable; fully=6, partial=0 → round(100 × 6/6) = **100 (high; scored

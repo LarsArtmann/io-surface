@@ -212,7 +212,12 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   `git diff -I` (`-I'^[[:space:]]*commit:' -I'^[[:space:]]*date:'`): those
   two lines legitimately drift because HEAD always moves between the
   manifest-refresh commit and the CI run. Do not "simplify" them away —
-  without them the gate is structurally red.
+  without them the gate is structurally red. Cheat-sheet: the gate compares
+  the CURRENT TREE against the COMMITTED manifest (regenerate from tree, diff
+  vs HEAD's facts.cue) — so it fails whenever working-tree Go edits moved or
+  added I/O sites before `init --force` ran, and it stays green for pure
+  comment/doc edits; a failure pasted from an earlier run may already be
+  fixed on disk, so re-run `check` before acting.
 - Baseline lifecycle is enforced: an entry suppressing nothing today warns
   (`unused-baseline` — only-shrinks), an expired `expires:` date fails
   (`baseline-expired`, error). The canonical-key hiding of two same-base-name
