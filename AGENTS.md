@@ -301,3 +301,17 @@ reproduce via `./scripts/fleetscan.sh docs/evidence/fleetscan-<date>.json`
 - Docs ownership: `README` (users) / `AGENTS` (agent context) / `FEATURES`
   (status inventory) / `TODO_LIST` (open work) / `ROADMAP` (vision, open
   questions) — one fact, one home.
+
+## Library utilization audit (2026-11-07)
+
+`docs/review/libs/` holds a point-in-time adoption audit of 22 LarsArtmann
+libraries (index.html dashboard + one report each, each ending in a verify
+block). Durable outcome: cmdguard (93/100) and go-atomic-write (80/100) are
+the only house libs directly used and are at/near ceiling for a gate CLI;
+go-error-family and go-output are in the graph (via go-finding / cmdguard)
+and deliberately unimported; all server/CQRS/UI libs rejected with reasons.
+Pending hygiene: bump cmdguard v4.2.0→v4.2.1 and go-atomic-write
+v0.6.0→v0.6.2 (no API changes). Two recorded adoption triggers: build
+`check --watch` on go-filewatcher/v2 if pilots ask; revisit go-error-family
+only for a networked mode (not planned). Re-audit trigger: a new direct
+dependency, or either pinned dep falling 2+ versions behind.

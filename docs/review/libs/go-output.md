@@ -1,6 +1,6 @@
 # go-output — adoption & utilization review
 
-> **Status: IN GRAPH, not imported** — indirect via `cmdguard/v4` (`go.mod` lines `v0.38.4 // indirect`, root + 10 submodules)
+> **Status: IN GRAPH, not imported** — indirect via `cmdguard/v4` (`go.mod` carries 12 lines: root `v0.38.4 // indirect` + 11 submodules)
 > **Verdict: correctly NOT adopted. io-surface's output is a byte-pinned contract, and every machine format that matters already has a dedicated path.**
 > Latest version: **v0.38.7** (root module, proxy confirms) · io-surface carries v0.38.4 indirect
 > Reviewed: 2026-11-07 · io-surface `docs/review/libs/` series
