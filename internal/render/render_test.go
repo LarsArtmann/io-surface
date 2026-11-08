@@ -171,13 +171,13 @@ func lineDiff(want, got string) string {
 			g = gotLines[i]
 		}
 		if w != g {
-			fmt.Fprintf(&b, "line %d\nwant: %q\ngot:  %q\n", i+1, w, g)
+			_, _ = fmt.Fprintf(&b, "line %d\nwant: %q\ngot:  %q\n", i+1, w, g)
 			if len(b.String()) > 2000 {
 				break
 			}
 		}
 	}
-	fmt.Fprintf(&b, "(%d want lines, %d got lines)\n", len(wantLines), len(gotLines))
+	_, _ = fmt.Fprintf(&b, "(%d want lines, %d got lines)\n", len(wantLines), len(gotLines))
 
 	return b.String()
 }

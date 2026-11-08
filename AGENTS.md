@@ -313,9 +313,13 @@ reproduce via `./scripts/fleetscan.sh docs/evidence/fleetscan-<date>.json`
   hiccup, and a piped reader closing early kills the process via SIGPIPE per
   Go runtime convention (the correct CLI behavior). No `.golangci.yml` exists
   by design and CI does not run golangci-lint; do not "fix" the `_, _ =`
-  sites or add a config without reopening the decision. Everything else
-  (real error returns, including test helpers like `fmt.Sscanf` parses) is
-  checked.
+  sites or add a config without reopening the decision. In-memory
+  strings.Builder assembly (render/scaffold/manifest message and document
+  building) is provably non-failing and shares the same `_, _ =`
+  convention (extended 2026-11-08: the application sweep found 20+ bare
+  sites golangci's max-same-issues cap of 3 had been revealing three at a
+  time). Everything else (real error returns, including test helpers like
+  `fmt.Sscanf` parses and `os.WriteFile` fixture writes) is checked.
 - Manifest editing: `facts.cue` is mechanical (regenerate, never hand-edit
   locations); `claims.cue`/`baseline.cue` are human judgment (never overwrite).
   `schema.cue` is the standard copy — do not edit per repo (except here, where

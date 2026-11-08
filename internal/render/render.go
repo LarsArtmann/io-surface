@@ -23,7 +23,7 @@ func Markdown(m *manifest.Manifest) string {
 	b.WriteString("# I/O Surface Inventory\n\n")
 	b.WriteString("> GENERATED from the io-surface manifest by `io-surface render`. Do not edit by hand:\n")
 	b.WriteString("> edit `facts.cue` (regenerate) or `claims.cue` (judgment) and re-render.\n")
-	fmt.Fprintf(&b, ">\n> Audited %s at `%s` — %d sites, %d location claims.\n\n",
+	_, _ = fmt.Fprintf(&b, ">\n> Audited %s at `%s` — %d sites, %d location claims.\n\n",
 		m.Audit.Date, m.Audit.Commit, len(m.Sites), m.Audit.Claims)
 	b.WriteString(sections(m))
 
@@ -71,7 +71,7 @@ func sections(m *manifest.Manifest) string {
 			continue
 		}
 		sort.Strings(ids)
-		fmt.Fprintf(&b, "## `%s` (%d)\n\n", fam, len(ids))
+		_, _ = fmt.Fprintf(&b, "## `%s` (%d)\n\n", fam, len(ids))
 		sites := newTable(
 			[]string{"Site", "Location", "Resource", "Trigger", "Discipline", "Crit", "Durab"},
 			make([]bool, 7),
@@ -108,12 +108,12 @@ func sections(m *manifest.Manifest) string {
 			b.WriteString("### Judgments\n\n")
 			for _, id := range withProse {
 				s := m.Sites[id]
-				fmt.Fprintf(&b, "- **`%s`**", id)
+				_, _ = fmt.Fprintf(&b, "- **`%s`**", id)
 				if s.Claims.Exception != "" {
-					fmt.Fprintf(&b, " — exception: %s", s.Claims.Exception)
+					_, _ = fmt.Fprintf(&b, " — exception: %s", s.Claims.Exception)
 				}
 				if s.Claims.Rationale != "" {
-					fmt.Fprintf(&b, " — %s", s.Claims.Rationale)
+					_, _ = fmt.Fprintf(&b, " — %s", s.Claims.Rationale)
 				}
 				b.WriteString("\n")
 			}
@@ -128,7 +128,7 @@ func sections(m *manifest.Manifest) string {
 	if len(m.Scope.Out) > 0 {
 		b.WriteString("## Deliberately out of scope\n\n")
 		for _, entry := range m.Scope.Out {
-			fmt.Fprintf(&b, "- %s\n", entry)
+			_, _ = fmt.Fprintf(&b, "- %s\n", entry)
 		}
 		b.WriteString("\n")
 	}
@@ -145,7 +145,7 @@ func capabilitiesSection(m *manifest.Manifest) string {
 	var b strings.Builder
 	b.WriteString("## Reachability (capabilities)\n\n")
 	if m.CapabilityAudit != nil {
-		fmt.Fprintf(&b, "> Engine-observed by %s %s of `%s` (%s): what each package can REACH, beyond its declared sites.\n",
+		_, _ = fmt.Fprintf(&b, "> Engine-observed by %s %s of `%s` (%s): what each package can REACH, beyond its declared sites.\n",
 			m.CapabilityAudit.Engine, m.CapabilityAudit.Version, m.CapabilityAudit.Commit, m.CapabilityAudit.Date)
 	}
 	b.WriteString("> `direct` = through the package's own code (high signal); `deep` adds transitive\n")

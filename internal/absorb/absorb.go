@@ -200,7 +200,7 @@ capabilityAudit: {
 capabilities: [
 `)
 	for _, s := range r.Sets {
-		fmt.Fprintf(&b, "\t{pkg: %s, direct: [%s], deep: [%s]},\n",
+		_, _ = fmt.Fprintf(&b, "\t{pkg: %s, direct: [%s], deep: [%s]},\n",
 			quote(s.Pkg), names(s.Direct), names(s.Deep))
 	}
 	b.WriteString("]\n")

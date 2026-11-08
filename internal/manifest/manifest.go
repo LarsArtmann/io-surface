@@ -308,11 +308,11 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 		return fmt.Errorf("%w in %s: %v", ErrConstraints, dir, uniErr)
 	}
 	var b strings.Builder
-	fmt.Fprintf(&b, "in %s", dir)
+	_, _ = fmt.Fprintf(&b, "in %s", dir)
 	if uniErr != nil {
-		fmt.Fprintf(&b, ": %v", uniErr)
+		_, _ = fmt.Fprintf(&b, ": %v", uniErr)
 	}
-	fmt.Fprintf(&b, " — %d constraint violation(s):", len(entries))
+	_, _ = fmt.Fprintf(&b, " — %d constraint violation(s):", len(entries))
 	seen := map[string]bool{}
 	for _, v := range entries {
 		key := v.ID + "|" + v.Msg + "|" + v.Path
@@ -326,13 +326,13 @@ func constraintError(dir string, value cue.Value, uniErr error) error {
 		}
 		switch {
 		case v.ID != "":
-			fmt.Fprintf(&b, "\n  - %s: %s%s", v.ID, v.Msg, where)
+			_, _ = fmt.Fprintf(&b, "\n  - %s: %s%s", v.ID, v.Msg, where)
 		case v.Msg != "":
-			fmt.Fprintf(&b, "\n  - %s%s", v.Msg, where)
+			_, _ = fmt.Fprintf(&b, "\n  - %s%s", v.Msg, where)
 		default:
 			// id and msg both decode empty (a foreign violations schema):
 			// the CUE path is then the only locator the user has.
-			fmt.Fprintf(&b, "\n  - constraint at %s", where)
+			_, _ = fmt.Fprintf(&b, "\n  - constraint at %s", where)
 		}
 	}
 

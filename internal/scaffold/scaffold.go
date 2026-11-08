@@ -96,7 +96,7 @@ func factsCUE(sites []*extract.Site, date, commit string) []byte {
 package io_surface
 
 `)
-	fmt.Fprintf(&b, "audit: {\n\tcommit: %q\n\tdate:   %q\n\tclaims: %d\n\tmethod: %q\n}\n\n",
+	_, _ = fmt.Fprintf(&b, "audit: {\n\tcommit: %q\n\tdate:   %q\n\tclaims: %d\n\tmethod: %q\n}\n\n",
 		commit, date, countLocations(sites), "io-surface extract (AST, stdlib-only)")
 
 	b.WriteString("enforcement: \"gate\"\n\n")
@@ -127,20 +127,20 @@ sites: {
 		if family == "" {
 			continue // weak-tier token with no family hint; advisory only
 		}
-		fmt.Fprintf(&b, "\t%q: {\n", s.ID)
+		_, _ = fmt.Fprintf(&b, "\t%q: {\n", s.ID)
 		b.WriteString("\t\tlocation: [\n")
 		for _, loc := range s.Locations {
-			fmt.Fprintf(&b, "\t\t\t%q,\n", loc)
+			_, _ = fmt.Fprintf(&b, "\t\t\t%q,\n", loc)
 		}
 		b.WriteString("\t\t]\n")
-		fmt.Fprintf(&b, "\t\tfamily: %q\n", family)
+		_, _ = fmt.Fprintf(&b, "\t\tfamily: %q\n", family)
 		b.WriteString("\t\tfacts: {\n")
 		if len(s.Calls) > 0 {
 			quoted := make([]string, len(s.Calls))
 			for i, c := range s.Calls {
 				quoted[i] = fmt.Sprintf("%q", c)
 			}
-			fmt.Fprintf(&b, "\t\t\tcall: [%s]\n", strings.Join(quoted, ", "))
+			_, _ = fmt.Fprintf(&b, "\t\t\tcall: [%s]\n", strings.Join(quoted, ", "))
 		}
 		if s.Testinfra {
 			b.WriteString("\t\t\ttestinfra: true\n")
