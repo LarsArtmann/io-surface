@@ -130,10 +130,18 @@ bridge deferred until a consumer exists; golangci composition rejected.
 - **Q1 — which repo gets the first _blocking_ gate?** dnsblockd has the richest
   manifest but was lock-held; InboxClean is free but claim-less (a smoke test,
   not a proof). (Birth report §g-Q1)
+  - **Decision recorded 2026-11-08 (owner, N19 batch): InboxClean takes the
+    first blocking gate** — free now and already on the v1.2 schema; a
+    claim-ful smoke gate is the right first enforcement target. dnsblockd
+    enforces after its owner diff review (3 claim-conflicts + 21 UNREVIEWED
+    fills from the mechanical port); go-taskqueue onboards advisory-first.
 - **Q2 — flake now, or stay Go-module-only until a second repo gates on it?**
   A flake buys `nix build` + sandbox-native gating and costs a row in the
   fleet's pin matrix. GitHub CI already satisfies "own CI so it can't rot"
   for the tool itself. (Birth report §g-Q2)
+  - **Decision recorded 2026-11-08 (owner, N19 batch): flake NOW.** Scope: a
+    minimal flake (build + tests + the self-hosting gate), hermetic by the
+    extractor's design. Cost accepted: the pin-matrix row.
 - **Q3 — may the weak (heuristic) tier ever fail a build, or is it advisory
   forever?** Opt-in `--strict-weak` per repo is the compromise candidate; this
   is a false-positive-budget policy call. (Birth report §g-Q3) For the
@@ -141,6 +149,11 @@ bridge deferred until a consumer exists; golangci composition rejected.
   never produce detector findings structurally, and every rule ships at info
   with fleet-evidence-gated promotion (Theme 5's SARIF policy keys off the
   same promotion bar).
+  - **Decision recorded 2026-11-08 (owner, N19 batch): build `--strict-weak`.**
+    The structural guarantee holds by default (token tier advisory forever);
+    a repo that passes the flag opts in and gets weak-tier undeclared sites
+    as errors. The false-positive budget moves to the adopting repo, not
+    the tool.
 - **Q4 — purge the ~67 MB binary blobs from git history, or keep them?** The
   auto-commit daemon committed a compiled `cmd/io-surface/io-surface` twice
   (blobs of 35,180,278 and 35,181,139 bytes, commits `05874f3` / `e15bf62`,
@@ -153,6 +166,11 @@ bridge deferred until a consumer exists; golangci composition rejected.
   requires force-push to both remotes and fresh clones everywhere; status
   reports citing those SHAs go stale. **Keep:** ~67 MB one-time clone cost,
   zero SHA breakage, but every zip of master carries the binary forever.
+  - **Decision recorded 2026-11-08 (owner, N19 batch): PURGE now** —
+    force-push explicitly approved. Accepted costs: proxy-cached zips for
+    already-published versions (v0.2.0, v0.4.0, v0.5.0) are immutable and
+    retain the blob (the first post-purge tag gives `@latest` a clean zip);
+    archived status reports citing pre-purge SHAs stay stale by design.
 - **Q5 — do Capslock's runtime-power capabilities ever become first-class
   vocabulary, or stay out-of-scope forever?** The blind-spot run showed
   REFLECT / RUNTIME / SYSTEM_CALLS / UNSAFE_POINTER / OPERATING_SYSTEM /
@@ -200,6 +218,9 @@ bridge deferred until a consumer exists; golangci composition rejected.
     is implemented yet; implementation is a future schema-v1.3 session
     (schema version bump per the taxonomy freeze). Until that session, the
     frozen architecture holds and no rule reads the field.
+  - **Session shape ratified 2026-11-08 (owner, N19 batch): ONE combined
+    v1.3 train** carrying both scopes (runtime-power capabilities +
+    claims.ownership). TODO row #136 owns the session; #138 closed.
 
 ## Non-goals
 
