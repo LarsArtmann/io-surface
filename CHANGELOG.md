@@ -15,6 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Nothing yet.
 
+## [0.5.1] - 2026-11-08
+
+### Fixed
+
+- Purged the 35 MB build binary the auto-commit daemon once committed from
+  git history (`git filter-repo` over commits `05874f3`/`e15bf62`; a fresh
+  clone drops from ~54 MB to ~4 MB).
+
+### Retracted
+
+- v0.2.0, v0.3.0, v0.4.0, v0.5.0 — published before the history purge, so
+  their module zips permanently contain the 35 MB binary (proxy caches are
+  immutable). `@latest` resolves here; explicit pins of the old versions
+  keep resolving, with a retraction warning.
+
 ## [0.5.0] - 2026-11-08
 
 ### Added

@@ -344,6 +344,13 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
+`v0.5.1` — the hygiene line: the 35 MB build binary the auto-commit daemon
+once committed is purged from git history (`git filter-repo`; fresh clones
+dropped from ~54 MB to ~4 MB), and every version published before the purge
+(v0.2.0–v0.5.0) is retracted — their proxy zips are immutable and retain the
+blob, so `@latest` serves this clean tag. Nothing about the tool's behavior
+changed.
+
 `v0.5.0` — the hardening line: the radar completes its ruleset (`write-non-atomic`,
 `tiny-buffer` — 10 rules total), site-level `//io-surface:ignore <rule> <reason>`
 directives silence one finding at one site with a mandatory reason, claims

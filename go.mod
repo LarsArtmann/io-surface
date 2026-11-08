@@ -88,3 +88,10 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )
+
+retract (
+	v0.5.0 // published pre-purge; zip carries the 35 MB binary; use v0.5.1
+	v0.4.0 // published pre-purge; zip carries the 35 MB binary
+	v0.3.0 // published pre-purge; zip carries the 35 MB binary
+	v0.2.0 // published pre-purge; zip carries the 35 MB binary
+)
