@@ -115,7 +115,7 @@ _(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked
 34. #50 verify + file the Capslock phantom-network upstream issue (verify-before-filing ritual).
 35. #61 owner decision: SARIF → GitHub code-scanning upload vs artifact-only.
 36. v0.1.1 release via go-release skill once T20 + #14 land (#48; re-tag discipline).
-37. Plan-file errata entry for T12/T13/T15 ownership (already in e.4 — do it in the file).
+37. ~~Plan-file errata entry for T12/T13/T15 ownership (already in e.4 — do it in the file).~~ RESOLVED (verified 2026-11-08): plan §3.7 "Execution errata" item 3 in `docs/planning/2026-11-06_06-02_unified-io-insights-pareto-plan.md` records the T12/T13/T15 ownership hand-off and the T15 only-shrinks design deviation.
 38. Consider absorb recording per-package unmapped counts as metadata (noise-budget visibility for consumers).
 39. Consider `absorb --check` emitting findings as SARIF (unified machine stream).
 40. AGENTS sharp edge: "extractor table change ⇒ facts regen + INVENTORY re-render" ritual (I hit the stale-INVENTORY gate).

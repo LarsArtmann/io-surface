@@ -27,8 +27,8 @@ CI fails when this block goes stale (`render --doc … --check`).
 | `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:234`   | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.extractor.walk`            | `internal/extract/extract.go:94`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.runExtract`                | `internal/extract/tables.go:107`    | —                                                         | —                                        | —          | —    | —     |
-| `internal/manifest.Load`                     | `internal/manifest/manifest.go:192` | —                                                         | —                                        | —          | —    | —     |
-| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:468` | —                                                         | —                                        | —          | —    | —     |
+| `internal/manifest.Load`                     | `internal/manifest/manifest.go:219` | —                                                         | —                                        | —          | —    | —     |
+| `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:498` | —                                                         | —                                        | —          | —    | —     |
 
 ### Judgments
 
@@ -61,7 +61,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | Site                      | Location                            | Resource                                        | Trigger                                           | Discipline | Crit | Durab |
 | ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- | ---- | ----- |
 | `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          | —    | —     |
-| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:228` | —                                               | —                                                 | —          | —    | —     |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:229` | —                                               | —                                                 | —          | —    | —     |
 
 ### Judgments
 
@@ -90,6 +90,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 - timers and tickers (scheduling)
 - memory pooling
 - kernel-internal I/O (epoll, page cache)
+- process stdio (stdout/stderr — user feedback, not durable state; DECIDED 2026-11-08, TODO #49)
 
 <!-- io-surface:end -->
 

@@ -2,7 +2,7 @@
 
 > **Status: NOT USED** (absent from the module graph)
 > **Verdict: reject — encrypted-at-rest credentials store with event sourcing and admin UI; io-surface holds no secrets, by design.**
-> Latest version: **v0.2.1** locally tagged (2026-10-30; master 27 commits ahead; README references a published v0.3.1) · module `github.com/larsartmann/go-credentials-store`
+> Latest version: **v0.3.1** (module proxy confirms, 2026-11-08 — plan M7; the local clone's newest tag is v0.2.1 and its README reference to a published v0.3.1 was correct, the clone is just behind) · module `github.com/larsartmann/go-credentials-store`
 > Reviewed: 2026-11-07 · io-surface `docs/review/libs/` series
 
 ## What it offers
