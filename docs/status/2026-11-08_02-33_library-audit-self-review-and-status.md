@@ -81,7 +81,7 @@
 13. Decide the 8 pre-existing errcheck warnings in `commands.go` (stdout-sink `fmt.F*`): fix, waive with rationale, or adopt errcheck into CI (no `.golangci.yml` exists today).
 14. Check CUE version currency (`cuelang.org/go v0.17.1`) — direct dep, never version-checked this session.
 15. Confirm BuildFlow picked up provider v0.4.0 (sdk_imports blank import ships with the release protocol).
-16. Verify README install/status lines still match version const `0.4.0`.
+16. ~~Verify README install/status lines still match version const `0.4.0`.~~ RESOLVED 2026-11-08 (superseded by two releases since: v0.5.0 and v0.5.1 — the README status line was re-cut for both (`grep -n "v0.5.1" README.md`), the const is `0.5.1` (`cmd/io-surface/main.go`), and the install line is version-agnostic `@latest`).
 17. Consider the 2 baselined sites — can either be declared or removed yet (baseline only shrinks)?
 18. ROADMAP Q5 (capability vocabulary promotion) — still open; audit's absorb notes touch it.
 19. Mobile check: render index.html at 320 px (only 1280 px was screenshotted).

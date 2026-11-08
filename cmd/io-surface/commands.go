@@ -273,7 +273,7 @@ func printDropped(w io.Writer, res *absorb.Result) {
 		names = append(names, fmt.Sprintf("%s×%d", name, count))
 	}
 	sort.Strings(names)
-	fmt.Fprintf(w, "io-surface: dropped unmapped capabilities (out-of-scope per ROADMAP Q5, or newer engine): %s\n", strings.Join(names, ", "))
+	_, _ = fmt.Fprintf(w, "io-surface: dropped unmapped capabilities (out-of-scope per ROADMAP Q5, or newer engine): %s\n", strings.Join(names, ", "))
 }
 
 func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
@@ -331,7 +331,7 @@ func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
 			return nil
 		}
 		storedLines, freshLines := storedLines(stored), storedLines(fresh)
-		fmt.Fprintf(os.Stderr, "io-surface: generated block in %s is stale\n", path)
+		_, _ = fmt.Fprintf(os.Stderr, "io-surface: generated block in %s is stale\n", path)
 		for i := range max(len(storedLines), len(freshLines)) {
 			var w, g string
 			if i < len(storedLines) {
@@ -341,11 +341,11 @@ func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
 				g = freshLines[i]
 			}
 			if w != g {
-				fmt.Fprintf(os.Stderr, "  line %d:\n  stored: %s\n  fresh:  %s\n", i+1, w, g)
+				_, _ = fmt.Fprintf(os.Stderr, "  line %d:\n  stored: %s\n  fresh:  %s\n", i+1, w, g)
 				break
 			}
 		}
-		fmt.Fprintf(os.Stderr, "io-surface: fix with `io-surface render --doc %s`\n", path)
+		_, _ = fmt.Fprintf(os.Stderr, "io-surface: fix with `io-surface render --doc %s`\n", path)
 
 		return errFindings
 	}
@@ -417,11 +417,11 @@ func printStats(sites []*extract.Site) error {
 		pkgs = append(pkgs, p)
 	}
 	sort.Strings(pkgs)
-	fmt.Fprintf(stdout, "%-6s %-8s %s\n", "sites", "resolved", "package")
+	_, _ = fmt.Fprintf(stdout, "%-6s %-8s %s\n", "sites", "resolved", "package")
 	for _, p := range pkgs {
-		fmt.Fprintf(stdout, "%-6d %-8d %s\n", counts[p], resolved[p], p)
+		_, _ = fmt.Fprintf(stdout, "%-6d %-8d %s\n", counts[p], resolved[p], p)
 	}
-	fmt.Fprintf(stdout, "%-6d %-8d TOTAL (%d packages)\n", len(sites), len(sites)-sumTokens(sites), len(pkgs))
+	_, _ = fmt.Fprintf(stdout, "%-6d %-8d TOTAL (%d packages)\n", len(sites), len(sites)-sumTokens(sites), len(pkgs))
 
 	return nil
 }
@@ -484,7 +484,7 @@ func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags
 		return err
 	}
 
-	fmt.Fprintf(stdout, "io-surface: baselined %s (note: %s, date: %s)\n", id, flags.Note, flags.Date)
+	_, _ = fmt.Fprintf(stdout, "io-surface: baselined %s (note: %s, date: %s)\n", id, flags.Note, flags.Date)
 
 	// Advisory feedback: a baselined ID that does not extract today is an
 	// entry suppressing nothing — the unused-baseline warning waiting to
@@ -502,7 +502,7 @@ func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags
 		}
 	}
 	if !found {
-		fmt.Fprintf(stdout, "io-surface: warning: %s does not extract from this tree today; the entry suppresses nothing until the site reappears\n", id)
+		_, _ = fmt.Fprintf(stdout, "io-surface: warning: %s does not extract from this tree today; the entry suppresses nothing until the site reappears\n", id)
 	}
 
 	return nil
@@ -559,10 +559,10 @@ func printLintReport(rep *check.Report, w io.Writer) {
 		if f.Location != "" {
 			loc = "  " + f.Location
 		}
-		fmt.Fprintf(w, "%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
-		fmt.Fprintf(w, "        %s\n", f.Message)
+		_, _ = fmt.Fprintf(w, "%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
+		_, _ = fmt.Fprintf(w, "        %s\n", f.Message)
 	}
-	fmt.Fprintf(w, "io-surface lint: %d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
+	_, _ = fmt.Fprintf(w, "io-surface lint: %d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
 		rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
 		rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
 }
@@ -586,9 +586,9 @@ func printGitHubAnnotations(rep *check.Report, w io.Writer) {
 		if file != "" {
 			props += ",file=" + githubEscape(file) + ",line=" + line
 		}
-		fmt.Fprintf(w, "::%s %s::%s\n", cmd, props, githubEscape(f.Message))
+		_, _ = fmt.Fprintf(w, "::%s %s::%s\n", cmd, props, githubEscape(f.Message))
 	}
-	fmt.Fprintf(w, "::notice title=io-surface lint::%d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
+	_, _ = fmt.Fprintf(w, "::notice title=io-surface lint::%d sites (%d resolved, %d token) — %d errors, %d warnings, %d infos (report only; pass --enforce to fail on errors)\n",
 		rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
 		rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
 }
