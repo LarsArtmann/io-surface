@@ -288,6 +288,15 @@ reproduce via `./scripts/fleetscan.sh docs/evidence/fleetscan-<date>.json`
 - Go code: gofmt-clean, tabs, stdlib-first. Errors wrap context
   (`fmt.Errorf("…: %w", err)`); sentinel errors live in per-package
   `errors.go`.
+- errcheck policy (decided 2026-11-08, TODO #123): stdout/stderr report
+  writes are deliberately unchecked and carry `_, _ =` at the site — the
+  exit-code contract (0/1/2) reflects the GATE result, never a printer
+  hiccup, and a piped reader closing early kills the process via SIGPIPE per
+  Go runtime convention (the correct CLI behavior). No `.golangci.yml` exists
+  by design and CI does not run golangci-lint; do not "fix" the `_, _ =`
+  sites or add a config without reopening the decision. Everything else
+  (real error returns, including test helpers like `fmt.Sscanf` parses) is
+  checked.
 - Manifest editing: `facts.cue` is mechanical (regenerate, never hand-edit
   locations); `claims.cue`/`baseline.cue` are human judgment (never overwrite).
   `schema.cue` is the standard copy — do not edit per repo (except here, where

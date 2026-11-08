@@ -600,7 +600,9 @@ func TestExtractStats(t *testing.T) {
 	var total int
 	for line := range strings.SplitSeq(out, "\n") {
 		if strings.Contains(line, "TOTAL") {
-			fmt.Sscanf(line, "%d", &total)
+			if n, _ := fmt.Sscanf(line, "%d", &total); n != 1 {
+				t.Fatalf("cannot parse TOTAL line %q as an integer", line)
+			}
 		}
 	}
 	if total != len(doc.Sites) {

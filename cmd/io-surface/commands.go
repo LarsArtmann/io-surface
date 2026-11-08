@@ -51,7 +51,7 @@ type versionFlags struct {
 // the consumer command wins over cmdguard's auto-registered one.
 func runVersion(_ context.Context, _ *rootFlags, flags versionFlags) error {
 	if !flags.JSON {
-		fmt.Fprintln(stdout, "io-surface "+version)
+		_, _ = fmt.Fprintln(stdout, "io-surface "+version)
 
 		return nil
 	}
@@ -135,7 +135,7 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 		if _, err = stdout.Write(data); err != nil {
 			return err
 		}
-		fmt.Fprintln(os.Stdout)
+		_, _ = fmt.Fprintln(os.Stdout)
 	case useJSON:
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
@@ -152,9 +152,9 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 			// modes (the JSON/SARIF stdout contract must stay parseable).
 			note := fmt.Sprintf("io-surface: enforcement: audit — %d error(s) reported but not failing (the manifest records the policy; override with --enforce)\n", rep.Stats.Errors)
 			if flags.Format == "sarif" || flags.JSON || flags.Format == "json" {
-				fmt.Fprint(os.Stderr, note)
+				_, _ = fmt.Fprint(os.Stderr, note)
 			} else {
-				fmt.Fprint(stdout, note)
+				_, _ = fmt.Fprint(stdout, note)
 			}
 
 			return nil
@@ -172,10 +172,10 @@ func printReport(rep *check.Report, w io.Writer) {
 		if f.Location != "" {
 			loc = "  " + f.Location
 		}
-		fmt.Fprintf(w, "%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
-		fmt.Fprintf(w, "        %s\n", f.Message)
+		_, _ = fmt.Fprintf(w, "%-7s %-32s %s\n", f.Severity, f.Rule, f.ID+loc)
+		_, _ = fmt.Fprintf(w, "        %s\n", f.Message)
 	}
-	fmt.Fprintf(w, "io-surface: %d declared, %d extracted (%d resolved, %d token), %d baselined — %d errors, %d warnings, %d infos\n",
+	_, _ = fmt.Fprintf(w, "io-surface: %d declared, %d extracted (%d resolved, %d token), %d baselined — %d errors, %d warnings, %d infos\n",
 		rep.Stats.Declared, rep.Stats.Extracted, rep.Stats.Resolved, rep.Stats.Token,
 		rep.Stats.Baselined, rep.Stats.Errors, rep.Stats.Warnings, rep.Stats.Infos)
 }
@@ -287,7 +287,7 @@ func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
 
 	docStr := render.Markdown(m)
 	if flags.Out == "" {
-		fmt.Fprint(stdout, docStr)
+		_, _ = fmt.Fprint(stdout, docStr)
 
 		return nil
 	}
@@ -533,7 +533,7 @@ func runLint(_ context.Context, root *rootFlags, flags lintFlags) error {
 		if _, err = stdout.Write(data); err != nil {
 			return err
 		}
-		fmt.Fprintln(os.Stdout)
+		_, _ = fmt.Fprintln(os.Stdout)
 	case "json":
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
