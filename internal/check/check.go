@@ -133,6 +133,12 @@ type Options struct {
 	// fails instead of hinting. The default stays advisory because a narrower
 	// scan is often deliberate (module-scoped runs).
 	StrictDirs bool
+	// StrictWeak escalates the weak-site finding (an undeclared token-tier
+	// site) from info to error: a repo that passes the flag moves the
+	// false-positive budget for heuristic extraction onto itself. The
+	// structural guarantee holds by default — without the flag the token
+	// tier stays advisory forever (ROADMAP Q3 decision 2026-11-08).
+	StrictWeak bool
 	// AllowUnusedBaseline exempts unused-baseline findings from strict-mode
 	// failure: a stale suppression warns, but teams mid-cleanup can opt out
 	// of the teeth while the baseline shrinks. The finding still reports.
