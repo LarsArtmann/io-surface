@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "265d7b7-dirty"
+	commit: "b918af5"
 	date:   "2026-11-08"
 	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
@@ -35,18 +35,17 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:301",
-			"cmd/io-surface/commands.go:338",
+			"cmd/io-surface/commands.go:319",
 		]
-		family: "file-write"
+		family: "file-read"
 		facts: {
-			call: ["atomicwrite.WriteVerified", "os.ReadFile"]
+			call: ["os.ReadFile"]
 		}
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:215",
-			"cmd/io-surface/commands.go:244",
+			"cmd/io-surface/commands.go:216",
+			"cmd/io-surface/commands.go:245",
 		]
 		family: "file-write"
 		facts: {
@@ -55,11 +54,20 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:294",
+			"cmd/io-surface/commands.go:295",
 		]
 		family: "file-write"
 		facts: {
 			call: ["atomicwrite.WriteWithPerm"]
+		}
+	}
+	"cmd/io-surface.writeDocVerified": {
+		location: [
+			"cmd/io-surface/commands.go:304",
+		]
+		family: "file-write"
+		facts: {
+			call: ["atomicwrite.WriteVerified"]
 		}
 	}
 	"internal/absorb.ModulePath": {
