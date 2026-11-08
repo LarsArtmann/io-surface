@@ -318,7 +318,8 @@ no `go/packages`, no module downloads), so it runs in a Nix sandbox with
   `net.*`, `tls.*`, `quic.*`, `http3.*`, `http.*`, `crypto/rand`, `database/sql`,
   `os/exec`, `syscall`, otel exporters, oidc, cqrs engines). These can fail the gate.
 - **token** — method-name heuristics on unresolvable receivers
-  (`ListenAndServe`, `DialContext`, `RoundTrip`, `ExecContext`, …). Advisory.
+  (`ListenAndServe`, `DialContext`, `RoundTrip`, `ExecContext`, `.Listen` on a
+  `net.ListenConfig` variable, …). Advisory.
 - **seams** — same-package wrappers (`atomicWriteFile`, `EnqueueOp`,
   `AppendBatch`, …) so the raw call is attributed to the wrapper, not to its callers.
 

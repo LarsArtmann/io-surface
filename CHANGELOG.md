@@ -49,6 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   carries `go-finding/meta/enforcement` (`gate`, `audit`, or lint-face
   `lint`), so consumers can tell which face produced the artifact without
   re-running the tool.
+- **`net.ListenConfig` var-ref extraction (TODO #19).** The modern listen
+  path (`var lc net.ListenConfig; lc.Listen(ctx, net, addr)`) now extracts at
+  the token tier with the `listener` family hint — advisory by construction
+  (a lexical var-ref tracker cannot see shadowing, so it must never be able
+  to fail a build). `os.Stdin/Stdout/Stderr` stay deliberately out of scope:
+  process stdio is user feedback, not durable state, and the scaffolded
+  `scope.out` documents the exclusion explicitly.
 
 ### Fixed
 

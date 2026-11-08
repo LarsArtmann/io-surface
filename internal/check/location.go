@@ -25,6 +25,7 @@ func symbolVisible(root string, locations []string, symbol string) bool {
 		}
 		src, cached := read[path]
 		if !cached {
+			//io-surface:ignore io-in-loop reads feed this per-path cache — each file is read at most once regardless of loop trips, so the N+1 this rule class names cannot occur here
 			data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 			if err != nil {
 				read[path] = nil

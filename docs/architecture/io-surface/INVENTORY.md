@@ -23,11 +23,11 @@ CI fails when this block goes stale (`render --doc … --check`).
 | -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- | ---- | ----- |
 | `cmd/io-surface.applyDoc`                    | `cmd/io-surface/commands.go:319`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          | —    | —     |
-| `internal/check.symbolVisible`               | `internal/check/location.go:28`     | —                                                         | —                                        | —          | —    | —     |
+| `internal/check.symbolVisible`               | `internal/check/location.go:29`     | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:171`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    | —    | —     |
 | `internal/extract.extractor.parseFile`       | `internal/extract/extract.go:234`   | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.extractor.walk`            | `internal/extract/extract.go:94`    | —                                                         | —                                        | —          | —    | —     |
-| `internal/extract.runExtract`                | `internal/extract/tables.go:107`    | —                                                         | —                                        | —          | —    | —     |
+| `internal/extract.runExtract`                | `internal/extract/tables.go:109`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/manifest.Load`                     | `internal/manifest/manifest.go:219` | —                                                         | —                                        | —          | —    | —     |
 | `internal/manifest.Manifest.Validate`        | `internal/manifest/manifest.go:498` | —                                                         | —                                        | —          | —    | —     |
 
@@ -63,7 +63,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 | Site                      | Location                            | Resource                                        | Trigger                                           | Discipline | Crit | Durab |
 | ------------------------- | ----------------------------------- | ----------------------------------------------- | ------------------------------------------------- | ---------- | ---- | ----- |
 | `internal/absorb.gitHead` | `internal/absorb/absorb.go:165`     | git HEAD + worktree status of the analyzed repo | every absorb run without an explicit audit commit | —          | —    | —     |
-| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:229` | —                                               | —                                                 | —          | —    | —     |
+| `internal/scaffold.git`   | `internal/scaffold/scaffold.go:230` | —                                               | —                                                 | —          | —    | —     |
 
 ### Judgments
 

@@ -73,6 +73,7 @@ func Write(root string, sites []*extract.Site, date string, force bool) (string,
 	for _, name := range names {
 		path := filepath.Join(dir, name)
 		if name != "facts.cue" {
+			//io-surface:ignore io-in-loop the loop trips once per scaffold file (schema, facts, claims, baseline — 4) — not a per-site N+1
 			if _, err := os.Stat(path); err == nil {
 				continue // judgment/standard file already present: never clobber
 			}

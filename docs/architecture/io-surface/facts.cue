@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "b918af5"
+	commit: "99450f6-dirty"
 	date:   "2026-11-08"
 	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
@@ -91,7 +91,7 @@ sites: {
 	}
 	"internal/check.symbolVisible": {
 		location: [
-			"internal/check/location.go:28",
+			"internal/check/location.go:29",
 		]
 		family: "file-read"
 		facts: {
@@ -127,8 +127,8 @@ sites: {
 	}
 	"internal/extract.runExtract": {
 		location: [
-			"internal/extract/tables.go:107",
-			"internal/extract/tables.go:97",
+			"internal/extract/tables.go:109",
+			"internal/extract/tables.go:98",
 		]
 		family: "file-read"
 		facts: {
@@ -167,7 +167,7 @@ sites: {
 		location: [
 			"internal/scaffold/scaffold.go:61",
 			"internal/scaffold/scaffold.go:64",
-			"internal/scaffold/scaffold.go:76",
+			"internal/scaffold/scaffold.go:77",
 		]
 		family: "file-write"
 		facts: {
@@ -176,7 +176,7 @@ sites: {
 	}
 	"internal/scaffold.git": {
 		location: [
-			"internal/scaffold/scaffold.go:229",
+			"internal/scaffold/scaffold.go:230",
 		]
 		family: "ipc-subprocess"
 		facts: {

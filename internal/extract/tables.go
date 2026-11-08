@@ -94,6 +94,7 @@ func runExtract(root string, opts Options, observing bool) ([]*Site, []Observati
 	// index must be complete before any scanFunc resolves). Pass B scans.
 	for _, dir := range dirs {
 		path := filepath.Join(root, dir)
+		//io-surface:ignore io-in-loop the loop trips once per --dirs entry (2-4 by convention, operator-supplied) — not a per-file N+1
 		info, err := os.Stat(path)
 		if err != nil || !info.IsDir() {
 			continue
@@ -104,6 +105,7 @@ func runExtract(root string, opts Options, observing bool) ([]*Site, []Observati
 	}
 	for _, dir := range dirs {
 		path := filepath.Join(root, dir)
+		//io-surface:ignore io-in-loop the loop trips once per --dirs entry (2-4 by convention, operator-supplied) — not a per-file N+1
 		info, err := os.Stat(path)
 		if err != nil || !info.IsDir() {
 			continue

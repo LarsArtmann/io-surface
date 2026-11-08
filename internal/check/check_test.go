@@ -62,8 +62,20 @@ func fixtureManifest() *manifest.Manifest {
 				Facts:    manifest.Facts{Extractable: true},
 			},
 			"cmd/app.serve": {
-				Location: []string{"cmd/app/main.go:21"},
+				Location: []string{"cmd/app/main.go:23"},
 				Family:   "stream-copy",
+				Facts:    manifest.Facts{Extractable: true},
+			},
+			// listenconfig var-ref sites (TODO #19): token tier — declared like
+			// any other site; the family is the claim, the extraction is advisory
+			"cmd/app.listen": {
+				Location: []string{"cmd/app/main.go:28"},
+				Family:   "listener",
+				Facts:    manifest.Facts{Extractable: true},
+			},
+			"cmd/app.listenPacket": {
+				Location: []string{"cmd/app/main.go:33"},
+				Family:   "listener",
 				Facts:    manifest.Facts{Extractable: true},
 			},
 			// generated file: declared like any other site (repos without --ignore
