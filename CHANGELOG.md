@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.5.0] - 2026-11-08
+
+### Added
+
 - **Detector severity modulation by claims (claims v1.2).** Claims grow two
   typed fields — `criticality` (`normal`/`critical`) and `durability`
   (`durable`/`ephemeral`) — with CUE-enforced vocabularies. `lint` escalates
@@ -56,10 +66,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   to fail a build). `os.Stdin/Stdout/Stderr` stay deliberately out of scope:
   process stdio is user feedback, not durable state, and the scaffolded
   `scope.out` documents the exclusion explicitly.
-
-### Fixed
-
-- Nothing yet.
 
 ## [0.4.0] - 2026-11-07
 

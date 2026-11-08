@@ -344,6 +344,17 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
+`v0.5.0` — the hardening line: the radar completes its ruleset (`write-non-atomic`,
+`tiny-buffer` — 10 rules total), site-level `//io-surface:ignore <rule> <reason>`
+directives silence one finding at one site with a mandatory reason, claims
+modulate severity (`criticality: critical` escalates one step, `durability`
+weighs `write-non-atomic`), a manifest declaring an unknown contract version
+refuses to load instead of mis-decoding, every SARIF result names its
+enforcement posture, `net.ListenConfig` extraction covers the modern listen
+path, and every file the tool writes is crash-safe (unique temp file, fsync,
+atomic rename via `go-atomic-write`, with fingerprint guards on
+read-modify-write paths).
+
 `v0.4.0` — the integration line: the BuildFlow provider runs BOTH faces
 (`buildflow -s io-surface`): adopted repos get the manifest gate, every Go
 module in a BuildFlow sweep gets the advisory radar at info severity — the
