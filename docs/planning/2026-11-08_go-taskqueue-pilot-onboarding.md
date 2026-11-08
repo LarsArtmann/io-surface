@@ -67,3 +67,34 @@ per-site `//io-surface:ignore <rule> <reason>` directive or a real fix.
 
 Executing this plan is an owner call (pilot queue order + session window);
 tracked as the last question of the 2026-11-08 decision batch.
+
+## Execution record (2026-11-08, owner approved "onboard now")
+
+Steps 1 (init), 4 (CI pin), 5 (gate green) executed; step 3's timeout-less
+client fixed; step 2 (the claims judgment hour) stays with the owner — the
+fresh scaffold carries 230 sites with empty claims blocks, gate green
+(`go run ./cmd/io-surface check --root ~/projects/go-taskqueue` → 0 errors,
+6 tolerated location-drift infos).
+
+- **Client fix done differently than planned:** the flagged client
+  (`internal/harvest.unixSocketClient`) ALSO serves the long-lived
+  `/v1/watch` SSE stream — a literal `Timeout` (what the detector asks for)
+  would have killed every watch stream. The fix: `ResponseHeaderTimeout:
+  10s` (bounds the hung-daemon dial/headers case, leaves the stream body
+  unbounded) + the per-site `//io-surface:ignore client-no-timeout …`
+  directive with the reason (the v0.5.0 directive feature working on its
+  hardest real case). Lint: 53 → 52 infos. `go test ./internal/harvest/`
+  green.
+- **Multi-module risk item resolved:** with the root manifest in place,
+  `buildflow -s io-surface` (fresh 7896257 binary) reports 0 error
+  findings — the gate face pairs cleanly with a root-only manifest; leaf
+  modules do NOT need their own manifests. Fan-out lint reports 53 infos
+  vs the root CLI's 52 (one leaf re-counts the harvest site) — advisory
+  only, recorded here per the plan's instruction.
+- **CI pin added** at `.github/workflows/ci.yml` (setup-go shape, not
+  InboxClean's nix-develop shape — each repo keeps its own runner
+  convention): `go run …io-surface@v0.5.1 check --root .`.
+- **Committed locally as `5d223a42`; NOT pushed** — the repo's own
+  AGENTS.md marks pushes owner-gated (a concurrent session's v0.4.2 line),
+  and their working tree carried in-flight AGENTS/CHANGELOG edits that are
+  not mine to publish.
