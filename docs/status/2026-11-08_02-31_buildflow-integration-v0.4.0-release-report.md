@@ -155,8 +155,11 @@ workflows, by design).
 14. Confirm pkg.go.dev indexed v0.4.0.
 15. Onboard go-taskqueue as next pilot (53 findings triaged to zero or
     claimed).
-16. InboxClean: commit + push its 4 pilot files (owner call, still open from
-    dogfooding §g).
+16. ~~InboxClean: commit + push its 4 pilot files (owner call, still open from
+    dogfooding §g).~~ SUPERSEDED 2026-11-08: the pilot files ARE committed
+    (T87 + pin bump `418ff69d`, whose BuildFlow pre-commit gate was
+    load-skipped); the remaining push decision + on-demand gates live in
+    TODO_LIST **#134** (one fact, one home).
 17. Push gogenfilter master; watch its CI when billing allows.
 18. dnsblockd v1→v1.2 judgment migration (owner call).
 19. Re-run `scripts/fleetscan.sh` post-v0.4.0 to refresh the evidence base.
