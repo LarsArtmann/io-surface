@@ -62,7 +62,7 @@ stop calling the inventory complete.
 
 Decision record for the io-surface × Capslock unification (plan:
 `docs/planning/2026-11-06_06-02_unified-io-insights-pareto-plan.md`; evidence:
-`docs/status/2026-11-06_06-45_capslock-v034-blind-spot-run.md`). io-surface
+`docs/status/archived/2026-11-06_06-45_capslock-v034-blind-spot-run.md`). io-surface
 answers **where** I/O sits — per-call-site, hermetic, error-tier. Capslock
 answers **what is reachable** — SSA callgraph through dependencies, transitive,
 noisy. The unified project keeps ONE manifest with TWO fact classes: `sites`
