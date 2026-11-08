@@ -18,6 +18,13 @@
 //	}
 package io_surface
 
+sites: "cmd/io-surface.writeDocVerified": claims: {
+	resource:   "inventory doc (--doc FILE), in-place rewrite"
+	trigger:    "every `io-surface render --doc` apply (not --check)"
+	discipline: ["atomic-write"]
+	rationale:  "the doc embed is a read-modify-write on a file the user may be editing; WriteVerified pins the commit to the entry fingerprint so a concurrent editor's bytes are never clobbered (TestApplyDoc_ConcurrentModification)"
+}
+
 sites: "cmd/io-surface.runAbsorb": claims: {
 	resource:   "Capslock JSON report passed via --capslock"
 	trigger:    "every `io-surface absorb` run"

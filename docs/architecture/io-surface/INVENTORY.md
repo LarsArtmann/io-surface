@@ -12,15 +12,16 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Family           | Sites | Claimed | With rationale |
 | ---------------- | ----: | ------: | -------------: |
-| `file-read`      |     8 |       2 |              2 |
-| `file-write`     |     5 |       2 |              2 |
+| `file-read`      |     9 |       2 |              2 |
+| `file-write`     |     5 |       3 |              3 |
 | `embed`          |     1 |       0 |              0 |
 | `ipc-subprocess` |     2 |       1 |              1 |
 
-## `file-read` (8)
+## `file-read` (9)
 
 | Site                                         | Location                            | Resource                                                  | Trigger                                  | Discipline | Crit | Durab |
 | -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- | ---- | ----- |
+| `cmd/io-surface.applyDoc`                    | `cmd/io-surface/commands.go:319`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:78`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          | —    | —     |
 | `internal/check.symbolVisible`               | `internal/check/location.go:28`     | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:171`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    | —    | —     |
@@ -37,17 +38,18 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 ## `file-write` (5)
 
-| Site                               | Location                                 | Resource                                   | Trigger                             | Discipline | Crit | Durab |
-| ---------------------------------- | ---------------------------------------- | ------------------------------------------ | ----------------------------------- | ---------- | ---- | ----- |
-| `cmd/io-surface.applyDoc`          | `cmd/io-surface/commands.go:301`         | —                                          | —                                   | —          | —    | —     |
-| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:215`         | Capslock JSON report passed via --capslock | every `io-surface absorb` run       | bounded    | —    | —     |
-| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:294`         | —                                          | —                                   | —          | —    | —     |
-| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:41` | baseline.cue of the manifest being edited  | every `io-surface baseline add` run | —          | —    | —     |
-| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:61`       | —                                          | —                                   | —          | —    | —     |
+| Site                               | Location                                 | Resource                                     | Trigger                                             | Discipline   | Crit | Durab |
+| ---------------------------------- | ---------------------------------------- | -------------------------------------------- | --------------------------------------------------- | ------------ | ---- | ----- |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:216`         | Capslock JSON report passed via --capslock   | every `io-surface absorb` run                       | bounded      | —    | —     |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:295`         | —                                            | —                                                   | —            | —    | —     |
+| `cmd/io-surface.writeDocVerified`  | `cmd/io-surface/commands.go:304`         | inventory doc (--doc FILE), in-place rewrite | every `io-surface render --doc` apply (not --check) | atomic-write | —    | —     |
+| `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:41` | baseline.cue of the manifest being edited    | every `io-surface baseline add` run                 | —            | —    | —     |
+| `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:61`       | —                                            | —                                                   | —            | —    | —     |
 
 ### Judgments
 
 - **`cmd/io-surface.runAbsorb`** — the operator names the artifact; the engine output is decoded in memory with no streaming copy, so an oversized report fails loudly at decode rather than silently truncating
+- **`cmd/io-surface.writeDocVerified`** — the doc embed is a read-modify-write on a file the user may be editing; WriteVerified pins the commit to the entry fingerprint so a concurrent editor's bytes are never clobbered (TestApplyDoc_ConcurrentModification)
 - **`internal/manifest.AppendBaseline`** — the machine's only sanctioned write into a judgment file: a surgical insertion of one {id, note, date} entry, refusing duplicates and noteless entries so the baseline keeps its only-shrinks shape; the read-modify-write is single-file, unbuffered, and fails loudly on a missing file
 
 ## `embed` (1)
