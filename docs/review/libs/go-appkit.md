@@ -15,7 +15,7 @@ skeleton), `httpx` (HTTP plumbing), `cqrs` (dispatch over go-cqrs-lite),
 ## Should io-surface use it?
 
 No. Every module presupposes a service; io-surface is a hermetic CLI whose
-value proposition is *not* being one. The correct-stack argument runs the
+value proposition is _not_ being one. The correct-stack argument runs the
 other way: io-surface is the gate you install INTO a go-appkit-style service
 to declare its I/O surface. Its extractor even recognizes the house CQRS
 stack by import path (`internal/extract/tables.go:141` maps

@@ -14,9 +14,9 @@ exit path, the consumer owns the exit-code contract. Core v4 surface used
 here: `NewApp`, `NewCommand`, `NewParentCommand`, `AddCommands`,
 `WithShort/WithLong/WithExample`, `WithCLIVersion`, `WithBatteries`,
 `ArgsFromContext`. Beyond what io-surface touches, the family offers:
-config-file loading with env precedence and (unreleased) strict keys +
-`config explain` provenance, a machine-readable error envelope
-(`--output json|yaml|toml` with stable `error_code`s, unreleased), dynamic
+config-file loading with env precedence and (unreleased) strict keys, `config
+explain` provenance, a machine-readable error envelope
+(`--output json|yaml|toml` with stable `error_code` fields, unreleased), dynamic
 shell completion (`WithCompletion`), `describe` (versioned JSON contract of
 commands/flags), `doctor`, and seven satellite modules (`prompts`, `spinner`,
 `telemetry`, `lint`, `glamour`, `flightrecorder`, `schema`).
@@ -31,19 +31,19 @@ commands/flags), `doctor`, and seven satellite modules (`prompts`, `spinner`,
 
 ## Capability inventory
 
-| # | Capability | Status | Evidence / reason |
-|---|-----------|--------|-------------------|
-| 1 | App wiring + typed struct-tag flags | 🟢 Fully leveraged | 8 commands, every flag typed and documented |
-| 2 | Per-command Short/Long/Example | 🟢 Fully leveraged | all 8 commands, main.go:68-147 |
-| 3 | `WithBatteries` (strict validation, signals, version/doctor, hints) | 🟢 Fully leveraged | main.go:160 |
-| 4 | Parent commands + positional args | 🟢 Fully leveraged | `baseline add`, main.go:149, commands.go:458 |
-| 5 | Consumer-owned exit-code contract | 🟢 Fully leveraged | 0/1/2 mapping, main.go:39-51, pinned by `main_test.go` |
-| 6 | Custom command overriding auto-registered ones | 🟢 Fully leveraged | `version --json`, commands.go:48-75 |
-| 7 | Version currency | 🟡 Partially used | v4.2.0 vs v4.2.1; v4.2.1 ships `887dcae` "Fix ExitCode(0) on errorfamily failures and flag leaks on reused CLIs" — low impact here (single Execute per process) but the bump is free |
-| 8 | Config files / env precedence / `config explain` | ⚪ N/A | io-surface is repo-driven: no config file concept; flags+defaults are the whole surface (deliberate) |
-| 9 | Machine error envelope (`--output json…` + `error_code`) | ⚪ N/A | io-surface's machine contract is its own `--format json/sarif` stdout, byte-pinned by goldens; usage errors are cmdguard's domain already |
-| 10 | Dynamic completion (`WithCompletion`) | ⚪ N/A | only candidate would be `--format` value completion; no dynamic data exists today |
-| 11 | Satellite modules (`prompts`, `spinner`, `telemetry`, `lint`, `glamour`, `flightrecorder`, `schema`) | ⚪ N/A | no interactivity by design, sub-second runs (no spinner), telemetry deliberately absent, `lint` targets cmdguard-API linters, `schema` emits JSON Schema for config-file consumers (no config files here) |
+| #  | Capability                                                                                           | Status             | Evidence / reason                                                                                                                                                                                         |
+| -- | ---------------------------------------------------------------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | App wiring + typed struct-tag flags                                                                  | 🟢 Fully leveraged | 8 commands, every flag typed and documented                                                                                                                                                               |
+| 2  | Per-command Short/Long/Example                                                                       | 🟢 Fully leveraged | all 8 commands, main.go:68-147                                                                                                                                                                            |
+| 3  | `WithBatteries` (strict validation, signals, version/doctor, hints)                                  | 🟢 Fully leveraged | main.go:160                                                                                                                                                                                               |
+| 4  | Parent commands + positional args                                                                    | 🟢 Fully leveraged | `baseline add`, main.go:149, commands.go:458                                                                                                                                                              |
+| 5  | Consumer-owned exit-code contract                                                                    | 🟢 Fully leveraged | 0/1/2 mapping, main.go:39-51, pinned by `main_test.go`                                                                                                                                                    |
+| 6  | Custom command overriding auto-registered ones                                                       | 🟢 Fully leveraged | `version --json`, commands.go:48-75                                                                                                                                                                       |
+| 7  | Version currency                                                                                     | 🟡 Partially used  | v4.2.0 vs v4.2.1; v4.2.1 ships `887dcae` "Fix ExitCode(0) on errorfamily failures and flag leaks on reused CLIs" — low impact here (single Execute per process) but the bump is free                      |
+| 8  | Config files / env precedence / `config explain`                                                     | ⚪ N/A             | io-surface is repo-driven: no config file concept; flags+defaults are the whole surface (deliberate)                                                                                                      |
+| 9  | Machine error envelope (`--output json…` + `error_code`)                                             | ⚪ N/A             | io-surface's machine contract is its own `--format json/sarif` stdout, byte-pinned by goldens; usage errors are cmdguard's domain already                                                                 |
+| 10 | Dynamic completion (`WithCompletion`)                                                                | ⚪ N/A             | only candidate would be `--format` value completion; no dynamic data exists today                                                                                                                         |
+| 11 | Satellite modules (`prompts`, `spinner`, `telemetry`, `lint`, `glamour`, `flightrecorder`, `schema`) | ⚪ N/A             | no interactivity by design, sub-second runs (no spinner), telemetry deliberately absent, `lint` targets cmdguard-API linters, `schema` emits JSON Schema for config-file consumers (no config files here) |
 
 Score derivation (skill rubric): N=11 rows, A=7 applicable, fully=6, partial=1 → round(100 × 6.5/7) = **93**.
 

@@ -25,15 +25,15 @@ Four bespoke printers own every human-facing byte, deliberately:
 
 ## Why not adopt
 
-| Capability | Fit | Reason |
-|-----------|-----|--------|
+| Capability                                   | Fit    | Reason                                                                                                                      |
+| -------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------- |
 | Terminal table rendering (`printStats` etc.) | ⚪ N/A | the text format is a stability contract, pinned by tests and grepped by humans/CI; restyling is churn without a user asking |
-| `Format` enum + runtime dispatch | ⚪ N/A | io-surface already has its own `--format` switch (text/json/sarif/github) — a second enum would be a split brain |
-| markdown/CSV/HTML renderers | ⚪ N/A | findings' machine formats are JSON + SARIF (what CI consumes); a markdown/CSV findings export has zero recorded demand |
-| NOM progress visualization | ⚪ N/A | runs are sub-second; no long-running workflow to visualize |
-| Color/themes | ⚪ N/A | gate output is deliberately plain (CI logs, piping); color would break byte-pinned goldens for zero value |
+| `Format` enum + runtime dispatch             | ⚪ N/A | io-surface already has its own `--format` switch (text/json/sarif/github) — a second enum would be a split brain            |
+| markdown/CSV/HTML renderers                  | ⚪ N/A | findings' machine formats are JSON + SARIF (what CI consumes); a markdown/CSV findings export has zero recorded demand      |
+| NOM progress visualization                   | ⚪ N/A | runs are sub-second; no long-running workflow to visualize                                                                  |
+| Color/themes                                 | ⚪ N/A | gate output is deliberately plain (CI logs, piping); color would break byte-pinned goldens for zero value                   |
 
-The strongest argument *for* adoption — it is already in the module graph via
+The strongest argument _for_ adoption — it is already in the module graph via
 cmdguard, so a direct import adds no new module — is exactly why this is
 worth writing down: the cost is one direct require line, and the benefit is
 still zero until a real rendering need exists. The minimal-deps doctrine

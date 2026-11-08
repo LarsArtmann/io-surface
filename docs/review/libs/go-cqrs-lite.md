@@ -23,7 +23,7 @@ engines — a second, heavier state model next to CUE for zero capability.
 
 The genuine relationship is already implemented and ships today: the
 extractor's import tables classify `go-cqrs-lite/system/v4` as
-`cqrs-system` (`internal/extract/tables.go:141`), so io-surface *audits*
+`cqrs-system` (`internal/extract/tables.go:141`), so io-surface _audits_
 CQRS systems as a first-class target.
 
 ## Recommendation

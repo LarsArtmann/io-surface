@@ -19,7 +19,7 @@ terminal findings (plain text, byte-pinned) and markdown inventories
 kit would add templ codegen, Tailwind, and a components dependency to a
 binary whose selling point is a stdlib-only core and four direct deps.
 
-If io-surface ever grows a report *website*, the right split stays: generate
+If io-surface ever grows a report _website_, the right split stays: generate
 static markdown/HTML from the manifest (render's current job), not a live
 component tree.
 

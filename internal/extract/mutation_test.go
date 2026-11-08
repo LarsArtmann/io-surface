@@ -121,7 +121,6 @@ func TestMutationRecall(t *testing.T) {
 	hits := map[string]int{}
 	total := map[string]int{}
 	for _, mc := range corpus {
-		mc := mc
 		t.Run(mc.name, func(t *testing.T) {
 			afterObs := extractObservationsFromSource(t, mc.after)
 			if !observationsContain(afterObs, mc.rule) {

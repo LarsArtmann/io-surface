@@ -28,13 +28,13 @@ the `atomicwrite` seam family).
 
 Five write sites, all through the library, none raw:
 
-| Site | Call | Why this variant |
-|------|------|------------------|
-| `cmd/io-surface/commands.go:244` (absorb → capabilities.cue) | `WriteWithPerm(…, 0o644)` | machine-written file must land with canonical perms |
-| `cmd/io-surface/commands.go:294` (render --out) | `WriteWithPerm(…, 0o644)` | same |
-| `internal/scaffold/scaffold.go:80` (init, all four manifest files) | `WriteWithPerm(…, 0o644)` | manifest files are committed; mode must be stable for CI diffs |
-| `cmd/io-surface/commands.go:305,338` (render --doc) | `FingerprintFromBytes` + `WriteVerified` | in-place rewrite of a human-edited doc: the fingerprint guard turns a lost update into an error instead of silent clobber |
-| `internal/manifest/baseline_write.go:45,62-63` (baseline add) | `FingerprintFromBytes` + `WriteVerified` + `errors.Is(err, atomicwrite.ErrConcurrentModification)` | surgical insertion into a judgment file; concurrent-edit race is caught and re-mapped to a domain error telling the operator to re-run |
+| Site                                                               | Call                                                                                               | Why this variant                                                                                                                       |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/io-surface/commands.go:244` (absorb → capabilities.cue)       | `WriteWithPerm(…, 0o644)`                                                                          | machine-written file must land with canonical perms                                                                                    |
+| `cmd/io-surface/commands.go:294` (render --out)                    | `WriteWithPerm(…, 0o644)`                                                                          | same                                                                                                                                   |
+| `internal/scaffold/scaffold.go:80` (init, all four manifest files) | `WriteWithPerm(…, 0o644)`                                                                          | manifest files are committed; mode must be stable for CI diffs                                                                         |
+| `cmd/io-surface/commands.go:305,338` (render --doc)                | `FingerprintFromBytes` + `WriteVerified`                                                           | in-place rewrite of a human-edited doc: the fingerprint guard turns a lost update into an error instead of silent clobber              |
+| `internal/manifest/baseline_write.go:45,62-63` (baseline add)      | `FingerprintFromBytes` + `WriteVerified` + `errors.Is(err, atomicwrite.ErrConcurrentModification)` | surgical insertion into a judgment file; concurrent-edit race is caught and re-mapped to a domain error telling the operator to re-run |
 
 That last row is the textbook use of the library's advanced path: the only
 sanctioned machine write into `baseline.cue` is guarded against concurrent
@@ -43,14 +43,14 @@ message — exactly the library's intended contract.
 
 ## Capability inventory
 
-| # | Capability | Status | Evidence / reason |
-|---|-----------|--------|-------------------|
-| 1 | Atomic staged writes with explicit perms (`WriteWithPerm`) | 🟢 Fully leveraged | all machine-written files, 3 call sites, consistent 0o644 |
-| 2 | Optimistic concurrency (`FingerprintFromBytes` + `WriteVerified`) | 🟢 Fully leveraged | both in-place rewrite paths guarded (applyDoc, AppendBaseline) |
-| 3 | `ErrConcurrentModification` sentinel handling | 🟢 Fully leveraged | baseline_write.go:63 remaps to `ErrBaseline` with re-run guidance |
-| 4 | Streaming writers (`WriteFunc`, unreleased `WriteFuncWithPerm`) | ⚪ N/A | every write source is an in-memory `[]byte` (CUE builder / markdown string); nothing streams |
-| 5 | `WriteIfChanged` (skip identical content) | 🟡 Partially used | `render --doc` rewrites identical bytes when fresh==stored… actually the `--check` path (CI) compares before writing; the write path only runs on demand. Residual impact: mtime-only churn. The variant is worth adopting only if `--doc` rewrites ever become scheduled |
-| 6 | Version currency | 🟡 Partially used | v0.6.0 vs v0.6.2: v0.6.1's temp-leak fix (staged `.tmp` not removed when rename fails) is real robustness for `render --out` into adversarial paths; the unreleased MkdirAll fix is irrelevant here (scaffold MkdirAlls the manifest dir itself, scaffold.go:66) |
+| # | Capability                                                        | Status             | Evidence / reason                                                                                                                                                                                                                                                         |
+| - | ----------------------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | Atomic staged writes with explicit perms (`WriteWithPerm`)        | 🟢 Fully leveraged | all machine-written files, 3 call sites, consistent 0o644                                                                                                                                                                                                                 |
+| 2 | Optimistic concurrency (`FingerprintFromBytes` + `WriteVerified`) | 🟢 Fully leveraged | both in-place rewrite paths guarded (applyDoc, AppendBaseline)                                                                                                                                                                                                            |
+| 3 | `ErrConcurrentModification` sentinel handling                     | 🟢 Fully leveraged | baseline_write.go:63 remaps to `ErrBaseline` with re-run guidance                                                                                                                                                                                                         |
+| 4 | Streaming writers (`WriteFunc`, unreleased `WriteFuncWithPerm`)   | ⚪ N/A             | every write source is an in-memory `[]byte` (CUE builder / markdown string); nothing streams                                                                                                                                                                              |
+| 5 | `WriteIfChanged` (skip identical content)                         | 🟡 Partially used  | `render --doc` rewrites identical bytes when fresh==stored… actually the `--check` path (CI) compares before writing; the write path only runs on demand. Residual impact: mtime-only churn. The variant is worth adopting only if `--doc` rewrites ever become scheduled |
+| 6 | Version currency                                                  | 🟡 Partially used  | v0.6.0 vs v0.6.2: v0.6.1's temp-leak fix (staged `.tmp` not removed when rename fails) is real robustness for `render --out` into adversarial paths; the unreleased MkdirAll fix is irrelevant here (scaffold MkdirAlls the manifest dir itself, scaffold.go:66)          |
 
 Score derivation (skill rubric): N=6 rows, row 4 excluded as N/A → A=5
 applicable; fully=3 (rows 1,2,3), partial=2 (rows 5,6) →

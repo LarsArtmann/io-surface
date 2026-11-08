@@ -1,3 +1,8 @@
+> **Live remainder:** every open item in this report was harvested into
+> TODO_LIST (docs-gates routing PASS, 0 unrouted rows, 2026-11-08) — remaining
+> context lives in the report body below.
+> Archived 2026-11-08 per the docs-cadence ritual (count threshold 15).
+
 # Capslock v0.3.4 blind-spot run — first real capability facts for io-surface
 
 **Report:** 2026-11-06 06:45 CET

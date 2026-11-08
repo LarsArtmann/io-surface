@@ -1,3 +1,8 @@
+> **Live remainder:** every open item in this report was harvested into
+> TODO_LIST (docs-gates routing PASS, 0 unrouted rows, 2026-11-08) — remaining
+> context lives in the report body below.
+> Archived 2026-11-08 per the docs-cadence ritual (count threshold 15).
+
 # Status: Pareto follow-through — cross-repo gates, manifest hardening, and the parallel-session sprint
 
 **Report:** 2026-11-06 06:33 CET

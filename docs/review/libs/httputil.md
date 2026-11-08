@@ -18,9 +18,9 @@ deliberate dependencies.
 No. The whole point of io-surface is that a tree's I/O surface is small and
 declared; the tool itself practices that doctrine — it performs zero network
 I/O, so there is no handler chain to wrap. Notably, io-surface's own README
-positions it as the tool you run *because* you added `httputil`-style surface
+positions it as the tool you run _because_ you added `httputil`-style surface
 to your app: the extractor classifies `httputil` imports via its import
-tables when scanning *consumers*, which is the only relationship between the
+tables when scanning _consumers_, which is the only relationship between the
 two projects.
 
 ## Recommendation

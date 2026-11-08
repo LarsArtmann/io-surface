@@ -18,7 +18,7 @@ No. io-surface's serialization surfaces are exactly two, both already owned
 by a deliberate choice:
 
 - Findings/report JSON (`--format json`, `extract`) — `encoding/json` on plain structs, pinned by goldens. A payload-codec abstraction over one format would be ceremony.
-- The manifest itself — CUE, loaded in-process by `cuelang.org/go` (`internal/manifest`), because the manifest is a *constraint language*, not a payload.
+- The manifest itself — CUE, loaded in-process by `cuelang.org/go` (`internal/manifest`), because the manifest is a _constraint language_, not a payload.
 
 There are no event payloads, no stores, no signing, no hot paths (runs are
 sub-second over at most thousands of sites).

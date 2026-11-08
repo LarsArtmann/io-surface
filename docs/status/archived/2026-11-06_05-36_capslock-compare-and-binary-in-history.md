@@ -1,3 +1,8 @@
+> **Live remainder:** every open item in this report was harvested into
+> TODO_LIST (docs-gates routing PASS, 0 unrouted rows, 2026-11-08) — remaining
+> context lives in the report body below.
+> Archived 2026-11-08 per the docs-cadence ritual (count threshold 15).
+
 # io-surface Status — Capslock Comparison Session + the 70 MB Binary the Daemon Buried in History
 
 **Report generated:** 2026-11-06 05:36 CET

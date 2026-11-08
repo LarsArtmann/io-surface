@@ -1,3 +1,8 @@
+> **Live remainder:** every open item in this report was harvested into
+> TODO_LIST (docs-gates routing PASS, 0 unrouted rows, 2026-11-08) — remaining
+> context lives in the report body below.
+> Archived 2026-11-08 per the docs-cadence ritual (count threshold 15).
+
 # cmdguard Adoption (io-surface) + Sentinel Contract Sprint (cmdguard) — Status Report
 
 **Date:** 2026-11-06 03:00–05:42 CET

@@ -77,11 +77,11 @@ func (e *extractor) collectIgnores(file *ast.File) {
 func directiveLine(line string) string {
 	s := strings.TrimSpace(line)
 	s = strings.TrimPrefix(s, "//")
-	if strings.HasPrefix(s, "/*") {
-		s = strings.TrimPrefix(s, "/*")
+	if after, ok := strings.CutPrefix(s, "/*"); ok {
+		s = after
 	}
-	if strings.HasSuffix(strings.TrimSpace(s), "*/") {
-		s = strings.TrimSuffix(strings.TrimSpace(s), "*/")
+	if before, ok := strings.CutSuffix(strings.TrimSpace(s), "*/"); ok {
+		s = before
 	}
 
 	return strings.TrimSpace(s)
