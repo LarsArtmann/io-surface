@@ -142,6 +142,11 @@ bridge deferred until a consumer exists; golangci composition rejected.
   - **Decision recorded 2026-11-08 (owner, N19 batch): flake NOW.** Scope: a
     minimal flake (build + tests + the self-hosting gate), hermetic by the
     extractor's design. Cost accepted: the pin-matrix row.
+    **Implemented 2026-11-08:** fleet `go-standard` module (go_1_27,
+    linux-only, proxyVendor); verified `nix build .#io-surface` and
+    `nix run .# -- check --root .` → 0 errors (the sandbox-native gate the
+    extractor was designed for). Quality gates stay BuildFlow's — the flake
+    owns distribution only.
 - **Q3 — may the weak (heuristic) tier ever fail a build, or is it advisory
   forever?** Opt-in `--strict-weak` per repo is the compromise candidate; this
   is a false-positive-budget policy call. (Birth report §g-Q3) For the

@@ -8,8 +8,10 @@ io-bug-radar) a detector layer that finds bad I/O via `io-surface lint`
 evidence-gated). Single Go module (`go 1.27`), four direct dependencies
 (`cuelang.org/go` for the manifest, `cmdguard/v4` for the CLI, `go-finding`
 for SARIF, `go-atomic-write` for the tool's own file writes — the gate core
-`internal/extract` itself stays stdlib-only), no
-`flake.nix` (deliberately withheld — status report §g-Q2), no Makefile/justfile.
+`internal/extract` itself stays stdlib-only). `flake.nix` (fleet
+`go-standard` module, go 1.27, linux-only) exists since 2026-11-08 — the
+withhold decision was reversed by owner ROADMAP Q2; `nix run .# -- check --root .`
+is the sandbox-native gate. No Makefile/justfile.
 
 `README.md` documents the tool for users. This file documents the repo for
 agents working ON the tool.
@@ -76,7 +78,9 @@ github  git@github.com:LarsArtmann/io-surface.git            # public mirror
   the published tag, so a provider change means a new release before BuildFlow
   can pick it up).
 - Releases are 0.x SemVer (features = MINOR): v0.2.0 shipped 2026-11-06,
-  v0.4.0 (provider two-face) 2026-11-07.
+  v0.4.0 (provider two-face) 2026-11-07, v0.5.1 (history purge + retraction
+  of v0.2.0–v0.5.0 — proxy zips are immutable, so the blob-carrying versions
+  stay cached; @latest moved to the clean tag) 2026-11-08.
   Protocol that worked: version const + CHANGELOG cut + README status line →
   full gates → push → CI green on THAT commit → annotated tag to BOTH remotes
   → proxy `go list -m @vX` check → GitHub Release. pkg.go.dev indexing lags
@@ -250,6 +254,15 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
 
 Fix work is tracked in `TODO_LIST.md`; this section is what to WATCH OUT for
 while working here:
+
+- A STALE system `buildflow`/`docs-gates` binary produces FALSE gate reds
+  (observed 2026-11-08: the pre-commit hook's old provider invoked a
+  `docs-gates` verb the current binary no longer has, blocking an amend
+  while the real battery was green). The tools resolve from `~/.local/bin`
+  (fresh shims, installed 2026-11-08) BEFORE the system profile — keep them
+  current: `nix build /home/lars/projects/BuildFlow#buildflow` +
+  `nix build /home/lars/projects/docs-gates#docs-gates` and refresh the
+  shims; `buildflow doctor` names the binary-freshness delta.
 
 - Baseline suppression is still canonical-key based: two distinct
   same-base-name sites can hide behind one entry. The `unused-baseline`
