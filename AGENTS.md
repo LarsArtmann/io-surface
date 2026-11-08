@@ -189,8 +189,9 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   stable contract — they become SARIF ruleIds and suppression keys; renaming
   one is a breaking change.
 - Extracted IDs and locations are **repo/root-relative** (relative to the
-  `--root` passed), e.g. `internal/store.LoadConfig` at
-  `internal/store/store.go:9` — not absolute, not walk-dir-relative. The
+  `--root` passed), e.g. scanning `testdata/extract` names
+  `internal/store.LoadConfig` at `testdata/extract/internal/store/store.go:8`
+  (fixture-verified 2026-11-08) — not absolute, not walk-dir-relative. The
   manifest contract keys on this.
 
 ### Check semantics worth remembering
