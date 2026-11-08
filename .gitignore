@@ -55,8 +55,16 @@ reports/
 vendor/
 go.work
 go.work.sum
+
+## Nix
+result-*
+.envrc
+.direnv/
 # <<< buildflow-managed (.gitignore) <<<
+
 # Build artifacts
 /io-surface
 /cmd/io-surface/io-surface
 /bin/
+# nix build output link (the daemon committed a 35MB binary once already)
+/result
