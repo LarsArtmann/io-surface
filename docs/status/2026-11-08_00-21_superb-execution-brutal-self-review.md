@@ -168,20 +168,20 @@ stash — deliberately untouched.
 
 **Detector-line continuations:**
 
-| #  | Task                                                                                                   |
-| -- | ------------------------------------------------------------------------------------------------------ |
-| 19 | stat-then-open refinement design: redundant-pre-check class (existence branch → silent)                |
-| 20 | client-no-timeout refinement: post-construction `.Timeout =` assignment follow (found in triage)       |
-| 21 | client-no-timeout: test-harness/loopback carve-out or `//io-surface:ignore` examples shipped           |
-| 22 | ctx-dropped force-kill class: shipped examples already in fixture — promote to rule-card example       |
-| 23 | tiny-buffer: decide whether custom-wrapper consumers ever enter the watched table (hermetic scope)     |
-| 24 | closer-missing ownership FP class: collect fleet samples for the v1.3 mapping table                    |
-| 25 | lint --format github: add endLine/column anchors + severity-aware summary                              |
-| 26 | fleetscan.sh: emit per-finding locations (not just counts) for T3-style protocols                      |
-| 27 | fleetscan.sh: dedup PR-branch twins in the corpus                                                      |
-| 28 | `--enforce` docs: a worked audit-mode example (README errors-help pass follow-up)                      |
-| 29 | io-in-loop: measure fleet hit-class distribution post-refinement (per-item vs fixed vs repeated)       |
-| 30 | Baseline policy: decide whether suppression directives should count as "shrinking" for unused-baseline |
+| #      | Task                                                                                                                                                                                                                                                                                                          |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 19     | stat-then-open refinement design: redundant-pre-check class (existence branch → silent)                                                                                                                                                                                                                       |
+| 20     | client-no-timeout refinement: post-construction `.Timeout =` assignment follow (found in triage)                                                                                                                                                                                                              |
+| 21     | client-no-timeout: test-harness/loopback carve-out or `//io-surface:ignore` examples shipped                                                                                                                                                                                                                  |
+| 22     | ctx-dropped force-kill class: shipped examples already in fixture — promote to rule-card example                                                                                                                                                                                                              |
+| 23     | tiny-buffer: decide whether custom-wrapper consumers ever enter the watched table (hermetic scope)                                                                                                                                                                                                            |
+| ~~24~~ | closer-missing ownership FP class: collect fleet samples for the v1.3 mapping table — DECIDED 2026-11-08: folded into TODO row #136 (owner ratified ONE combined v1.3 train: runtime-power capabilities + claims.ownership; the FP-sample collection is part of that session's closer-missing semantics work) |
+| 25     | lint --format github: add endLine/column anchors + severity-aware summary                                                                                                                                                                                                                                     |
+| 26     | fleetscan.sh: emit per-finding locations (not just counts) for T3-style protocols                                                                                                                                                                                                                             |
+| 27     | fleetscan.sh: dedup PR-branch twins in the corpus                                                                                                                                                                                                                                                             |
+| 28     | `--enforce` docs: a worked audit-mode example (README errors-help pass follow-up)                                                                                                                                                                                                                             |
+| 29     | io-in-loop: measure fleet hit-class distribution post-refinement (per-item vs fixed vs repeated)                                                                                                                                                                                                              |
+| 30     | Baseline policy: decide whether suppression directives should count as "shrinking" for unused-baseline                                                                                                                                                                                                        |
 
 **Hygiene / docs:**
 
