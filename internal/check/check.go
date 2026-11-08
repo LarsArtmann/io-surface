@@ -220,150 +220,21 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		declaredByID[id] = true
 	}
 
-	for _, canon := range sortedKeys(buckets) {
-		b := buckets[canon]
-		declaredSet := map[string]bool{}
-		for _, id := range b.declared {
-			declaredSet[id] = true
-		}
-		paired := map[string]*extract.Site{} // declared ID -> extracted site
-		usedExtracted := map[*extract.Site]bool{}
-
-		// 1. Exact ID matches pair first; they are never ambiguous.
-		for _, s := range b.extracted {
-			if declaredSet[s.ID] && !usedExtracted[s] {
-				paired[s.ID] = s
-				usedExtracted[s] = true
-			}
-		}
-		// 2. Then a 1:1 leftover pair is ID drift (method -> function etc.).
-		var leftoversDeclared []string
-		for _, id := range b.declared {
-			if paired[id] == nil {
-				leftoversDeclared = append(leftoversDeclared, id)
-			}
-		}
-		var leftoversExtracted []*extract.Site
-		for _, s := range b.extracted {
-			if !usedExtracted[s] {
-				leftoversExtracted = append(leftoversExtracted, s)
-			}
-		}
-		if len(leftoversDeclared) == 1 && len(leftoversExtracted) == 1 {
-			id, s := leftoversDeclared[0], leftoversExtracted[0]
-			paired[id] = s
-			usedExtracted[s] = true
-			rep.add(Finding{
-				Rule: RuleIDDrift, Severity: SeverityWarning, ID: id, Family: familyOf(m, id, s),
-				Location: firstLocation(s.Locations),
-				Message:  fmt.Sprintf("declared as %q but extracts as %q; update the ID form (same symbol, different receiver)", id, s.ID),
-			})
-			leftoversDeclared, leftoversExtracted = nil, nil
-		}
-
-		// 3. Anything still unpaired on the extraction side is undeclared.
-		for _, s := range leftoversExtracted {
-			if baselined[canon] {
-				usedBaseline[canon] = true
-
-				continue
-			}
-			if s.Confidence != extract.ConfidenceResolved {
-				if opts.Advisory {
-					rep.add(Finding{
-						Rule: RuleWeakSite, Severity: SeverityInfo, ID: s.ID, Family: s.Family(),
-						Location: firstLocation(s.Locations),
-						Message:  fmt.Sprintf("weak-tier I/O site (%s) is not declared; declare it or convert the call to a resolved form", join(s.Calls)),
-					})
-				}
-
-				continue
-			}
-			// The site whose dotted variant is declared is already covered by
-			// the id-form error on the declaration; reporting undeclared too
-			// would double-count one authoring mistake.
-			if dotted, ok := match.DottedVariant(s.ID); ok && declaredByID[dotted] {
-				continue
-			}
-			rep.add(Finding{
-				Rule: RuleUndeclared, Severity: SeverityError, ID: s.ID, Family: s.Family(),
-				Location: firstLocation(s.Locations),
-				Message:  fmt.Sprintf("undeclared I/O site (%s); declare it in facts/claims or add it to baseline with a note", join(s.Calls)),
-			})
-		}
-
-		// 4. Declared sites with no extraction partner: classify honestly.
-		for _, id := range leftoversDeclared {
-			site := m.Sites[id]
-			if !site.Facts.Extractable {
-				continue
-			}
-			// A dotted-subpackage ID can never pair: the extractor always
-			// emits slash-package paths. Confirmed against the extracted set
-			// so the unexported-type dotted form (internal/extract.extractor.
-			// parseFile — "extractor" IS a type) stays legal. This is an
-			// error, not drift: the declaration guards nothing while the
-			// real call site goes unguarded (dnsblockd adoption lesson).
-			if variant, ok := match.SlashVariant(id); ok && extractedByID[variant] {
-				rep.add(Finding{
-					Rule: RuleIDForm, Severity: SeverityError, ID: id, Family: site.Family,
-					Location: firstLocation(site.Location),
-					Message:  fmt.Sprintf("declared with a dotted subpackage; the extractor emits %q — the dotted form can never pair with an extraction", variant),
-				})
-
-				continue
-			}
-			if len(site.Location) == 0 {
-				rep.add(Finding{
-					Rule: RuleMissingLocation, Severity: SeverityWarning, ID: id, Family: site.Family,
-					Message: "declared as extractable but carries no location; regenerate facts.cue",
-				})
-			}
-			if len(b.extracted) > 0 {
-				// The group exists but the pairing stayed ambiguous: two
-				// different symbols share a base name, so a guess would lie.
-				rep.add(Finding{
-					Rule: RuleAmbiguousMatch, Severity: SeverityInfo, ID: id, Family: site.Family,
-					Location: firstLocation(site.Location),
-					Message:  fmt.Sprintf("cannot be paired unambiguously (%d declared, %d extracted here share a base symbol); declare the exact ID form", len(b.declared), len(b.extracted)),
-				})
-
-				continue
-			}
-			if symbolVisible(root, site.Location, match.Symbol(id)) {
-				rep.add(Finding{
-					Rule: RuleExtractionBlind, Severity: SeverityInfo, ID: id, Family: site.Family,
-					Location: firstLocation(site.Location),
-					Message:  "declared symbol exists but no watched I/O call extracts from it; mark facts.extractable=false or teach the extractor the seam",
-				})
-
-				continue
-			}
-			rep.add(Finding{
-				Rule: RuleStaleClaim, Severity: SeverityWarning, ID: id, Family: site.Family,
-				Location: firstLocation(site.Location),
-				Message:  "declared site no longer extracts and its symbol is not in the declared file; the symbol moved, was renamed, or the call was removed",
-			})
-		}
-
-		// 5. Paired sites: locations are derived data, so a mismatch is a
-		// maintenance nudge (info), never a failure.
-		for _, id := range b.declared {
-			s := paired[id]
-			if s == nil {
-				continue
-			}
-			for _, loc := range m.Sites[id].Location {
-				if !hasString(s.Locations, loc) {
-					rep.add(Finding{
-						Rule: RuleLocationDrift, Severity: SeverityInfo, ID: id, Family: m.Sites[id].Family,
-						Location: loc,
-						Message:  "declared location differs from the extraction (line numbers are derived data); regenerate facts.cue",
-					})
-				}
-			}
-		}
+	// The bidirectional pairing walk (directions 1+2) lives in pairing.go:
+	// one self-contained phase over the buckets assembled above. All rule
+	// firings and their order are unchanged — the split is mechanical (TODO #64).
+	p := &pairer{
+		root:          root,
+		m:             m,
+		opts:          opts,
+		rep:           rep,
+		buckets:       buckets,
+		baselined:     baselined,
+		usedBaseline:  usedBaseline,
+		extractedByID: extractedByID,
+		declaredByID:  declaredByID,
 	}
+	p.pairGroups()
 
 	// Scope hint: a --dirs narrowing that excludes declared sites produces
 	// findings that look like manifest rot but are really the flag's doing.
