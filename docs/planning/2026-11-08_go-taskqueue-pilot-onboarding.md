@@ -9,8 +9,8 @@ ruleset counts **53** advisory findings, verified how:
 ## Why this pilot next
 
 go-taskqueue is the largest unaudited first-party consumer in the fleet
-(multi-module: 12+ leaf `go.mod`s, unusual layout — every internal package is
-its own module). Both BuildFlow integration questions are already answered
+(multi-module: 12+ leaf modules, each package its own `go.mod`, unusual
+layout). Both BuildFlow integration questions are already answered
 for it by the N3 evidence: the provider's module fan-out reaches the leaf
 modules and the radar fires end-to-end (53 findings through
 `buildflow -s io-surface`, identical count through the pinned CLI). Onboarding
@@ -19,11 +19,11 @@ the hardest layout.
 
 ## Findings class table (v0.5.0 ruleset, all advisory info)
 
-| Rule                        | Count | Class summary                                                                        |
-| --------------------------- | ----- | ------------------------------------------------------------------------------------ |
-| `io-surface/io-in-loop`     | 32    | N+1 shapes: per-item `filepath.Glob`/`os.Stat`/HTTP GET inside loops                  |
-| `io-surface/write-non-atomic` | 20  | direct final-path writes without temp+rename (state files, caches)                    |
-| `io-surface/client-no-timeout` | 1  | one `http.Client` literal without a `Timeout`                                          |
+| Rule                           | Count | Class summary                                                        |
+| ------------------------------ | ----- | -------------------------------------------------------------------- |
+| `io-surface/io-in-loop`        | 32    | N+1 shapes: per-item `filepath.Glob`/`os.Stat`/HTTP GET inside loops |
+| `io-surface/write-non-atomic`  | 20    | direct final-path writes without temp+rename (state files, caches)   |
+| `io-surface/client-no-timeout` | 1     | one `http.Client` literal without a `Timeout`                        |
 
 All 53 are info severity: nothing fails, everything is a candidate for the
 per-site `//io-surface:ignore <rule> <reason>` directive or a real fix.

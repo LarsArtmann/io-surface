@@ -159,12 +159,12 @@ stash — deliberately untouched.
 
 **Ratification-dependent (owner boxes):**
 
-| #  | Task                                                                                                         |
-| -- | ------------------------------------------------------------------------------------------------------------ |
-| 15 | Ratify promotion-policy numbers (policy §8) — unblocks every future promotion                                |
-| 16 | Ratify ownership v1.3 scope (ROADMAP Q6 ADR)                                                                 |
-| 17 | Post-ratification: implement `claims.ownership` (schema v1.3 spike → schema bump + closer-missing semantics) |
-| 18 | Post-ratification: first promotion evaluation under the ledger (likely: none yet — write the "why not" note) |
+| #  | Task                                                                                                                                                                                    |
+| -- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 15 | Ratify promotion-policy numbers (policy §8) — unblocks every future promotion                                                                                                           |
+| 16 | Ratify ownership v1.3 scope (ROADMAP Q6 ADR) — RESOLVED 2026-11-08 (owner ratified design-only; ROADMAP Q6 decision recorded; TODO row #117 struck; implementation tracked as row #135) |
+| 17 | Post-ratification: implement `claims.ownership` (schema v1.3 spike → schema bump + closer-missing semantics)                                                                            |
+| 18 | Post-ratification: first promotion evaluation under the ledger (likely: none yet — write the "why not" note)                                                                            |
 
 **Detector-line continuations:**
 
