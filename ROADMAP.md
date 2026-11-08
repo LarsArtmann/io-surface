@@ -135,6 +135,11 @@ bridge deferred until a consumer exists; golangci composition rejected.
     claim-ful smoke gate is the right first enforcement target. dnsblockd
     enforces after its owner diff review (3 claim-conflicts + 21 UNREVIEWED
     fills from the mechanical port); go-taskqueue onboards advisory-first.
+    **Executed 2026-11-08:** InboxClean already declares
+    `enforcement: "gate"` (errors block CI structurally — no --enforce flag
+    needed); the ratification landed as the pin upgrade to v0.5.1
+    (InboxClean commit `7147b75c`, `.github/workflows/ci.yml`), removing the
+    retraction-warning version from the fleet's first blocking gate.
 - **Q2 — flake now, or stay Go-module-only until a second repo gates on it?**
   A flake buys `nix build` + sandbox-native gating and costs a row in the
   fleet's pin matrix. GitHub CI already satisfies "own CI so it can't rot"
