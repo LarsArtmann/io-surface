@@ -309,3 +309,21 @@ go run ./cmd/io-surface check --root .                               # gate gree
 go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@2278406afdfd run   # 5/5 PASS
 npx -y @mermaid-js/mermaid-cli -i docs/planning/2026-11-08_06-27_superb-remainder-plan.md -o /tmp/plan.png  # graph parses (optional)
 ```
+
+## 7. Execution record (2026-11-08 session, N19 batch + Q1–Q4 landed)
+
+The N19 Q1–Q4 owner batch was asked and answered (ONE question call,
+15:45–15:50 CET): **Q1** InboxClean takes the first blocking gate
+(executed: pin `@v0.5.1`, their `enforcement: "gate"` already blocks);
+**Q2** flake NOW (executed: fleet go-standard flake, `nix run .# --
+check --root .` green); **Q3** build `--strict-weak` (executed:
+`Options.StrictWeak` + `TestRun_StrictWeakEscalates`); **Q4** purge now
+(executed: mirror backup → `git filter-repo` → force-push BOTH remotes
+(owner-approved) → v0.5.1 with `retract` directives → proxy serves the
+clean zip, fresh clone 54 MB → 4 MB); **v1.3 shape** = ONE combined train
+(TODO #138 closed). go-taskqueue onboarded per its plan (local commit
+`5d223a42`, push owner-gated). Full outcomes live in ROADMAP Q1–Q6 and the
+wrap status report. Known opens after this session: InboxClean CI
+confirm blocked by a GitHub BILLING failure on the owner's account (jobs
+never start), dnsblockd owner diff review (3 claim-conflicts + 21
+UNREVIEWED fills), go-taskqueue claims judgment hour + push.
