@@ -85,7 +85,7 @@ _(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked
 4. Re-dogfood after T20: re-run absorb (mapped vocabulary unchanged — syscall is out-of-scope vocabulary; confirm Dropped counts), self-check green.
 5. ~~Write plan errata (deviations from e.4/e.5) into the plan file.~~ RESOLVED same day: plan §3.7 "Execution errata — where the shipped design diverged from this plan" in `docs/planning/2026-11-06_06-02_unified-io-insights-pareto-plan.md` records the e.4/e.5 deviations (capability-drift moved to `absorb --check`, Q4/Q5 labels, T12/T13/T15 ownership, T21 re-base).
 6. Verify GitHub CI on `7056141`: first run with `-race` + the `capabilities` job (capslock install with repo toolchain is the risky step).
-7. Re-check pkg.go.dev indexing (#38) once the crawler catches up.
+7. ~~Re-check pkg.go.dev indexing (#38) once the crawler catches up.~~ RESOLVED 2026-11-08: `https://pkg.go.dev/github.com/larsartmann/io-surface` → HTTP 200 showing **v0.4.0 Latest** (published Nov 7, 2026); cmd package page also 200. #38 marked DONE.
 8. Decide #49: stdout/stderr in `scope.in`? (owner; evidence: `commands.go:77`, bufio/syscall now watched).
 9. ~~T14 enforcement policy field (`advisory|gate` per manifest; the shadow/capability tier's promotion path).~~ RESOLVED 2026-11-07: shipped as the manifest `enforcement` field (`gate|audit` — EnforcementGate/EnforcementAudit, EnforcementPolicy(), audit-mode demotion live in check)
 10. T16b `baseline add` subcommand with `owner`/`expires` prompts (#22).
