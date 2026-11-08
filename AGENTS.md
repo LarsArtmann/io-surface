@@ -310,8 +310,9 @@ block). Durable outcome: cmdguard (93/100) and go-atomic-write (80/100) are
 the only house libs directly used and are at/near ceiling for a gate CLI;
 go-error-family and go-output are in the graph (via go-finding / cmdguard)
 and deliberately unimported; all server/CQRS/UI libs rejected with reasons.
-Pending hygiene: bump cmdguard v4.2.0→v4.2.1 and go-atomic-write
-v0.6.0→v0.6.2 (no API changes). Two recorded adoption triggers: build
-`check --watch` on go-filewatcher/v2 if pilots ask; revisit go-error-family
-only for a networked mode (not planned). Re-audit trigger: a new direct
-dependency, or either pinned dep falling 2+ versions behind.
+Open audit-fallout tasks live in TODO_LIST (#118–126, ranked plan:
+`docs/planning/2026-11-08_02-36_post-audit-pareto-plan.md`). Two recorded
+adoption triggers: build `check --watch` on go-filewatcher/v2 if pilots ask;
+revisit go-error-family only for a networked mode (not planned). Re-audit
+trigger: a new direct dependency, or either pinned dep falling 2+ versions
+behind.

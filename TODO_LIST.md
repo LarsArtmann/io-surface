@@ -185,3 +185,21 @@
 | 115 | Same seam test for applyDoc (render doc-fingerprint capture)                                                                         | 🔴 `TODO`            | Low    | 30min  | 20-25 report §f5 (harvested 2026-11-07)                                                                                      |
 | 116 | Manifest `version` field: unknown-major refusal (Load/Validate rejects versions beyond the shipped contract)                         | 🔴 `TODO`            | Low    | 30min  | 04-27 report §f33 + archived 02-33 report row 28 (harvested 2026-11-07)                                                      |
 | 117 | Owner ratifications pending: promotion-policy numbers (policy §8) + ownership v1.3 scope (ROADMAP Q6) + InboxClean CI pin/SARIF step | 🔴 `TODO`            | Med    | 30min  | plan D1/D6; policy + ADR both propose, owner disposes                                                                        |
+
+## Post-audit hygiene (harvested 2026-11-08)
+
+> Source: library-utilization audit (`docs/review/libs/`, 2026-11-07/08) +
+> status report `docs/status/2026-11-08_02-33_library-audit-self-review-and-status.md` §f.
+> Full ranking and ≤12min breakdown: `docs/planning/2026-11-08_02-36_post-audit-pareto-plan.md` (M1–M24).
+
+| #   | Task                                                                                                                    | Status | Impact | Effort | Evidence                                                                                                    |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------ | ------------------------------------------------------------------------------------------------------------ |
+| 118 | Bump `cmdguard/v4` → v4.2.1 + `go-atomic-write` → v0.6.2; full gates; refresh audit reports' version-currency rows        | 🔴 `TODO` | High | 30min | `docs/review/libs/cmdguard.md` + `go-atomic-write.md` (bump gaps verified against proxy 2026-11-07)          |
+| 119 | Proxy-check latest versions for the 16 local-tag-only audit libs; resolve go-credentials-store v0.2.1-tag vs README-v0.3.1 | 🔴 `TODO` | Med  | 60min | status report §b.1; only 6 in-graph modules proxy-verified                                                  |
+| 120 | Audit discoverability: README pointer to `docs/review/libs/`, screenshot link in index footer, README claims vs v0.4.0   | 🔴 `TODO` | Med  | 30min | status report §f.6+9+16                                                                                     |
+| 121 | Run full local CI battery (render, inventory-doc --check, SARIF emit, facts-freshness) — convert "gate green" to "CI green" | 🔴 `TODO` | Med  | 30min | status report §b.3; folds in #38 pkg.go.dev index check                                                     |
+| 122 | go-finding + go-finding/toolsdk utilization deep-dives in the `docs/review/libs/` series (+ index 22→24 rows)            | 🔴 `TODO` | Med  | 100min | status report §f.10; direct deps off the original 22-lib audit list                                          |
+| 123 | errcheck decision for the 8 `commands.go` stdout-sink warnings: adopt minimal config + fix, or documented waiver        | 🔴 `TODO` | Med  | 60min | golangci_lint_ls diagnostics, visible all session; no `.golangci.yml` exists                                 |
+| 124 | Version currency: `cuelang.org/go` v0.17.1 vs latest + toolsdk v1.16.0/go-finding v1.15.1 skew check                    | 🔴 `TODO` | Low  | 30min | status report §f.11+14                                                                                      |
+| 125 | Verify BuildFlow picked up provider v0.4.0 (sdk_imports pin; run one detect end-to-end)                                 | 🔴 `TODO` | Med  | 30min | status report §f.15; release protocol requires both halves shipped                                          |
+| 126 | Series sweep: `docs/reviews/` + `docs/research/` overlap check + supersedes convention for the audit series             | 🔴 `TODO` | Low  | 30min | status report §c.5; pareto plan M22                                                                         |
