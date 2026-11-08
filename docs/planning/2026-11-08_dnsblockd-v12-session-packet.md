@@ -17,14 +17,14 @@ T19) already fixes the mechanics.
 
 ## Scope (what the session does)
 
-| Item                                                                | Count       | Judgment needed          |
-| ------------------------------------------------------------------- | ----------- | ------------------------ |
-| Undeclared sites failing the gate (`writeUnbound`, `cssHandler`)    | 2 errors    | declare vs baseline each |
-| Extraction-blind declared symbols                                   | ~10 infos   | `extractable: false` + rationale, or leave |
-| v1 claims ported to v1.2 shape: per-site `discipline` tags + `exception` prose replacing the global `disciplines.cue` constraints | 134 claims  | per-site "why this write is safe" — the reason the owner is in the room |
-| New v1.2 vocabulary: `criticality` + `durability` per claim         | 134 claims  | what breaks / what a lost write costs |
-| `version: "io-surface/v1.2"` in the manifest                        | 1 line      | none (mechanical)        |
-| Nix wiring: retire/replace `check-io-surface.sh` with the CLI gate (`io-surface check` as the Nix check) | 1 flake edit | keep-or-retire call for the old script |
+| Item                                                                                                                              | Count        | Judgment needed                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------- |
+| Undeclared sites failing the gate (`writeUnbound`, `cssHandler`)                                                                  | 2 errors     | declare vs baseline each                                                |
+| Extraction-blind declared symbols                                                                                                 | ~10 infos    | `extractable: false` + rationale, or leave                              |
+| v1 claims ported to v1.2 shape: per-site `discipline` tags + `exception` prose replacing the global `disciplines.cue` constraints | 134 claims   | per-site "why this write is safe" — the reason the owner is in the room |
+| New v1.2 vocabulary: `criticality` + `durability` per claim                                                                       | 134 claims   | what breaks / what a lost write costs                                   |
+| `version: "io-surface/v1.2"` in the manifest                                                                                      | 1 line       | none (mechanical)                                                       |
+| Nix wiring: retire/replace `check-io-surface.sh` with the CLI gate (`io-surface check` as the Nix check)                          | 1 flake edit | keep-or-retire call for the old script                                  |
 
 Effort estimate: **2–3 h** with the owner (134 sites at ~45–60 s of judgment
 each is the bulk); **~30 min** if mechanical-then-review is chosen.
