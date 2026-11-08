@@ -205,7 +205,7 @@ double-count in per-rule aggregates).
 **Tooling/tests**
 36. Derive count assertions from goldens (kill the sed churn).
 37. Parse-only CI guard for `testdata/detectors` + gofmt it explicitly.
-38. Dead-table guard: errResults/closableCtors/etc. entries must exist in
+38. ~~Dead-table guard: errResults/closableCtors/etc. entries must exist in callFamily (mirror of `TestPkgOf_CoversEveryWatchedPackage`).~~ DONE — VERIFIED 2026-11-08: the guard exists as `TestPkgOf_CoversEveryWatchedPackage` (`internal/extract/extract_test.go:24`), which fails on any callFamily entry unreachable from pkgOf/importSubstring (`go test ./internal/extract -run TestPkgOf_Covers -v`).
 callFamily (mirror of `TestPkgOf_CoversEveryWatchedPackage`).
 39. Fuzz the capture tracker on the fixture corpus (FuncLits inside loop
 bodies).
