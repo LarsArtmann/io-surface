@@ -233,9 +233,9 @@ func runAbsorb(_ context.Context, root *rootFlags, flags absorbFlags) error {
 
 	if flags.Check {
 		for _, line := range absorb.Drift(m, res) {
-			fmt.Fprintf(stdout, "%-7s %-32s %s\n", "info", absorb.RuleCapabilityDrift, line)
+			_, _ = fmt.Fprintf(stdout, "%-7s %-32s %s\n", "info", absorb.RuleCapabilityDrift, line)
 		}
-		fmt.Fprintf(stdout, "io-surface: %d packages with capability facts, %d unmapped edges dropped — %d drift (advisory; capabilities never fail the gate)\n",
+		_, _ = fmt.Fprintf(stdout, "io-surface: %d packages with capability facts, %d unmapped edges dropped — %d drift (advisory; capabilities never fail the gate)\n",
 			res.Pkgs, dropped, len(absorb.Drift(m, res)))
 		printDropped(stdout, res)
 
@@ -246,7 +246,7 @@ func runAbsorb(_ context.Context, root *rootFlags, flags absorbFlags) error {
 	if err = atomicwrite.WriteWithPerm(path, absorb.CUE(res, audit), 0o644); err != nil {
 		return err
 	}
-	fmt.Fprintf(stdout, "io-surface: wrote %s (%d packages, audit %s@%s of %s, %d unmapped edges dropped)\n",
+	_, _ = fmt.Fprintf(stdout, "io-surface: wrote %s (%d packages, audit %s@%s of %s, %d unmapped edges dropped)\n",
 		path, res.Pkgs, audit.Engine, audit.Version, audit.Commit, dropped)
 	printDropped(stdout, res)
 

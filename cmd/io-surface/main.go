@@ -24,7 +24,7 @@ const version = "0.5.1"
 func main() {
 	app, err := newApp()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "io-surface: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "io-surface: %v\n", err)
 		os.Exit(2)
 	}
 

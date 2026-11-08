@@ -3,5 +3,6 @@
 max_file_size: 650 # lines; the fleet default (350) fights this repo's design:
 # the extractor's classification tables, the pairing engine,
 # and the cmdguard handlers are deliberately single-file
-# (AGENTS.md "Where detection rules live"). Split planned:
-# TODO_LIST #64.
+# (AGENTS.md "Where detection rules live"). The pairing split
+# shipped 2026-11-08 (row #64 struck); the pin stays for the
+# remaining deliberate single-file tables.

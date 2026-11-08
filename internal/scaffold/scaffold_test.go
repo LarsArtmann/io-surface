@@ -223,14 +223,18 @@ func TestAuditCommit_HeadAndDirty(t *testing.T) {
 	if got := auditCommit(dir); got != "working-tree" {
 		t.Fatalf("repo without commits must fall back, got %q", got)
 	}
-	os.WriteFile(filepath.Join(dir, "seed.txt"), []byte("x"), 0o644)
+	if err := os.WriteFile(filepath.Join(dir, "seed.txt"), []byte("x"), 0o644); err != nil {
+		t.Fatalf("write seed.txt: %v", err)
+	}
 	run(dir, "add", ".")
 	run(dir, "commit", "-q", "-m", "seed")
 	head := strings.TrimSpace(run(dir, "rev-parse", "--short", "HEAD"))
 	if got := auditCommit(dir); got != head {
 		t.Fatalf("want clean-repo hash %q, got %q", head, got)
 	}
-	os.WriteFile(filepath.Join(dir, "extra.txt"), []byte("y"), 0o644)
+	if err := os.WriteFile(filepath.Join(dir, "extra.txt"), []byte("y"), 0o644); err != nil {
+		t.Fatalf("write extra.txt: %v", err)
+	}
 	if got := auditCommit(dir); got != head+"-dirty" {
 		t.Fatalf("want dirty marker %q, got %q", head+"-dirty", got)
 	}
