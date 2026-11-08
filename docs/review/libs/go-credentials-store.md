@@ -30,4 +30,5 @@ exists to make explicit.
 ```bash
 rg go-credentials-store go.mod go.sum      # no hits
 rg -n 'password|apikey|api_key' --glob '*.go' internal/ cmd/   # nothing to store
+go list -m github.com/larsartmann/go-credentials-store@latest   # v0.3.1 (proxy-confirmed 2026-11-08)
 ```

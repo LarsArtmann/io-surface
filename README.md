@@ -358,9 +358,11 @@ severity promotion. Everything from `v0.2.0` stands: extractor, bidirectional
 gate, scaffolder, renderer, claims-aware docs embedding, capabilities via
 `absorb` (advisory).
 
-Next, in order: dnsblockd v1→v1.2 judgment migration (owner call), the next
+Next, in order: dnsblockd v1→v1.2 judgment migration (owner-scheduled 2026-11-08), the next
 pilot cohort (go-taskqueue, 37 findings), severity promotion once fleet
-evidence meets the FP≈0 bar.
+evidence meets the FP≈0 bar. The dependencies this tool builds on are
+audited for utilization in `docs/review/libs/` (per-library reports +
+`index.html` dashboard).
 
 Shipped in the 0.2 line: `--json` holds for every gate outcome (validation
 failures included), `init --force` can no longer clobber `claims.cue`/

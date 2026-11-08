@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -294,6 +295,23 @@ func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
 	return atomicwrite.WriteWithPerm(flags.Out, []byte(docStr), 0o644)
 }
 
+// writeDocVerified is the doc seam's read-modify-write commit: it writes the
+// regenerated block only if the file still holds the bytes the caller's
+// fingerprint was captured from. A concurrent writer fails the command with
+// re-run guidance instead of silently clobbering their edit (same contract as
+// the baseline append path). Tested by TestApplyDoc_ConcurrentModification.
+func writeDocVerified(path string, updated []byte, fp atomicwrite.Fingerprint) error {
+	err := atomicwrite.WriteVerified(path, updated, fp)
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, atomicwrite.ErrConcurrentModification) {
+		return fmt.Errorf("%w: %s changed since read (re-run the command to merge)", err, path)
+	}
+
+	return fmt.Errorf("writing %s: %w", path, err)
+}
+
 // applyDoc is the doc-embedding path: rewrite the block in place, or verify
 // it when checking. Drift names the divergence so the author knows WHAT went
 // stale, and the fix hint names the exact command.
@@ -335,11 +353,7 @@ func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
 		return err
 	}
 
-	if err := atomicwrite.WriteVerified(path, []byte(updated), fp); err != nil {
-		return fmt.Errorf("writing %s: %w", path, err)
-	}
-
-	return nil
+	return writeDocVerified(path, []byte(updated), fp)
 }
 
 func storedLines(s string) []string {

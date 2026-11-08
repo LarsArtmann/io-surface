@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/larsartmann/go-atomic-write"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -213,6 +214,61 @@ func TestRunRender_CheckFreshAndStale(t *testing.T) {
 	if !errors.Is(err, errFindings) {
 		t.Fatalf("--check on stale doc err = %v, want errFindings", err)
 	}
+}
+
+// TestApplyDoc_ConcurrentModification pins the doc seam's TOCTOU guard
+// (TODO #115): writeDocVerified commits only against the fingerprint captured
+// at read time, so a concurrent writer fails the command with re-run
+// guidance instead of being clobbered, and their bytes survive on disk. This
+// is the same-seam proof the baseline append path carries; the race mechanics
+// themselves are go-atomic-write's own test suite.
+func TestApplyDoc_ConcurrentModification(t *testing.T) {
+	docPath := filepath.Join(t.TempDir(), "NOTES.md")
+	if err := os.WriteFile(docPath, []byte(renderDocProse), 0o644); err != nil {
+		t.Fatalf("write doc: %v", err)
+	}
+
+	t.Run("stale fingerprint refuses and preserves the concurrent edit", func(t *testing.T) {
+		data, err := os.ReadFile(docPath)
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		fp := atomicwrite.FingerprintFromBytes(data)
+
+		if err := os.WriteFile(docPath, []byte("# concurrent edit by another session\n"), 0o644); err != nil {
+			t.Fatalf("concurrent write: %v", err)
+		}
+
+		err = writeDocVerified(docPath, []byte("# regenerated block"), fp)
+		if !errors.Is(err, atomicwrite.ErrConcurrentModification) {
+			t.Fatalf("want ErrConcurrentModification, got %v", err)
+		}
+		if !strings.Contains(err.Error(), "re-run the command to merge") {
+			t.Errorf("error lacks re-run guidance: %v", err)
+		}
+		got, rErr := os.ReadFile(docPath)
+		if rErr != nil {
+			t.Fatalf("read back: %v", rErr)
+		}
+		if string(got) != "# concurrent edit by another session\n" {
+			t.Errorf("concurrent edit was clobbered, file holds %q", got)
+		}
+	})
+
+	t.Run("fresh fingerprint commits", func(t *testing.T) {
+		data, err := os.ReadFile(docPath)
+		if err != nil {
+			t.Fatalf("read: %v", err)
+		}
+		fp := atomicwrite.FingerprintFromBytes(data)
+		if err := writeDocVerified(docPath, []byte("# regenerated block"), fp); err != nil {
+			t.Fatalf("verified write: %v", err)
+		}
+		got, _ := os.ReadFile(docPath)
+		if string(got) != "# regenerated block" {
+			t.Errorf("file holds %q, want the regenerated block", got)
+		}
+	})
 }
 
 // TestRunCheck_FormatMatrix locks the flag surface: --json, --format json and
