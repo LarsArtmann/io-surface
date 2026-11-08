@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "8d4150b"
+	commit: "e740663-dirty"
 	date:   "2026-11-08"
 	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
@@ -138,7 +138,7 @@ sites: {
 	}
 	"internal/manifest.Load": {
 		location: [
-			"internal/manifest/manifest.go:192",
+			"internal/manifest/manifest.go:219",
 		]
 		family: "file-read"
 		facts: {
@@ -147,7 +147,7 @@ sites: {
 	}
 	"internal/manifest.Manifest.Validate": {
 		location: [
-			"internal/manifest/manifest.go:468",
+			"internal/manifest/manifest.go:498",
 		]
 		family: "file-read"
 		facts: {

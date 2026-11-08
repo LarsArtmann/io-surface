@@ -192,6 +192,61 @@ func TestLoad_EnforcementPolicy(t *testing.T) {
 	})
 }
 
+// TestLoad_VersionRefusal pins the contract-version guard (TODO #116): the
+// three shipped versions load, absence stays legal (v1 predated the field),
+// and anything else — a future v2, a typo, garbage — is refused with
+// ErrUnsupportedVersion naming the supported set, even when the repo's
+// schema.cue would not catch it (stale or missing).
+func TestLoad_VersionRefusal(t *testing.T) {
+	site := `sites: "a.B": {location: ["a.go:1"], family: "env", facts: {call: ["os.Getenv"]}}`
+
+	t.Run("shipped versions and absent load", func(t *testing.T) {
+		for _, version := range []string{"", "io-surface/v1", "io-surface/v1.1", "io-surface/v1.2"} {
+			facts := "package io_surface\n\n" + site
+			if version != "" {
+				facts = "package io_surface\n\nversion: \"" + version + "\"\n\n" + site
+			}
+			dir := writeManifest(t, map[string]string{
+				"schema.cue": schemaBody,
+				"facts.cue":  facts,
+			})
+			m, err := Load(dir)
+			if err != nil {
+				t.Errorf("version %q must load, got: %v", version, err)
+				continue
+			}
+			if m.Version != version {
+				t.Errorf("decoded version = %q, want %q", m.Version, version)
+			}
+		}
+	})
+
+	t.Run("future major is refused", func(t *testing.T) {
+		dir := writeManifest(t, map[string]string{
+			"schema.cue": schemaBody,
+			"facts.cue":  "package io_surface\n\nversion: \"io-surface/v2\"\n\n" + site,
+		})
+		_, err := Load(dir)
+		if !errors.Is(err, ErrUnsupportedVersion) {
+			t.Fatalf("want ErrUnsupportedVersion, got %v", err)
+		}
+		if !strings.Contains(err.Error(), "io-surface/v1.2") {
+			t.Errorf("error must name the newest supported version, got: %v", err)
+		}
+	})
+
+	t.Run("typo is refused without a schema enum", func(t *testing.T) {
+		dir := writeManifest(t, map[string]string{
+			"schema.cue": schemaBody,
+			"facts.cue":  "package io_surface\n\nversion: \"io-surface/v1.3\"\n\n" + site,
+		})
+		_, err := Load(dir)
+		if !errors.Is(err, ErrUnsupportedVersion) {
+			t.Fatalf("want ErrUnsupportedVersion, got %v", err)
+		}
+	})
+}
+
 // TestLoad_NonEmptyViolationsFails pins the disciplines contract for the
 // common shape: a computed violations list with no conflicting default
 // anywhere. The load fails and the message names the actual violation.

@@ -38,6 +38,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   at the resolved tier (`Write*`/`WriteFunc*` = `file-write`,
   `FingerprintFile` = `file-read`), so repos adopting the library keep
   full gate coverage and its sites never fire `write-non-atomic`.
+- **Manifest contract-version refusal (TODO #116).** A manifest declaring a
+  `version` outside the shipped set (`io-surface/v1|v1.1|v1.2`) fails to load
+  with `ErrUnsupportedVersion` naming the supported set and the upgrade path —
+  instead of silently mis-decoding sites written for a newer contract. Absent
+  stays legal (v1 predated the field). The CUE schema enum already refuses
+  unknown versions when a current `schema.cue` is present; the Go-side guard
+  covers stale or missing schema copies.
+- **SARIF enforcement-posture property (TODO #93).** Every SARIF result
+  carries `go-finding/meta/enforcement` (`gate`, `audit`, or lint-face
+  `lint`), so consumers can tell which face produced the artifact without
+  re-running the tool.
 
 ### Fixed
 

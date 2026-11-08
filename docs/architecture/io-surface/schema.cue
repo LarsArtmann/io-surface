@@ -31,7 +31,10 @@ package io_surface
 // declare the newest. A schema change bumps the minor: a new family,
 // capability name, or claims vocabulary is a version bump, never a casual
 // edit (taxonomy freeze). v1.1 added capabilities; v1.2 added the
-// claims.criticality/durability severity-modulation vocabulary.
+// claims.criticality/durability severity-modulation vocabulary. The TOOL
+// refuses any version outside this set at load time (manifest.ErrUnsupportedVersion):
+// a stale schema copy or a manifest written for a newer tool fails loudly,
+// it is never silently mis-decoded.
 version?: "io-surface/v1" | "io-surface/v1.1" | "io-surface/v1.2"
 
 // Enforcement policy (decision D4: new undeclared sites fail the build).

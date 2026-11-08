@@ -1,6 +1,6 @@
-// Package manifest loads an io-surface CUE manifest package (io-surface/v1
-// and v1.1): schema, facts, claims, disciplines, baseline, scope, and — since
-// v1.1 — the engine-derived capabilities section.
+// Package manifest loads an io-surface CUE manifest package (io-surface/v1,
+// v1.1, and v1.2): schema, facts, claims, disciplines, baseline, scope, and —
+// since v1.1 — the engine-derived capabilities section.
 //
 // The load is in-process (cuelang.org/go), so the checker needs no `cue` binary
 // at runtime and stays hermetic in a sandbox. Loading doubles as constraint
@@ -135,6 +135,33 @@ const (
 	EnforcementAudit = "audit"
 )
 
+// ContractVersionMax is the newest manifest contract this tool fully
+// understands (schema.cue's `version` enum, TODO #116). SupportedVersions is
+// the closed set Load accepts; anything else is refused loudly instead of
+// mis-decoded, because sites written for a newer contract can carry fields
+// and vocabulary this tool has no meaning for.
+const SupportedVersions = "io-surface/v1, io-surface/v1.1, io-surface/v1.2"
+
+// versionsSupported is the lookup set behind SupportedVersions; keep in sync
+// with the closed enum in internal/scaffold/schema.cue (the schema refuses
+// unknown versions at unification when present — this guard covers manifests
+// whose schema.cue is stale or missing).
+var versionsSupported = map[string]bool{
+	"io-surface/v1":   true,
+	"io-surface/v1.1": true,
+	"io-surface/v1.2": true,
+}
+
+// checkVersion refuses manifests declaring a contract version beyond the
+// shipped set. Absent stays legal: v1 manifests predate the field.
+func checkVersion(version string) error {
+	if version == "" || versionsSupported[version] {
+		return nil
+	}
+
+	return fmt.Errorf("%w: %q (this tool supports %s; upgrade io-surface, or pin the repo to the matching release)", ErrUnsupportedVersion, version, SupportedVersions)
+}
+
 // EnforcementPolicy returns the manifest's recorded policy, normalized:
 // an absent field means "gate" (the birth decision — new undeclared sites
 // fail; a repo opts out by changing the manifest, visibly).
@@ -239,6 +266,9 @@ func Load(dir string) (*Manifest, error) {
 	// v1.1 sections are optional: a v1 manifest loads unchanged.
 	_ = value.LookupPath(cue.ParsePath("version")).Decode(&m.Version)
 	_ = value.LookupPath(cue.ParsePath("enforcement")).Decode(&m.Enforcement)
+	if err := checkVersion(m.Version); err != nil {
+		return nil, fmt.Errorf("loading %s: %w", dir, err)
+	}
 	if err = value.LookupPath(cue.ParsePath("capabilities")).Decode(&m.Capabilities); err != nil {
 		m.Capabilities = nil
 	}
