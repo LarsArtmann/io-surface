@@ -153,7 +153,11 @@ bridge deferred until a consumer exists; golangci composition rejected.
     The structural guarantee holds by default (token tier advisory forever);
     a repo that passes the flag opts in and gets weak-tier undeclared sites
     as errors. The false-positive budget moves to the adopting repo, not
-    the tool.
+    the tool. **Implemented 2026-11-08:** `check --strict-weak`
+    (`Options.StrictWeak`, one severity flip in the pairing pass); verified
+    by `TestRun_StrictWeakEscalates` (`go test ./internal/check
+    -run TestRun_StrictWeakEscalates`) — default run stays non-failing,
+    escalated run fails with identical finding count.
 - **Q4 — purge the ~67 MB binary blobs from git history, or keep them?** The
   auto-commit daemon committed a compiled `cmd/io-surface/io-surface` twice
   (blobs of 35,180,278 and 35,181,139 bytes, commits `05874f3` / `e15bf62`,

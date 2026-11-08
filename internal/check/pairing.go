@@ -85,8 +85,12 @@ func (p *pairer) pairGroups() {
 			}
 			if s.Confidence != extract.ConfidenceResolved {
 				if p.opts.Advisory {
+					sev := SeverityInfo
+					if p.opts.StrictWeak {
+						sev = SeverityError
+					}
 					p.rep.add(Finding{
-						Rule: RuleWeakSite, Severity: SeverityInfo, ID: s.ID, Family: s.Family(),
+						Rule: RuleWeakSite, Severity: sev, ID: s.ID, Family: s.Family(),
 						Location: firstLocation(s.Locations),
 						Message:  fmt.Sprintf("weak-tier I/O site (%s) is not declared; declare it or convert the call to a resolved form", join(s.Calls)),
 					})

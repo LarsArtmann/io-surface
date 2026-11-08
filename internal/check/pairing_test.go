@@ -106,6 +106,47 @@ func TestRun_WeakTierIsAdvisoryOnly(t *testing.T) {
 	}
 }
 
+// TestRun_StrictWeakEscalates pins the --strict-weak contract (ROADMAP Q3
+// decision 2026-11-08): the undeclared token-tier finding stays info by
+// default (the structural guarantee — the weak tier never fails a build —
+// is opt-out, not gone), and a repo that passes the flag moves the
+// false-positive budget onto itself: same finding, error severity, gate
+// fails.
+func TestRun_StrictWeakEscalates(t *testing.T) {
+	m := fixtureManifest()
+	m.Baseline = []manifest.BaselineEntry{
+		{ID: "cmd/app.fetch", Note: "known", Date: "2026-01-01"},
+		{ID: "cmd/app.openDB", Note: "known", Date: "2026-01-01"},
+	}
+	def := runFixture(t, m, Options{Advisory: true})
+	defWeak := findingsByRule(def, RuleWeakSite)
+	if len(defWeak) == 0 {
+		t.Fatal("fixture produced no weak-site findings; the escalation test would be vacuous")
+	}
+	for _, f := range defWeak {
+		if f.Severity != SeverityInfo {
+			t.Errorf("default %s severity = %q, want info", f.ID, f.Severity)
+		}
+	}
+	if def.Failing() {
+		t.Error("weak-site infos alone must not fail the default gate")
+	}
+
+	esc := runFixture(t, m, Options{Advisory: true, StrictWeak: true})
+	escWeak := findingsByRule(esc, RuleWeakSite)
+	if len(escWeak) != len(defWeak) {
+		t.Fatalf("strict-weak changed the finding count: %d vs %d", len(escWeak), len(defWeak))
+	}
+	for _, f := range escWeak {
+		if f.Severity != SeverityError {
+			t.Errorf("strict-weak %s severity = %q, want error", f.ID, f.Severity)
+		}
+	}
+	if !esc.Failing() {
+		t.Error("--strict-weak with undeclared weak sites must fail the gate")
+	}
+}
+
 func TestRun_LocationDriftIsInfoOnly(t *testing.T) {
 	m := fixtureManifest()
 	site := m.Sites["internal/store.LoadConfig"]

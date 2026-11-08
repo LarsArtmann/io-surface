@@ -35,6 +35,7 @@ type checkFlags struct {
 	Strict              bool   `flag:"strict" help:"treat warnings as failures"`
 	Enforce             bool   `flag:"enforce" help:"fail on errors even when the manifest declares enforcement: audit"`
 	StrictDirs          bool   `flag:"strict-dirs" help:"fail when declared sites fall outside --dirs instead of hinting"`
+	StrictWeak          bool   `flag:"strict-weak" help:"fail when weak-tier (heuristic) I/O sites are undeclared instead of hinting"`
 	AllowUnusedBaseline bool   `flag:"allow-unused-baseline" help:"unused-baseline findings never fail (exempt from --strict) while the baseline shrinks"`
 }
 
@@ -118,7 +119,7 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 	if vErrs := m.Validate(); len(vErrs) > 0 {
 		rep = check.ValidationReport(m, vErrs)
 	} else {
-		if rep, err = check.Run(root.Root, m, check.Options{Advisory: flags.Advisory, Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore), StrictDirs: flags.StrictDirs}); err != nil {
+		if rep, err = check.Run(root.Root, m, check.Options{Advisory: flags.Advisory, Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore), StrictDirs: flags.StrictDirs, StrictWeak: flags.StrictWeak}); err != nil {
 			return err
 		}
 	}

@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- Nothing yet.
+- `check --strict-weak` (opt-in, ROADMAP Q3 decision 2026-11-08): escalates
+  the `weak-site` finding (an undeclared token-tier/heuristic I/O site) from
+  info to error, so a repo can adopt teeth for heuristic extraction without
+  changing the default — without the flag the weak tier stays advisory
+  forever.
 
 ### Fixed
 

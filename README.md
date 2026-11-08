@@ -113,7 +113,7 @@ to warnings, so a repo's own recorded posture decides whether BuildFlow fails.
 | Command                                                                                                            | What it does                                                                                                                             |
 | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `io-surface init [--root DIR] [--force]`                                                                           | Extract the tree and write the CUE package (green by construction; `--force` refreshes `facts.cue` only)                                 |
-| `io-surface check [--root] [--manifest] [--json] [--format text\|json\|sarif] [--advisory] [--strict] [--enforce]` | The bidirectional gate (exit 1 on error findings); `--format sarif` emits SARIF 2.1.0; `--enforce` overrides an audit enforcement policy |
+| `io-surface check [--root] [--manifest] [--json] [--format text\|json\|sarif] [--advisory] [--strict] [--enforce] [--strict-dirs] [--strict-weak]` | The bidirectional gate (exit 1 on error findings); `--format sarif` emits SARIF 2.1.0; `--enforce` overrides an audit enforcement policy; `--strict-weak` (opt-in, ROADMAP Q3) escalates undeclared weak-tier sites from info to error — default stays advisory forever |
 | `io-surface render [--root] [--out FILE]`                                                                          | Render the inventory markdown from the manifest (claims-aware)                                                                           |
 | `io-surface render --doc FILE [--check]`                                                                           | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                                    |
 | `io-surface extract [--root] [--include-tests]`                                                                    | Print the raw extraction as JSON (debugging, counts)                                                                                     |
@@ -188,7 +188,7 @@ non-blocking job and uploads the raw report as an artifact.
 | `location-drift`    | info      | Line numbers moved (derived data — regenerate `facts.cue`)                                                          |
 | `extraction-blind`  | info      | Symbol exists but no watched I/O call extracts from it — mark `extractable: false` or teach the extractor the seam  |
 | `ambiguous-match`   | info      | Two symbols in one package share a base name; declare the exact ID form                                             |
-| `weak-site`         | info      | Heuristic-tier finding (method-name token like `.Do`, `.Serve`); advisory only                                      |
+| `weak-site`         | info      | Heuristic-tier finding (method-name token like `.Do`, `.Serve`); advisory by default — `--strict-weak` opt-in escalates to error |
 | `shadow-capability` | info      | Extracted call family not covered by the package's declared capability set — declare it or drop the call (advisory) |
 | `capability-drift`  | info      | Committed `capabilities.cue` disagrees with a fresh engine run; from `absorb --check`, never the hermetic gate      |
 
