@@ -10,21 +10,21 @@ through their owning BuildFlow steps.
 
 **Verified this session** (claim → command → result):
 
-| # | Claim | Verifying command | Result |
-| - | ----- | ----------------- | ------ |
-| V1 | Zero golangci findings remain | `BUILDFLOW_NO_RESULT_CACHE=1 buildflow -s golangci-lint --format finding --budget 5m --max-time 5m` | `"findings": []`, `"total": 0` |
-| V2 | No bare report write remains | `rg -n 'fmt\.Fprint' --type go \| grep -v '_, _ ='` | `NONE` (22 sites fixed) |
-| V3 | Build/vet clean | `go build ./... && go vet ./...` | both exit 0 |
-| V4 | Tests + race clean | `go test -race ./...` | all 12 packages `ok` |
-| V5 | gofmt gate clean | `gofmt -l .` | empty output |
-| V6 | Self-check gate green | `go run ./cmd/io-surface check --root .` | 17 declared, 17 extracted, 0 errors/warnings/infos, exit 0 |
-| V7 | Facts fresh | `init --force` + CI's filtered `git diff -I` | diff empty (`FACTS-FRESH`) |
-| V8 | Render + doc fresh | `render > /dev/null`; `render --doc docs/architecture/io-surface/INVENTORY.md --check` | both clean |
-| V9 | Both SARIF emits valid | `check --format sarif` / `lint --format sarif` | 0 results each, parseable JSON |
-| V10 | Lint radar severity-clean | `go run ./cmd/io-surface lint --root .` | 17 sites, 0 findings |
-| V11 | gomod freshness cleared | `buildflow -s gomod-check --format finding` | total 0 |
-| V12 | Nix FOD hashes witness green | `buildflow -s nix-hash-fix --fix` | "2 targets built, 2 succeeded, 0 findings" |
-| V13 | Push state | `git status -sb`, `git log origin/master..HEAD --oneline` | ahead 2: `2faa439` (TODO_LIST, concurrent session), `6a2c130` (facts.cue audit-line drift from V7's refresh — expected per AGENTS.md). Same 2 on `github/master`. |
+| #   | Claim                         | Verifying command                                                                                   | Result                                                                                                                                                            |
+| --- | ----------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| V1  | Zero golangci findings remain | `BUILDFLOW_NO_RESULT_CACHE=1 buildflow -s golangci-lint --format finding --budget 5m --max-time 5m` | `"findings": []`, `"total": 0`                                                                                                                                    |
+| V2  | No bare report write remains  | `rg -n 'fmt\.Fprint' --type go \| grep -v '_, _ ='`                                                 | `NONE` (22 sites fixed)                                                                                                                                           |
+| V3  | Build/vet clean               | `go build ./... && go vet ./...`                                                                    | both exit 0                                                                                                                                                       |
+| V4  | Tests + race clean            | `go test -race ./...`                                                                               | all 12 packages `ok`                                                                                                                                              |
+| V5  | gofmt gate clean              | `gofmt -l .`                                                                                        | empty output                                                                                                                                                      |
+| V6  | Self-check gate green         | `go run ./cmd/io-surface check --root .`                                                            | 17 declared, 17 extracted, 0 errors/warnings/infos, exit 0                                                                                                        |
+| V7  | Facts fresh                   | `init --force` + CI's filtered `git diff -I`                                                        | diff empty (`FACTS-FRESH`)                                                                                                                                        |
+| V8  | Render + doc fresh            | `render > /dev/null`; `render --doc docs/architecture/io-surface/INVENTORY.md --check`              | both clean                                                                                                                                                        |
+| V9  | Both SARIF emits valid        | `check --format sarif` / `lint --format sarif`                                                      | 0 results each, parseable JSON                                                                                                                                    |
+| V10 | Lint radar severity-clean     | `go run ./cmd/io-surface lint --root .`                                                             | 17 sites, 0 findings                                                                                                                                              |
+| V11 | gomod freshness cleared       | `buildflow -s gomod-check --format finding`                                                         | total 0                                                                                                                                                           |
+| V12 | Nix FOD hashes witness green  | `buildflow -s nix-hash-fix --fix`                                                                   | "2 targets built, 2 succeeded, 0 findings"                                                                                                                        |
+| V13 | Push state                    | `git status -sb`, `git log origin/master..HEAD --oneline`                                           | ahead 2: `2faa439` (TODO_LIST, concurrent session), `6a2c130` (facts.cue audit-line drift from V7's refresh — expected per AGENTS.md). Same 2 on `github/master`. |
 
 **NOT verified / out of scope** (stated, not hidden):
 
