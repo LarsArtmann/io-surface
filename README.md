@@ -74,7 +74,10 @@ Rules are evidence-gated: they ship at `info` and never fail a build by default;
 `--enforce` exits 1 on error-severity findings (severities are promoted only after
 fleet false-positive measurement, so a new version can never go red by surprise).
 Findings reuse the gate's rule-ID contract (`io-surface/err-dropped`, …), so
-`--format sarif` and `--format json` work unchanged. Detected today: discarded error
+`--format sarif` and `--format json` work unchanged. Every SARIF result also
+carries a `go-finding/meta/enforcement` property (`gate`, `audit`, or `lint`),
+so a consumer can tell which face produced the artifact without re-running the
+tool. Detected today: discarded error
 returns (`x, _ := os.ReadFile(p)` flags; `_ =` deliberate ignores never do), with
 more I/O bug and inefficiency rules landing across the v0.3 line.
 

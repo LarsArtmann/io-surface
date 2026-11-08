@@ -31,8 +31,9 @@ const ToolName = "io-surface"
 //
 // Every finding also carries the run's enforcement posture (D4, TODO #93) as
 // result metadata ("enforcement" → SARIF property
-// `go-finding/meta/enforcement`): consumers can tell a manifest gate run from
-// a radar audit run off the SARIF artifact alone. Result-level is deliberate
+// `go-finding/meta/enforcement`; values "gate", "audit", or lint-face
+// "lint"): consumers can tell the run faces apart off the SARIF artifact
+// alone. Result-level is deliberate
 // over run-level: go-finding has no run propertyBag today, and per-result
 // properties survive consumer-side filtering that would drop a run bag. If
 // go-finding grows a run propertyBag, migrate there and drop this key in a

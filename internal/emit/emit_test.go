@@ -122,6 +122,72 @@ func TestSARIF_DocumentShape(t *testing.T) {
 	}
 }
 
+// TestSARIF_EnforcementProperty pins the D4 posture contract (TODO #93):
+// every result of a run carries the report's enforcement policy as the
+// `go-finding/meta/enforcement` property, for BOTH postures, so a consumer
+// can tell a gate run from an audit run off the artifact alone.
+func TestSARIF_EnforcementProperty(t *testing.T) {
+	for _, posture := range []string{"gate", "audit"} {
+		rep := sampleReport()
+		rep.Enforcement = posture
+		data, err := SARIF(rep, "0.1.0")
+		if err != nil {
+			t.Fatalf("SARIF(%s): %v", posture, err)
+		}
+
+		var doc struct {
+			Runs []struct {
+				Results []struct {
+					RuleID     string         `json:"ruleId"`
+					Properties map[string]any `json:"properties"`
+				} `json:"results"`
+			} `json:"runs"`
+		}
+		if err := json.Unmarshal(data, &doc); err != nil {
+			t.Fatalf("parse SARIF(%s): %v", posture, err)
+		}
+		if len(doc.Runs) != 1 || len(doc.Runs[0].Results) != 3 {
+			t.Fatalf("posture %s: want one run with 3 results", posture)
+		}
+		for _, res := range doc.Runs[0].Results {
+			got, ok := res.Properties["go-finding/meta/enforcement"]
+			if !ok {
+				t.Errorf("posture %s, rule %s: no enforcement property", posture, res.RuleID)
+				continue
+			}
+			if got != posture {
+				t.Errorf("posture %s, rule %s: enforcement = %v", posture, res.RuleID, got)
+			}
+		}
+	}
+}
+
+// TestToFindings_EnforcementRidesMetadata checks the source of the SARIF
+// property: the report's posture lands in every finding's metadata, merged
+// with (not clobbering) the detector rule description.
+func TestToFindings_EnforcementRidesMetadata(t *testing.T) {
+	rep := sampleReport()
+	rep.Enforcement = "audit"
+	rep.Findings[0].Rule = "io-surface/err-dropped" // detector rule → gets ruleDescription
+	fs := ToFindings(rep)
+	if len(fs) != 3 {
+		t.Fatalf("got %d findings, want 3", len(fs))
+	}
+	first := fs[0]
+	if first.Metadata["enforcement"] != "audit" {
+		t.Errorf("enforcement metadata: %q", first.Metadata["enforcement"])
+	}
+	if first.Metadata["ruleDescription"] == "" {
+		t.Error("ruleDescription lost when enforcement rides along")
+	}
+
+	rep.Enforcement = ""
+	fs = ToFindings(rep)
+	if _, ok := fs[0].Metadata["enforcement"]; ok {
+		t.Error("empty enforcement must not emit the property")
+	}
+}
+
 // TestSARIF_Deterministic matters for golden-style consumers and caches.
 func TestSARIF_Deterministic(t *testing.T) {
 	a, err := SARIF(sampleReport(), "0.1.0")
