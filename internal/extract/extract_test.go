@@ -58,6 +58,8 @@ func TestExtract_FamiliesAndConfidence(t *testing.T) {
 		{"resolved fs walk", "internal/store.WalkFiles", "file-read", "filepath.WalkDir", ConfidenceResolved},
 		{"seam ident is weak tier", "internal/store.persistAll", "file-write", "atomicWriteFile", ConfidenceToken},
 		{"method token is weak tier", "internal/store.Server.Serve", "listener", ".ListenAndServe", ConfidenceToken},
+		{"listenconfig var-ref is weak tier", "cmd/app.listen", "listener", ".Listen", ConfidenceToken},
+		{"listenconfig packet var-ref is weak tier", "cmd/app.listenPacket", "listener", ".ListenPacket", ConfidenceToken},
 		{"embed var", "internal/store.quotaJSON", "embed", "go:embed quota.json", ConfidenceResolved},
 		{"resolved mmap", "internal/store.MmapFile", "file-read", "syscall.Mmap", ConfidenceResolved},
 		{"resolved bufio wrapper", "internal/store.Buffered", "stream-copy", "bufio.NewReader", ConfidenceResolved},

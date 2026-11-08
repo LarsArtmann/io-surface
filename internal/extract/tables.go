@@ -212,6 +212,14 @@ var methodToken = map[string]string{
 	"ActivateAndServe": "listener", "ListenAndServe": "listener", "ListenAndServeTLS": "listener",
 	"Serve": "listener", "ServeTLS": "listener", "Accept": "listener", "AcceptStream": "listener",
 	"AcceptUnix": "listener", "ReadFromUDP": "listener",
+	// Listen/ListenPacket (TODO #19): the modern listen path is
+	// `var lc net.ListenConfig; lc.Listen(ctx, net, addr)` — the receiver is a
+	// plain variable, unresolvable without type facts, so these land on the
+	// token tier (advisory by construction: a lexical var-ref tracker cannot
+	// see shadowing, and a misread var at the resolved tier could fail a build
+	// on a site whose real type has no Listen at all). The listener family is
+	// the hint; the manifest's family is the claim.
+	"Listen": "listener", "ListenPacket": "listener",
 	"Dial": "outbound", "DialContext": "outbound", "RoundTrip": "outbound",
 	"LookupHost": "outbound", "FinishLogin": "outbound", "WriteToUDP": "outbound",
 	// .Do is ambiguous by design: every http.Client.Do, sql.Tx.Do-style
