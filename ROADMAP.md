@@ -184,10 +184,12 @@ bridge deferred until a consumer exists; golangci composition rejected.
     session handles → `caller`. The suppression directive stays the
     fine-grained tool for one-off sites; ownership is the _policy_ tool for
     a class of sites.
-  - **Decision point:** ratify v1.3 scope (and the helper-naming mechanism)
-    alongside the promotion policy — both are schema/contract decisions the
-    owner owns. Design only; nothing implemented (frozen architecture
-    holds until ratification).
+  - **Decision recorded 2026-11-08 (owner):** v1.3 scope RATIFIED —
+    `claims.ownership: "self" | "caller" | "helper"` as designed, additive
+    default-on-absent, helper-naming mechanism included. Design-only: nothing
+    is implemented yet; implementation is a future schema-v1.3 session
+    (schema version bump per the taxonomy freeze). Until that session, the
+    frozen architecture holds and no rule reads the field.
 
 ## Non-goals
 

@@ -184,7 +184,7 @@
 | 114 | T25 Wrap: status report v3 + cadence check + push                                                                                    | ✅ `DONE` 2026-11-07 | Med    | 30min  | 21-12 evidence report is the session wrap; cadence re-archived; both remotes pushed                                          |
 | 115 | Same seam test for applyDoc (render doc-fingerprint capture)                                                                         | 🔴 `TODO`            | Low    | 30min  | 20-25 report §f5 (harvested 2026-11-07)                                                                                      |
 | 116 | Manifest `version` field: unknown-major refusal (Load/Validate rejects versions beyond the shipped contract)                         | 🔴 `TODO`            | Low    | 30min  | 04-27 report §f33 + archived 02-33 report row 28 (harvested 2026-11-07)                                                      |
-| 117 | Owner ratifications pending: promotion-policy numbers (policy §8) + ownership v1.3 scope (ROADMAP Q6) + InboxClean CI pin/SARIF step | 🔴 `TODO`            | Med    | 30min  | plan D1/D6; policy + ADR both propose, owner disposes                                                                        |
+| 117 | Owner ratifications pending: promotion-policy numbers (policy §8) + ownership v1.3 scope (ROADMAP Q6) + InboxClean CI pin/SARIF step | ✅ `DONE` 2026-11-08 | Med    | 30min  | All three ratified (owner, in-session): policy §8 checked `Lars Artmann, 2026-11-08`; ROADMAP Q6 records v1.3 scope ratification; InboxClean `ci.yml` pin `@v0.3.0`→`@v0.4.0` committed `418ff69d` |
 
 ## Post-audit hygiene (harvested 2026-11-08)
 

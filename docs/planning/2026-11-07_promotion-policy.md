@@ -1,10 +1,11 @@
-# io-surface Promotion Policy v1 (PROPOSED — awaits owner ratification)
+# io-surface Promotion Policy v1 (RATIFIED)
 
 **Created:** 2026-11-07 (superb-verification plan T1)
-**Status:** 🔶 PROPOSED — no promotion has happened under this policy yet, and
-none may until the owner ratifies the numbers (plan decision D1; open question 2
-of the detector plan). Ratification = the owner edits the **Ratification**
-section below with a name+date, or amends the numbers in place.
+**Status:** ✅ RATIFIED 2026-11-08 — numbers stand as written (Ratification §8
+below); future amendments go through the owner editing §3/§4 directly.
+No promotion has happened under this policy yet (the ledger in §9 shows zero
+qualifying rules); promotion tasks may prepare evidence, and the first flip
+that meets the gates may now execute without a further owner gate.
 **Applies to:** detector rules emitted by `io-surface lint` (all currently
 `info`), not to manifest gate rules (`internal/check`) — those are already
 error-severity by manifest contract.
@@ -92,7 +93,7 @@ whole has exactly one shared gate: W3/E3 (self-gate green under `--enforce`).
 **Owner decision required (open question 2, carried since 2026-11-07):** do the
 thresholds above stand as written?
 
-- [ ] Ratified as-is — `Lars Artmann, 2026-__-__`
+- [x] Ratified as-is — `Lars Artmann, 2026-11-08`
 - [ ] Amended — owner edits the tables in §3/§4 directly and initials here.
 
 Until one of those boxes is checked: **no rule promotes**, regardless of what
