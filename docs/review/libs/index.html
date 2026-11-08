@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>io-surface Library Utilization Audit — 2026-11-07</title>
+    <title>io-surface Library Utilization Audit — 2026-11-08</title>
     <style>
       /* =========================================================================
          BAUHAUS DARK — Dashboard template
@@ -829,7 +829,7 @@
     <!-- Full-bleed top bar -->
     <div class="top-bar">
       <span>LIBRARY UTILIZATION AUDIT</span>
-      <span>2026-11-07</span>
+      <span>2026-11-08</span>
       <span>io-surface &middot; docs/review/libs/</span>
     </div>
 
@@ -857,7 +857,7 @@
           <div class="hero-badge">Library Utilization Audit</div>
           <h1>io-surface &times; the LarsArtmann library fleet</h1>
           <p class="hero-subtitle">
-            22 libraries, one question each: does io-surface use it, and if
+            24 libraries, one question each: does io-surface use it, and if
             not, should it? A detailed report per library sits next to this
             index; every verdict there cites code or commands.
           </p>
@@ -867,11 +867,11 @@
         <h2 id="summary"><span class="num">00</span>Summary</h2>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="stat-value">22</div>
+            <div class="stat-value">24</div>
             <div class="stat-label">Libraries audited</div>
           </div>
           <div class="stat-card stat-good">
-            <div class="stat-value">2</div>
+            <div class="stat-value">4</div>
             <div class="stat-label">Adopted (direct deps)</div>
           </div>
           <div class="stat-card stat-warn">
@@ -879,7 +879,7 @@
             <div class="stat-label">In graph, unused (correct)</div>
           </div>
           <div class="stat-card">
-            <div class="stat-value">18</div>
+            <div class="stat-value">16</div>
             <div class="stat-label">Correctly rejected</div>
           </div>
         </div>
@@ -894,7 +894,11 @@
           (<a href="go-error-family.md">go-error-family</a>,
           <a href="go-output.md">go-output</a>) are already compiled into the
           binary via go-finding and cmdguard, and are still correctly left
-          unimported. Everything else is server, CQRS, UI, or lifecycle
+          unimported. The go-finding and toolsdk reports (added 2026-11-08)
+          close the findings-contract gap: both score 100 — the library's one
+          known limitation this tool hits (no run-level SARIF propertyBag) is
+          worked around at the right layer with the migration path on record.
+          Everything else is server, CQRS, UI, or lifecycle
           machinery for a process io-surface deliberately is not.
         </p>
 
@@ -962,6 +966,18 @@
               <td>v0.6.2</td>
               <td><span class="badge badge-fixed">Used &middot; direct</span></td>
               <td>90/100 high &mdash; bumped to v0.6.2 (2026-11-08)</td>
+            </tr>
+            <tr>
+              <td><a href="go-finding.md">go-finding</a></td>
+              <td>v1.15.1</td>
+              <td><span class="badge badge-fixed">Used &middot; direct</span></td>
+              <td>100/100 &mdash; audited 2026-11-08 (report added)</td>
+            </tr>
+            <tr>
+              <td><a href="go-finding-toolsdk.md">go-finding/toolsdk</a></td>
+              <td>v1.16.0</td>
+              <td><span class="badge badge-fixed">Used &middot; direct</span></td>
+              <td>100/100 &mdash; audited 2026-11-08 (report added)</td>
             </tr>
             <tr>
               <td><a href="go-error-family.md">go-error-family</a></td>
@@ -1125,19 +1141,19 @@
         <!-- ASCII Diagram -->
         <h2 id="graph">Module Graph</h2>
         <div class="dep-tree">
-          <span class="root">io-surface</span> &middot; 22 audited libs, 4
+          <span class="root">io-surface</span> &middot; 24 audited libs, 4
           direct deps &middot; house libs in the graph:<br />
           &nbsp;&nbsp;direct &mdash;
           <span class="ok">cmdguard/v4 v4.2.1</span> &middot;
           <span class="ok">go-atomic-write v0.6.2</span> &middot;
-          <span class="ok">go-finding v1.15.1 + toolsdk v1.16.0</span> (not on
-          the audit list, adjacent)<br />
+          <span class="ok">go-finding v1.15.1</span> +
+          <span class="ok">toolsdk v1.16.0</span><br />
           &nbsp;&nbsp;indirect &mdash;
           <span class="unwanted">go-error-family v0.12.0</span> via
           go-finding &middot;
           <span class="unwanted">go-output v0.38.4</span> + go-branded-id +
           go-ndjson + samber-do-auditlog via cmdguard<br />
-          &nbsp;&nbsp;absent &mdash; the remaining 18 audited libraries
+          &nbsp;&nbsp;absent &mdash; the remaining 16 audited libraries
         </div>
 
         <!-- Numbered Steps -->
@@ -1175,7 +1191,7 @@
         </p>
         <div class="compare-row">
           <div>
-            <pre><code>ls docs/review/libs/*.md | wc -l   # 22
+            <pre><code>ls docs/review/libs/*.md | wc -l   # 24
 rg -n 'larsartmann' go.mod          # direct + indirect lines
 go mod why -m github.com/larsartmann/go-error-family
 go list -m github.com/larsartmann/cmdguard/v4@latest
@@ -1185,7 +1201,7 @@ go run ./cmd/io-surface check --root .   # gate green at audit HEAD</code></pre>
         </div>
 
         <footer class="footer">
-          Generated 2026-11-07 &middot; Library utilization audit series &middot;
+          Generated 2026-11-08 &middot; Library utilization audit series &middot;
           per-library reports: cmdguard.md, go-atomic-write.md,
           go-error-family.md, go-output.md + 18 rejection reports in this
           directory &middot; all claims cite code paths or verify commands
