@@ -115,6 +115,7 @@ package io_surface
 		"timers and tickers (scheduling)",
 		"memory pooling",
 		"kernel-internal I/O (epoll, page cache)",
+		"process stdio (stdout/stderr — user feedback, not durable state; DECIDED 2026-11-08, TODO #49)",
 	]
 }
 

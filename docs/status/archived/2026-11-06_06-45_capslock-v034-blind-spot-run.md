@@ -50,6 +50,23 @@ caught every file/subprocess sink Capslock found in first-party code. The one
 undeclared sink is stdout — a scope-boundary decision, not a missed table entry
 (`fmt.Print*` is equally unseen; `scope.in` is silent on stdout).
 
+> **DECIDED 2026-11-08 (TODO #49, plan M5): stdout/stderr stay OUT of scope —
+> now explicitly.** The gate documents a program's interaction with durable
+> state and external systems: fds that can leak, files that can tear, sockets
+> that can hang. Process stdio is user feedback, not durable state — a failed
+> stdout write is visible by construction (the write IS the feedback), it
+> cannot corrupt anything, and declaring it would flood every manifest with
+> per-render noise that drowns the sites that matter. Policing `fmt.Print*`
+> too would be incoherent, and policing it would mean gate-failing every log
+> line. Application: the scaffold template's `scope.out` now carries
+> `"process stdio (stdout/stderr — user feedback, not durable state)"` so the
+> exclusion is a committed, visible manifest line instead of silence
+> (internal/scaffold/scaffold.go; this repo's facts.cue carries it since
+> 2026-11-08). The counter-argument, for the record: Capslock classes stdout
+> under FILES, and "the manifest lists every I/O call site" is only honest if
+> the exclusion is written down — which is exactly what this decision does;
+> the manifest was silent, now it is explicit.
+
 ## Capslock false-positive classes observed (evidence for absorb's advisory tier)
 
 1. **Phantom NETWORK via SSA range-func conflation.** `internal/extract` — the

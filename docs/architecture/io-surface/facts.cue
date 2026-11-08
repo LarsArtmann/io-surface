@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "e740663-dirty"
+	commit: "e17f1a3-dirty"
 	date:   "2026-11-08"
 	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
@@ -28,6 +28,7 @@ scope: {
 		"timers and tickers (scheduling)",
 		"memory pooling",
 		"kernel-internal I/O (epoll, page cache)",
+		"process stdio (stdout/stderr — user feedback, not durable state; DECIDED 2026-11-08, TODO #49)",
 	]
 }
 
@@ -167,7 +168,7 @@ sites: {
 	}
 	"internal/scaffold.git": {
 		location: [
-			"internal/scaffold/scaffold.go:228",
+			"internal/scaffold/scaffold.go:229",
 		]
 		family: "ipc-subprocess"
 		facts: {
