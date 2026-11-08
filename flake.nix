@@ -45,6 +45,7 @@
           "aarch64-linux"
         ];
         src = packageSrc;
+        subPackages = [ "cmd/io-surface" ];
         vendorHash = "sha256-vPMkJMzE3/mR+eC7fxmvt4VsRHfcN2kjY9SHtXBBAHc=";
         # Match the fleet build: vendoring via the module proxy.
         proxyVendor = true;
