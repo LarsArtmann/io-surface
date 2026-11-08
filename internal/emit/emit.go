@@ -28,6 +28,15 @@ const ToolName = "io-surface"
 // `properties.ruleDescription` (T15): go-finding's SARIF export has no
 // tool-level rules array, so the description rides the result — SARIF
 // consumers see WHAT a rule means without a second lookup.
+//
+// Every finding also carries the run's enforcement posture (D4, TODO #93) as
+// result metadata ("enforcement" → SARIF property
+// `go-finding/meta/enforcement`): consumers can tell a manifest gate run from
+// a radar audit run off the SARIF artifact alone. Result-level is deliberate
+// over run-level: go-finding has no run propertyBag today, and per-result
+// properties survive consumer-side filtering that would drop a run bag. If
+// go-finding grows a run propertyBag, migrate there and drop this key in a
+// minor release (CHANGELOG note).
 func ToFindings(rep *check.Report) []finding.Finding {
 	out := make([]finding.Finding, 0, len(rep.Findings))
 	for _, f := range rep.Findings {
@@ -41,6 +50,12 @@ func ToFindings(rep *check.Report) []finding.Finding {
 		)
 		if def, ok := detectorRuleDescription(f.Rule); ok {
 			fnd.Metadata = map[string]string{"ruleDescription": def}
+		}
+		if rep.Enforcement != "" {
+			if fnd.Metadata == nil {
+				fnd.Metadata = make(map[string]string, 1)
+			}
+			fnd.Metadata["enforcement"] = rep.Enforcement
 		}
 		out = append(out, fnd)
 	}
