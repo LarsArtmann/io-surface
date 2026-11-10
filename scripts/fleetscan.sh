@@ -19,18 +19,18 @@ go build -o "$IOSURFACE_BIN" ./cmd/io-surface
 
 REPOS_TSV="${2:-}"
 if [[ -z "$REPOS_TSV" ]]; then
-  REPOS_TSV="$(mktemp /tmp/fleetscan-repos.XXXXXX.tsv)"
-  trap 'rm -f "$REPOS_TSV" "$IOSURFACE_BIN"' EXIT
-  pma list -o json 2>/dev/null | sed -n '/^\[/,$p' |
-    python3 -c '
+	REPOS_TSV="$(mktemp /tmp/fleetscan-repos.XXXXXX.tsv)"
+	trap 'rm -f "$REPOS_TSV" "$IOSURFACE_BIN"' EXIT
+	pma list -o json 2>/dev/null | sed -n '/^\[/,$p' |
+		python3 -c '
 import json, sys
 for p in json.load(sys.stdin):
     types = p.get("typeDetails", {}).get("all", []) or [p.get("type", "")]
     if "go" in types:
-        print(p["name"] + "\t" + p["path"])' > "$REPOS_TSV"
+        print(p["name"] + "\t" + p["path"])' >"$REPOS_TSV"
 fi
 
-python3 - "$REPOS_TSV" "$IOSURFACE_BIN" "$OUT" << 'PY'
+python3 - "$REPOS_TSV" "$IOSURFACE_BIN" "$OUT" <<'PY'
 import json, subprocess, sys
 
 repos_tsv, bin_path, out_path = sys.argv[1], sys.argv[2], sys.argv[3]
