@@ -14,7 +14,7 @@ import (
 
 	"runtime/debug"
 
-	v4 "github.com/larsartmann/cmdguard/v4/pkg/cmdguard/v4"
+	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 	atomicwrite "github.com/larsartmann/go-atomic-write"
 	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
@@ -470,7 +470,7 @@ func manifestDir(root, flagValue string) string {
 // hand-edited CUE. The command exits 0 on success and prints the resulting
 // gate status so the operator sees the effect immediately.
 func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags) error {
-	args := v4.ArgsFromContext(ctx)
+	args := v5.ArgsFromContext(ctx)
 	if len(args) != 1 {
 		return fmt.Errorf("baseline add takes exactly one site ID argument (usage: io-surface baseline add <pkg.Func> --note \"why\")")
 	}
