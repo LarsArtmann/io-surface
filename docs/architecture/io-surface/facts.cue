@@ -5,7 +5,7 @@
 package io_surface
 
 audit: {
-	commit: "59e54c5"
+	commit: "61b393b-dirty"
 	date:   "2026-11-11"
 	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
@@ -35,7 +35,7 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:320",
+			"cmd/io-surface/commands.go:331",
 		]
 		family: "file-read"
 		facts: {
@@ -44,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:217",
-			"cmd/io-surface/commands.go:246",
+			"cmd/io-surface/commands.go:228",
+			"cmd/io-surface/commands.go:257",
 		]
 		family: "file-write"
 		facts: {
@@ -54,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:296",
+			"cmd/io-surface/commands.go:307",
 		]
 		family: "file-write"
 		facts: {
@@ -63,7 +63,7 @@ sites: {
 	}
 	"cmd/io-surface.writeDocVerified": {
 		location: [
-			"cmd/io-surface/commands.go:305",
+			"cmd/io-surface/commands.go:316",
 		]
 		family: "file-write"
 		facts: {
@@ -72,7 +72,7 @@ sites: {
 	}
 	"internal/absorb.ModulePath": {
 		location: [
-			"internal/absorb/absorb.go:78",
+			"internal/absorb/absorb.go:79",
 		]
 		family: "file-read"
 		facts: {
@@ -81,8 +81,8 @@ sites: {
 	}
 	"internal/absorb.gitHead": {
 		location: [
-			"internal/absorb/absorb.go:165",
-			"internal/absorb/absorb.go:172",
+			"internal/absorb/absorb.go:166",
+			"internal/absorb/absorb.go:173",
 		]
 		family: "ipc-subprocess"
 		facts: {
@@ -127,8 +127,8 @@ sites: {
 	}
 	"internal/extract.runExtract": {
 		location: [
-			"internal/extract/tables.go:103",
-			"internal/extract/tables.go:114",
+			"internal/extract/tables.go:104",
+			"internal/extract/tables.go:115",
 		]
 		family: "file-read"
 		facts: {
@@ -185,7 +185,7 @@ sites: {
 	}
 	"internal/scaffold.schemaCUE": {
 		location: [
-			"internal/scaffold/scaffold.go:33",
+			"internal/scaffold/scaffold.go:34",
 		]
 		family: "embed"
 		facts: {

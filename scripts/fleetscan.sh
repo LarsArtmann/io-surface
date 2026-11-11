@@ -46,10 +46,23 @@ with open(repos_tsv) as fh:
 per_rule = {}
 per_repo = []
 scan_failures = []
+import os
 for name, path in repos:
+    # The lint face defaults to cmd+internal (extract.DefaultDirs). A repo
+    # whose packages live elsewhere would scan as a SILENT ZERO — the
+    # 2026-11-11 project-discovery-sdk artifact. When neither default dir
+    # exists on disk, rescan the whole tree so the aggregate is honest;
+    # repos with the default dirs keep the narrow scan (testdata fixtures
+    # and vendored trees stay out of the numbers).
+    scanned_dirs = "default"
+    if not any(os.path.isdir(os.path.join(path, d)) for d in ("cmd", "internal")):
+        scanned_dirs = "."
+    args = [bin_path, "lint", "--root", path, "--format", "json"]
+    if scanned_dirs != "default":
+        args += ["--dirs", scanned_dirs]
     try:
         proc = subprocess.run(
-            [bin_path, "lint", "--root", path, "--format", "json"],
+            args,
             capture_output=True, text=True, timeout=300,
         )
     except subprocess.TimeoutExpired:
@@ -71,6 +84,7 @@ for name, path in repos:
         per_rule[rule] = per_rule.get(rule, 0) + n
     per_repo.append({
         "project": name, "path": path,
+        "dirs": scanned_dirs,
         "sites": rep["stats"]["extracted"], "resolved": rep["stats"]["resolved"],
         "findings": counts,
     })

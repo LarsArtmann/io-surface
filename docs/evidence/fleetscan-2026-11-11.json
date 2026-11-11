@@ -3,16 +3,18 @@
  "discovered": 3,
  "scanned": 3,
  "scanFailures": [],
- "reposWithFindings": 2,
+ "reposWithFindings": 3,
  "findingsByRule": {
+  "io-surface/io-in-loop": 21,
+  "io-surface/write-non-atomic": 18,
   "io-surface/client-no-timeout": 2,
-  "io-surface/write-non-atomic": 2,
-  "io-surface/io-in-loop": 1
+  "io-surface/stat-then-open": 1
  },
  "repos": [
   {
    "project": "overview",
    "path": "/home/lars/projects/overview",
+   "dirs": "default",
    "sites": 27,
    "resolved": 24,
    "findings": {
@@ -24,13 +26,19 @@
   {
    "project": "project-discovery-sdk",
    "path": "/home/lars/projects/project-discovery-sdk",
-   "sites": 0,
-   "resolved": 0,
-   "findings": {}
+   "dirs": ".",
+   "sites": 62,
+   "resolved": 57,
+   "findings": {
+    "io-surface/io-in-loop": 20,
+    "io-surface/stat-then-open": 1,
+    "io-surface/write-non-atomic": 16
+   }
   },
   {
    "project": "project-discovery-daemon",
    "path": "/home/lars/projects/project-discovery-daemon",
+   "dirs": "default",
    "sites": 11,
    "resolved": 11,
    "findings": {

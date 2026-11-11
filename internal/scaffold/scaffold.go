@@ -3,10 +3,11 @@
 //
 // What it writes (in <root>/docs/architecture/io-surface/):
 //
-//	schema.cue    the standard (embedded copy; do not edit per repo)
-//	facts.cue     every extracted site, as a committed snapshot
-//	claims.cue    an empty, documented place for human judgment
-//	baseline.cue  empty; add entries only for findings you refuse to declare
+//	schema.cue         the standard (embedded copy; do not edit per repo)
+//	facts.cue          every extracted site, as a committed snapshot
+//	claims.cue         an empty, documented place for human judgment
+//	baseline.cue       empty; add entries only for findings you refuse to declare
+//	capabilities.cue   empty; written ONLY by `absorb` (reachability facts)
 //
 // A forced refresh (--force) rewrites facts.cue only; the other three files
 // survive once they exist.
@@ -33,9 +34,8 @@ import (
 //go:embed schema.cue
 var schemaCUE []byte
 
-// Dir is the conventional manifest location inside a repository.
-// Dir is the conventional manifest location — aliased from the manifest
-// package, which owns the fact (one constant, one home).
+// Dir is the conventional manifest location inside a repository — aliased
+// from the manifest package, which owns the fact (one constant, one home).
 const Dir = manifest.Dir
 
 // Files returns the scaffold file set as path->content (paths relative to the

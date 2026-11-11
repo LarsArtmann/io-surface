@@ -52,7 +52,7 @@ var Provider = toolsdk.Register(toolsdk.Spec{
 		if dir == "" {
 			dir = "."
 		}
-		manifestDir := filepath.Join(dir, "docs", "architecture", "io-surface")
+		manifestDir := filepath.Join(dir, manifest.Dir)
 
 		m, err := manifest.Load(manifestDir)
 		if errors.Is(err, manifest.ErrNotInitialized) {
@@ -104,7 +104,8 @@ func convert(rep *check.Report, policy string) []finding.Finding {
 		if loc := f.Location; loc != "" {
 			if i := strings.LastIndex(loc, ":"); i > 0 {
 				pos.File = finding.FilePath(loc[:i])
-				if n := 0; parseLine(loc[i+1:], &n) {
+				var n int
+				if parseLine(loc[i+1:], &n) {
 					pos.Line = n
 				}
 			}

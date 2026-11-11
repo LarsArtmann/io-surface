@@ -22,6 +22,7 @@ import (
 	"os/exec"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -208,7 +209,10 @@ capabilities: [
 	return []byte(b.String())
 }
 
-func quote(s string) string { return "\"" + s + "\"" }
+// quote renders s as a CUE string literal. strconv.Quote escapes quotes and
+// control characters, so a --engine-version or commit string containing a
+// double quote still produces valid CUE instead of a broken file.
+func quote(s string) string { return strconv.Quote(s) }
 
 func names(ns []capability.Name) string {
 	parts := make([]string, len(ns))
