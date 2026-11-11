@@ -217,7 +217,7 @@ func (e *extractor) resolveCrossPkgSeam(local, ident string) string {
 			if !ok {
 				continue
 			}
-			if strings.HasSuffix(imp.path, "/"+dir) || imp.path == dir && dir != "" {
+			if strings.HasSuffix(imp.path, "/"+dir) || (imp.path == dir && dir != "") {
 				if len(dir) > bestLen {
 					best, bestLen = fam, len(dir)
 				}
@@ -366,13 +366,13 @@ func (e *extractor) scanFunc(fn *ast.FuncDecl, imports map[string]string, pkg st
 func (e *extractor) record(id string, n ast.Node, testinfra bool, call, family, confidence, via string) {
 	s := e.site(id, testinfra)
 	loc := e.locOf(n)
-	if !contains(s.Locations, loc) {
+	if !slices.Contains(s.Locations, loc) {
 		s.Locations = append(s.Locations, loc)
 	}
-	if !contains(s.Calls, call) {
+	if !slices.Contains(s.Calls, call) {
 		s.Calls = append(s.Calls, call)
 	}
-	if family != "" && !contains(s.Families, family) {
+	if family != "" && !slices.Contains(s.Families, family) {
 		s.Families = append(s.Families, family)
 	}
 	if confidence == ConfidenceToken {
@@ -414,13 +414,13 @@ func (e *extractor) scanEmbeds(file *ast.File, pkg string, testinfra bool) {
 			}
 			s := e.site(pkg+"."+varName, testinfra)
 			loc := rel + ":" + strconv.Itoa(pos.Line)
-			if !contains(s.Locations, loc) {
+			if !slices.Contains(s.Locations, loc) {
 				s.Locations = append(s.Locations, loc)
 			}
-			if !contains(s.Calls, "go:embed "+directive) {
+			if !slices.Contains(s.Calls, "go:embed "+directive) {
 				s.Calls = append(s.Calls, "go:embed "+directive)
 			}
-			if !contains(s.Families, "embed") {
+			if !slices.Contains(s.Families, "embed") {
 				s.Families = append(s.Families, "embed")
 			}
 		}
@@ -446,10 +446,6 @@ func embedVarName(file *ast.File, pos token.Pos) string {
 	}
 
 	return ""
-}
-
-func contains(list []string, v string) bool {
-	return slices.Contains(list, v)
 }
 
 // sortedSites returns sites ordered by ID with deterministic inner slices.

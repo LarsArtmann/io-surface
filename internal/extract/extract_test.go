@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -72,7 +73,7 @@ func TestExtract_FamiliesAndConfidence(t *testing.T) {
 			if got := s.Family(); got != tc.family {
 				t.Errorf("family = %q, want %q (families=%v)", got, tc.family, s.Families)
 			}
-			if !contains(s.Calls, tc.wantCall) {
+			if !slices.Contains(s.Calls, tc.wantCall) {
 				t.Errorf("calls = %v, want %q", s.Calls, tc.wantCall)
 			}
 			if s.Confidence != tc.conf {
@@ -246,7 +247,7 @@ func TestExtract_CrossPackageSeam(t *testing.T) {
 	if caller.Via != "genWrite" {
 		t.Errorf("via = %q, want genWrite", caller.Via)
 	}
-	if !contains(caller.Calls, "store.genWrite") {
+	if !slices.Contains(caller.Calls, "store.genWrite") {
 		t.Errorf("calls = %v, want store.genWrite", caller.Calls)
 	}
 }

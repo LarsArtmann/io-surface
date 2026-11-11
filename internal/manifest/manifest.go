@@ -135,11 +135,11 @@ const (
 	EnforcementAudit = "audit"
 )
 
-// ContractVersionMax is the newest manifest contract this tool fully
-// understands (schema.cue's `version` enum, TODO #116). SupportedVersions is
-// the closed set Load accepts; anything else is refused loudly instead of
-// mis-decoded, because sites written for a newer contract can carry fields
-// and vocabulary this tool has no meaning for.
+// SupportedVersions is the closed set of manifest contract versions this tool
+// fully understands (schema.cue's `version` enum, TODO #116); Load accepts
+// exactly these and refuses anything else loudly instead of mis-decoding,
+// because sites written for a newer contract can carry fields and vocabulary
+// this tool has no meaning for.
 const SupportedVersions = "io-surface/v1, io-surface/v1.1, io-surface/v1.2"
 
 // versionsSupported is the lookup set behind SupportedVersions; keep in sync
@@ -190,7 +190,7 @@ type CapabilityAudit struct {
 	Date    string `json:"date"`
 }
 
-// ids returns the declared site IDs, sorted.
+// IDs returns the declared site IDs, sorted.
 func (m *Manifest) IDs() []string {
 	out := make([]string, 0, len(m.Sites))
 	for id := range m.Sites {

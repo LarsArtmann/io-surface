@@ -10,6 +10,7 @@ import (
 	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 )
 
 // DefaultDirs is the scan scope used when Options.Dirs is empty. It lives HERE
@@ -38,7 +39,7 @@ var familyPrecedence = []string{
 // family it touches), or "" when the extraction could not classify it.
 func (s *Site) Family() string {
 	for _, fam := range familyPrecedence {
-		if contains(s.Families, fam) {
+		if slices.Contains(s.Families, fam) {
 			return fam
 		}
 	}
