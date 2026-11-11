@@ -1,12 +1,12 @@
 package check
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/larsartmann/io-surface/internal/manifest"
-	"os"
-	"path/filepath"
 )
 
 func TestRun_UndeclaredResolvedSitesFail(t *testing.T) {

@@ -1,6 +1,9 @@
 package store
 
-import "os"
+import (
+	_ "embed"
+	"os"
+)
 
 //go:embed quota.json
 var quotaJSON string

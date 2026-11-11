@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"example.com/fixture/internal/store"
 )
 
 func fetch() (*http.Response, error) {

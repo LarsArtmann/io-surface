@@ -8,11 +8,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"time"
-
-	"runtime/debug"
 
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 	atomicwrite "github.com/larsartmann/go-atomic-write"
