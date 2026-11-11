@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # io-surface ↔ BuildFlow Integration — v0.4.0 Release Report
 
 **Session:** 2026-11-07 ~19:55–20:35 CET (integration + release work), report

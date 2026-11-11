@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # 2026-11-07 09-09 — io-bug-radar full execution: honest retrospective (all 25 tasks)
 
 **Session:** Crush, 2026-11-07 ~05:10→09:05 CET. Plan executed end-to-end:

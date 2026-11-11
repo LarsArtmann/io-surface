@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # Post-audit Pareto plan execution — M1–M12 shipped, M13 mid-flight, gates green
 
 **Report:** 2026-11-08 06:16 CET

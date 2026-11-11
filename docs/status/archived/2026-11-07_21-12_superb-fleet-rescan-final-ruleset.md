@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # io-surface — status: superb verification begins — fleet re-scan with the final 10-rule ruleset
 
 **Date:** 2026-11-07 (superb-verification plan T2)

@@ -177,6 +177,13 @@ family: hidden I/O becomes a named finding, and a package-keyed baseline entry
 is the deliberate answer. This repository's CI runs the same steps as a
 non-blocking job and uploads the raw report as an artifact.
 
+Capslock capabilities outside the mapped vocabulary are never silently
+dropped: `absorb` prints a `dropped unmapped capabilities` line on stdout
+naming each out-of-scope capability with its edge count (`name×count`,
+sorted) — whether it is out-of-scope per the ROADMAP vocabulary decision or
+an addition from a newer engine — and only the mapped sets land in
+`capabilities.cue`.
+
 ## Findings
 
 | Rule                | Severity  | Meaning                                                                                                                          |

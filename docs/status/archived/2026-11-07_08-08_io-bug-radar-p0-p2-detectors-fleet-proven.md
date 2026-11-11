@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # 2026-11-07 08-08 — io-bug-radar P0–P2: detector suite shipped, fleet-proven, severity stayed info
 
 **Status:** DONE — ALL phases (P0/P1/P2/P3, tasks T1–T25 / TODO_LIST #65–#89). v0.3.0

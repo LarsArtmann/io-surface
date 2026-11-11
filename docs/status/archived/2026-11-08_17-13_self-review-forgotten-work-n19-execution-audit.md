@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # Self-review: what was forgotten, what broke, and the full N19-execution ledger (purge, v0.5.1, flake, strict-weak, first gate, taskqueue)
 
 **Date:** 2026-11-08 17:13 CET · **Session:** continuation (N19 batch execution +

@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # 2026-11-08 22:45 — errcheck sweep to zero, the max-same-issues trap, dogfood battery green
 
 Session: "io-surface dogfood!" — intercepted by a BuildFlow paste: 5 golangci-lint

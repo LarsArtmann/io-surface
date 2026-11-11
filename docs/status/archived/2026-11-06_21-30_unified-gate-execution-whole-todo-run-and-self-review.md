@@ -201,7 +201,7 @@ the generated block).
 itself, not only direct `Detect` calls.
 28. `version --json`: stamp commit/date in the CI release flow (currently
 `unknown` for non-VCS builds; v0.2.0's released binary is affected).
-29. Document `absorb`'s unmapped-edges report (`printDropped`) in README.
+29. ~~Document `absorb`'s unmapped-edges report (`printDropped`) in README.~~ RESOLVED 2026-11-11: README's absorb section now documents the dropped report — `dropped unmapped capabilities` on stdout, `name×count` sorted, only mapped sets land in `capabilities.cue` (`README.md` "Reachability facts" section; verified `grep -n 'dropped unmapped' README.md`)
 30. Consider teaching `absorb` to respect `--ignore` globs (today it has no
 ignore concept).
 31. schema.cue deployed-copy drift guard: CI byte-compare

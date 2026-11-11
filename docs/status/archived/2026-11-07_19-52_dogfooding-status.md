@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # Dogfooding Status — io-surface eating its own food
 
 **Scope.** Verified live 2026-11-07 19:52 with: `go run ./cmd/io-surface check --root .`

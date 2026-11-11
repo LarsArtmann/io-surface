@@ -1,3 +1,5 @@
+> **Live remainder:** routed open rows live in TODO_LIST.md / ROADMAP.md (owners named per row); verified before archival 2026-11-11 via `docs-gates run` — routing CLEAN (0 unrouted open rows), annotate CLEAN, audit-all unharvested 1→0 after the README `printDropped` harvest.
+
 # Self-review II: the three answers executed (taskqueue pushed, backup deleted, Forgejo pivot recorded) — plus the fuckup ledger for this segment
 
 **Date:** 2026-11-08 21:53 CET · **Session:** continuation of the 17:13
