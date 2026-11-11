@@ -47,18 +47,11 @@ not on this machine), every publish pushes BOTH remotes — the auto-commit
 daemon creates commits, it does not push. GitHub stays public deliberately
 (`go install …@latest` requires it); Forgejo defaults private.
 
-## Releases
-
-Protocol, provider coupling, tag/proxy/verify steps, and the blocked Capslock
-upstream issue live in `docs/release-protocol.md`. Releases are 0.x SemVer
-(features = MINOR); version const in `cmd/io-surface/main.go`.
-
 ## Self-hosting: editing Go code updates the gate contract
 
 This repo is gated by its own tool. The committed manifest
 (`docs/architecture/io-surface/{facts,claims,baseline,schema}.cue`) is a
-snapshot of the tree. Consequences of touching any `.go` file under `cmd/`
-or `internal/`:
+tree snapshot. Consequences of touching `.go` files under `cmd/`/`internal/`:
 
 - Added an I/O call → next `check` reports `undeclared-site` (error) → CI
   fails. Declare it in `facts.cue` (or `claims.cue`).
@@ -67,8 +60,9 @@ or `internal/`:
 
 Refresh facts after an I/O-adding change: `go run ./cmd/io-surface init
 --root . --force` — safe since 2026-11-06: refreshes ONLY `facts.cue`
-(judgment/standard files are skipped when they exist — guarded by
-`TestWrite_ForceRefreshesFactsOnly`).
+(other files are skipped when they exist, guarded by
+`TestWrite_ForceRefreshesFactsOnly`). Release protocol: `docs/release-protocol.md`
+(0.x SemVer; version const in `cmd/io-surface/main.go`).
 
 ## Architecture
 
@@ -76,31 +70,28 @@ Data flow: `cmd/io-surface` (flag dispatch) → `internal/extract` (AST walk) �
 either `internal/scaffold` (`init`) or `internal/check` (gate) →
 `internal/render` (markdown).
 
-| Package               | Role |
-| --------------------- | ---- |
-| `cmd/io-surface`      | cmdguard-wired CLI: `NewApp` + batteries, typed flag structs (`commands.go`), handlers keep the exact output contract. Exit codes: 0 clean, 1 gate findings (`errFindings`), 2 usage/internal (`exitCode` in `main.go`). Version const lives here. |
+| Package               | Role                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `cmd/io-surface`      | cmdguard-wired CLI: `NewApp` + batteries, typed flag structs (`commands.go`), handlers keep the exact output contract. Exit codes: 0 clean, 1 gate findings (`errFindings`), 2 usage/internal (`exitCode` in `main.go`). Version const lives here.                                                                                                                                                                                                           |
 | `internal/extract`    | Hermetic AST walker (`go/parser` + `ast.Inspect`, deliberately NO `go/packages`, no network) so it runs in a Nix sandbox with `GOPROXY=off`. Plus the detector layer: `observations.go` (Observation channel + capture contexts) and `detectors.go` (8 rules, registry + metadata in one table); detection tables live in `tables.go`. `Extract` stays byte-identical to pre-detector behavior — `ExtractWithObservations` is the observing entrypoint (D1). |
-| `internal/manifest`   | Loads the CUE package in-process (no `cue` binary). `Load` doubles as constraint enforcement: non-empty `violations` fails unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`. |
-| `internal/check`      | The bidirectional gate. 14 rules (incl. lifecycle + scope-hint + shadow-capability); pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`). |
-| `internal/match`      | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`). |
-| `internal/scaffold`   | `init` writer; `schema.cue` embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not deployed copies. |
-| `internal/render`     | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim). |
-| `internal/absorb`     | Pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `absorb --check` reports advisory drift (`io-surface/capability-drift`), never fails the gate. |
-| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping (`FamiliesFor`), engine edges folded into per-package sets. |
-| `internal/emit`       | Findings → go-finding model for consumer formats (SARIF via `--format sarif`); rule IDs/severities map 1:1, confidence 1.0. |
-| `internal/lint`       | Manifestless face: `lint.Run` = `ExtractWithObservations` → `check.Report` (Enforcement "lint"). Claim modulation when a manifest exists (`criticality` escalates, `durability: ephemeral` drops write-non-atomic). Exit 0 unless `--enforce`. |
+| `internal/manifest`   | Loads the CUE package in-process (no `cue` binary). `Load` doubles as constraint enforcement: non-empty `violations` fails unification. Sentinels: `ErrNotInitialized`, `ErrEmpty`.                                                                                                                                                                                                                                                                          |
+| `internal/check`      | The bidirectional gate. 14 rules (incl. lifecycle + scope-hint + shadow-capability); pairs exact IDs first, then 1:1 canonical leftovers (= `id-drift`).                                                                                                                                                                                                                                                                                                     |
+| `internal/match`      | Receiver-insensitive ID canonicalization (`internal/server.Server.Save` ≡ `internal/server.Save`).                                                                                                                                                                                                                                                                                                                                                           |
+| `internal/scaffold`   | `init` writer; `schema.cue` embedded via `go:embed` — edit `internal/scaffold/schema.cue`, not deployed copies.                                                                                                                                                                                                                                                                                                                                              |
+| `internal/render`     | Claims-aware markdown renderer (facts from manifest, prose from claims, verbatim).                                                                                                                                                                                                                                                                                                                                                                           |
+| `internal/absorb`     | Pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `absorb --check` reports advisory drift (`io-surface/capability-drift`), never fails the gate.                                                                                                                                                                                                                                                                                                  |
+| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping (`FamiliesFor`), engine edges folded into per-package sets.                                                                                                                                                                                                                                                                                                                                |
+| `internal/emit`       | Findings → go-finding model for consumer formats (SARIF via `--format sarif`); rule IDs/severities map 1:1, confidence 1.0.                                                                                                                                                                                                                                                                                                                                  |
+| `internal/lint`       | Manifestless face: `lint.Run` = `ExtractWithObservations` → `check.Report` (Enforcement "lint"). Claim modulation when a manifest exists (`criticality` escalates, `durability: ephemeral` drops write-non-atomic). Exit 0 unless `--enforce`.                                                                                                                                                                                                               |
 
 ### Where detection rules live
 
 Everything the extractor "knows" is hardcoded tables in
-`internal/extract/extract.go`: `pkgOf`/`importSubstring` (import path →
-classification key), `callFamily` (package-qualified calls → family,
-**resolved** tier, can fail builds), `methodToken` (name heuristics on
-unresolvable receivers, **token** tier, advisory only), `seamIdent`
-(same-package wrapper identifiers), `familyPrecedence`. Teaching the
-extractor a new call = edit these tables + add a fixture case. Type-fact
-resolution is out of scope BY DESIGN: such sites get
-`facts.extractable: false`.
+`internal/extract/extract.go`: `pkgOf`/`importSubstring`, `callFamily`
+(**resolved** tier, can fail builds), `methodToken` (**token** tier,
+advisory only), `seamIdent`, `familyPrecedence`. Teaching a new call = edit
+these tables + add a fixture case. Type-fact resolution is out of scope BY
+DESIGN: such sites get `facts.extractable: false`.
 
 ### Invariants that must stay in sync
 
@@ -117,24 +108,23 @@ resolution is out of scope BY DESIGN: such sites get
   `internal/scaffold/schema.cue` (updated by hand — `init --force` never
   touches it); pilots own their copies (InboxClean v1.2, dnsblockd v1,
   migration pending owner decision).
-- Capability vocabulary: `#CapabilityName` CUE enum in `schema.cue` + closed
-  enum/mapping in `internal/capability` (the single-source mapping — rules
-  and absorb derive from it). New capability names = schema version bump +
-  ROADMAP Q5 decision.
-- `capabilities.cue` is written ONLY by `absorb`; the hermetic gate never
-  runs the reachability engine (`capability-drift` is emitted by
-  `absorb --check`, not `check`). Capslock in CI installs with the repo's
-  own Go toolchain (a version-skewed analyzer fails to type-check stdlib).
+- Capability vocabulary: `#CapabilityName` CUE enum in `schema.cue` + the
+  closed enum/mapping in `internal/capability` (single source — rules and
+  absorb derive from it). New names = schema version bump + ROADMAP Q5
+  decision. `capabilities.cue` is written ONLY by `absorb`; the gate never
+  runs the engine (`capability-drift` comes from `absorb --check`). Capslock
+  in CI installs with the repo's own Go toolchain (version-skewed analyzers
+  fail to type-check stdlib).
 - Rule constants in `internal/check/check.go` are a stable contract (SARIF
   ruleIds, suppression keys) — renaming is breaking.
 - Extracted IDs and locations are **repo/root-relative** (relative to
   `--root`), fixture-verified — the manifest contract keys on this.
 - `testdata/` is formatter-frozen: `flake.nix` excludes `testdata/**` from
-  treefmt (gofumpt/goimports) because goimports prunes the fixture's
-  unresolvable seam import (breaking `TestExtract_CrossPackageSeam`) and
-  rewrites the embed import (shifting line-pinned locations). CI's
-  `gofmt -l .` stays whole-tree. treefmt v2.6 global excludes match
-  root-relative globs: `testdata/**` works, `**/testdata/**` does not.
+  treefmt (goimports prunes the fixture's unresolvable seam import, breaking
+  `TestExtract_CrossPackageSeam`, and rewrites the embed import, shifting
+  line-pinned locations); CI's `gofmt -l .` stays whole-tree. treefmt v2.6
+  excludes match root-relative globs: `testdata/**` works, `**/testdata/**`
+  does not.
 
 ### Check semantics worth remembering
 
@@ -146,17 +136,15 @@ filters on `commit:`/`date:` are structural, do not remove them.
 
 ## Testing patterns
 
-- `testdata/extract/` is a fixed miniature tree (`cmd/app`,
-  `internal/store`) shared by extract and check tests; sites are referenced
-  by repo-relative ID with pinned line numbers; determinism asserted.
-- `testdata/detectors/` is the SECOND miniature tree: deliberately
-  bug-shaped, OUT of the manifest contract, never compiles (testdata is
-  invisible to the go tool — parseable is the only requirement). Lint
-  output is byte-pinned by goldens (`cmd/io-surface/testdata/lint-*.golden`);
-  intentional changes re-run
+- `testdata/extract/` is a fixed miniature tree shared by extract and check
+  tests; sites referenced by repo-relative ID with pinned line numbers.
+- `testdata/detectors/` is the SECOND tree: bug-shaped, OUT of the manifest
+  contract, never compiles (testdata is invisible to the go tool —
+  parseable is the only requirement). Lint output is byte-pinned by goldens
+  (`cmd/io-surface/testdata/lint-*.golden`); intentional changes re-run
   `go test ./cmd/io-surface -run TestGolden -update`.
-- `internal/scaffold`'s test is the round-trip proof: copy fixture → extract
-  → scaffold → `manifest.Load` → `check.Run` → `render.Markdown`, green by
+- `internal/scaffold`'s test is the round-trip proof: fixture → extract →
+  scaffold → `manifest.Load` → `check.Run` → `render.Markdown`, green by
   construction.
 - `cmd/io-surface` has e2e tests (`main_test.go`): every test drives the
   real cmdguard execution via `runApp` with a swappable `stdout` sink, plus
@@ -167,23 +155,20 @@ filters on `commit:`/`date:` are structural, do not remove them.
 
 ## Sharp edges (current constraints)
 
-- **BuildFlow repair tools rewrite files mid-run and the daemon commits
-  after gate builds**: `go-fix` reorders imports, inserts aliases
-  (`atomicwrite "github.com/larsartmann/go-atomic-write"`), and HAS mangled
+- **BuildFlow repair tools rewrite files mid-run; the daemon commits after
+  gate builds**: `go-fix` reorders imports, inserts aliases, and HAS mangled
   `testdata/` fixtures (2026-11-11: seam import pruned, embed import added —
   3 tests red until restored from blobs). Gate reds from mid-run snapshots
-  can vanish once the run settles — re-run builds before acting on them.
+  can vanish once the run settles — re-run before acting on them.
 - A STALE system `buildflow`/`docs-gates` binary produces FALSE gate reds.
-  Signature seen 2026-11-11: `go-mod-parity` step failing with
-  `wait for go-mod-parity: exit status 1` — the old binary's probes executed
-  a literal `go-mod-parity` binary (fixed in BuildFlow `8936ca0a2`, probes
-  now use real `git`/`go`). Fix: rebuild from the repo
-  (`nix build .# && nix run .#reinstall` in BuildFlow) and refresh the
-  `~/.local/bin` shims (they resolve BEFORE the system profile);
-  `buildflow doctor` names the binary-freshness delta.
-- A `nix-checker` "vendorHash may be stale" finding can be mtime-heuristic
-  noise (go.sum rewritten with unchanged content). Prove validity with
-  `nix build .#` before touching the hash.
+  Signature seen 2026-11-11: `go-mod-parity` failing with
+  `wait for go-mod-parity: exit status 1` (old probes ran a literal
+  `go-mod-parity` binary; fixed upstream `8936ca0a2`). Fix: rebuild in the
+  BuildFlow repo (`nix build .# && nix run .#reinstall`), refresh the
+  `~/.local/bin` shims (resolve BEFORE the system profile); `buildflow
+  doctor` names the delta.
+- A `nix-checker` "vendorHash may be stale" finding can be mtime noise
+  (go.sum rewritten with unchanged content) — prove with `nix build .#`.
 - docs-gates: BuildFlow findings name INTERNAL gate names ("docs gate
   audit-all is red"), not CLI verbs (`run`/`strike`/`purge`). Archive ritual
   when cadence is red: verify rows struck/routed, prepend a
@@ -191,14 +176,13 @@ filters on `commit:`/`date:` are structural, do not remove them.
 - Baseline suppression is canonical-key based; the hiding is by design
   (`internal/match/collision_test.go`).
 - The extractor's unexported-type dotted IDs are lexically indistinguishable
-  from dotted-subpackage mistakes — the `id-form` rule confirms the slash
-  variant against the extracted set instead of guessing; a declared dotted
-  ID with NO extraction at all classifies stale/extraction-blind as before.
-- Multiple agent sessions may work this repo concurrently: never revert
-  in-flight changes you didn't author. A running `buildflow --fix` loop can
-  revert uncommitted working-tree files mid-edit (2026-11-07) — when one is
-  live (`pgrep -af buildflow`), re-read files before editing and verify
-  edits landed on disk.
+  from dotted-subpackage mistakes — `id-form` confirms the slash variant
+  against the extracted set instead of guessing; a declared dotted ID with
+  NO extraction classifies stale/extraction-blind as before.
+- Concurrent agent sessions: never revert in-flight changes you didn't
+  author. A live `buildflow --fix` loop can revert uncommitted files
+  mid-edit (2026-11-07) — re-read before editing when one is running
+  (`pgrep -af buildflow`) and verify edits landed on disk.
 - Fleet evidence: FP classes, T17 severity verdicts (nothing promoted — D4
   bar is FP≈0) and pilot retro live in
   `docs/status/archived/2026-11-07_08-08_io-bug-radar-*.md`; reproduce via
@@ -218,15 +202,12 @@ filters on `commit:`/`date:` are structural, do not remove them.
 - Manifest editing: `facts.cue` is mechanical (regenerate, never hand-edit
   locations); `claims.cue`/`baseline.cue` are human judgment (never
   overwrite). `schema.cue` source of truth is `internal/scaffold/schema.cue`.
-- `cue` binary is never needed at runtime or for tests; `cue fmt` is only a
-  hand-editing habit.
-- CHANGELOG follows Keep a Changelog; version const in
-  `cmd/io-surface/main.go`.
+- `cue` binary is never needed at runtime or tests. CHANGELOG follows Keep a
+  Changelog.
 - Every health/report claim names its verifying command — a number without
   the command that produced it is unverified and says so.
-- Docs ownership: `README` (users) / `AGENTS` (agent context) / `FEATURES`
-  (status inventory) / `TODO_LIST` (open work) / `ROADMAP` (vision) — one
-  fact, one home.
+- Docs ownership — `README` users / `AGENTS` agent context / `FEATURES`
+  inventory / `TODO_LIST` open work / `ROADMAP` vision — one fact, one home.
 
 ## Library utilization audit (2026-11-07)
 

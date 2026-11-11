@@ -21,7 +21,7 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                                         | Location                            | Resource                                                  | Trigger                                  | Discipline | Crit | Durab |
 | -------------------------------------------- | ----------------------------------- | --------------------------------------------------------- | ---------------------------------------- | ---------- | ---- | ----- |
-| `cmd/io-surface.applyDoc`                    | `cmd/io-surface/commands.go:331`    | —                                                         | —                                        | —          | —    | —     |
+| `cmd/io-surface.applyDoc`                    | `cmd/io-surface/commands.go:330`    | —                                                         | —                                        | —          | —    | —     |
 | `internal/absorb.ModulePath`                 | `internal/absorb/absorb.go:79`      | go.mod of the analyzed repo                               | every absorb run without --module        | —          | —    | —     |
 | `internal/check.symbolVisible`               | `internal/check/location.go:29`     | —                                                         | —                                        | —          | —    | —     |
 | `internal/extract.extractor.collectSeamDecl` | `internal/extract/extract.go:171`   | candidate Go source files during the seam-collection pass | pass A of every two-pass extraction walk | bounded    | —    | —     |
@@ -40,9 +40,9 @@ CI fails when this block goes stale (`render --doc … --check`).
 
 | Site                               | Location                                 | Resource                                     | Trigger                                             | Discipline   | Crit | Durab |
 | ---------------------------------- | ---------------------------------------- | -------------------------------------------- | --------------------------------------------------- | ------------ | ---- | ----- |
-| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:228`         | Capslock JSON report passed via --capslock   | every `io-surface absorb` run                       | bounded      | —    | —     |
-| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:307`         | —                                            | —                                                   | —            | —    | —     |
-| `cmd/io-surface.writeDocVerified`  | `cmd/io-surface/commands.go:316`         | inventory doc (--doc FILE), in-place rewrite | every `io-surface render --doc` apply (not --check) | atomic-write | —    | —     |
+| `cmd/io-surface.runAbsorb`         | `cmd/io-surface/commands.go:227`         | Capslock JSON report passed via --capslock   | every `io-surface absorb` run                       | bounded      | —    | —     |
+| `cmd/io-surface.runRender`         | `cmd/io-surface/commands.go:306`         | —                                            | —                                                   | —            | —    | —     |
+| `cmd/io-surface.writeDocVerified`  | `cmd/io-surface/commands.go:315`         | inventory doc (--doc FILE), in-place rewrite | every `io-surface render --doc` apply (not --check) | atomic-write | —    | —     |
 | `internal/manifest.AppendBaseline` | `internal/manifest/baseline_write.go:41` | baseline.cue of the manifest being edited    | every `io-surface baseline add` run                 | —            | —    | —     |
 | `internal/scaffold.Write`          | `internal/scaffold/scaffold.go:61`       | —                                            | —                                                   | —            | —    | —     |
 
