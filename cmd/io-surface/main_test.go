@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/larsartmann/go-atomic-write"
+	atomicwrite "github.com/larsartmann/go-atomic-write"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
