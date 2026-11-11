@@ -1,0 +1,10 @@
+# Repo-local policy on top of the default ruleset (recorded decisions only).
+suppressions:
+  - rule: golangci-config
+    reason: >-
+      io-surface deliberately ships no .golangci.yml: the gate is hermetic
+      stdlib-only and CI's whole quality bar is build/vet/test/gofmt +
+      self-check. The errcheck decision (TODO #123, recorded 2026-11-08,
+      docs/errcheck-policy.md) forbids adding a golangci config without
+      reopening it — AGENTS.md "Conventions".
+    expires: "2027-02-11"

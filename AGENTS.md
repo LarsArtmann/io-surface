@@ -170,9 +170,9 @@ filters on `commit:`/`date:` are structural, do not remove them.
 - A `nix-checker` "vendorHash may be stale" finding can be mtime noise
   (go.sum rewritten with unchanged content) — prove with `nix build .#`.
 - docs-gates: BuildFlow findings name INTERNAL gate names ("docs gate
-  audit-all is red"), not CLI verbs (`run`/`strike`/`purge`). Archive ritual
-  when cadence is red: verify rows struck/routed, prepend a
-  `> **Live remainder:**` banner, `git mv` to `docs/status/archived/`.
+  audit-all is red"), not CLI verbs. Archive ritual when cadence is red:
+  verify rows struck/routed, prepend a `> **Live remainder:**` banner,
+  `git mv` to `docs/status/archived/`.
 - Baseline suppression is canonical-key based; the hiding is by design
   (`internal/match/collision_test.go`).
 - The extractor's unexported-type dotted IDs are lexically indistinguishable
@@ -214,7 +214,6 @@ filters on `commit:`/`date:` are structural, do not remove them.
 `docs/review/libs/` holds the point-in-time audit of 22 LarsArtmann
 libraries: cmdguard and go-atomic-write are the only direct house deps
 (at/near ceiling); go-error-family/go-output ride the graph via
-go-finding/cmdguard, deliberately unimported. Adoption triggers on record
-(`check --watch` via go-filewatcher/v2 if pilots ask; go-error-family only
-for a networked mode). Re-audit when a new direct dep lands or a pinned dep
-falls 2+ versions behind.
+go-finding/cmdguard, deliberately unimported. Adoption triggers and the
+re-audit bar (new direct dep, or a pinned dep 2+ versions behind) are in
+that index.
