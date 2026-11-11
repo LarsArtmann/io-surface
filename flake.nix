@@ -57,5 +57,12 @@
           mainProgram = "io-surface";
         };
       };
+
+      # Fixture trees (testdata/extract, testdata/detectors) are contract
+      # data: parseable-only Go with line-pinned test expectations. goimports
+      # prunes the fixture's unresolvable seam import and rewrites the embed
+      # import, breaking seam tests and location pins — formatters must not
+      # touch testdata. The CI gofmt gate stays whole-tree.
+      perSystem.treefmt.settings.exclude = [ "testdata/**" ];
     };
 }
