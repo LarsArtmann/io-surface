@@ -62,7 +62,11 @@
       # data: parseable-only Go with line-pinned test expectations. goimports
       # prunes the fixture's unresolvable seam import and rewrites the embed
       # import, breaking seam tests and location pins — formatters must not
-      # touch testdata. The CI gofmt gate stays whole-tree.
-      perSystem.treefmt.settings.excludes = [ "**/testdata/**" ];
+      # touch testdata. The CI gofmt gate stays whole-tree. treefmt v2.6
+      # global excludes match root-relative globs, so the root-level
+      # testdata/** shape is the working form (leading **/ does not match);
+      # nested testdata dirs hold only .golden/.md files, which no formatter
+      # includes.
+      perSystem.treefmt.settings.excludes = [ "testdata/**" ];
     };
 }
