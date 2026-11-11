@@ -12,6 +12,11 @@ import (
 	"path/filepath"
 )
 
+// DefaultDirs is the scan scope used when Options.Dirs is empty. It lives HERE
+// because the extractor owns the walk — check.effectiveDirs reads the same
+// source so the scope-hint never computes "outside" against a drifted scope.
+func DefaultDirs() []string { return []string{"cmd", "internal"} }
+
 // familyPrecedence orders the families by "how much this tells you about the
 // site". A function that stats a file and then renames it is a file WRITER, not
 // a reader; one that listens and also dials is a listener. The first family in
@@ -87,7 +92,7 @@ func runExtract(root string, opts Options, observing bool) ([]*Site, []Observati
 	}
 	dirs := opts.Dirs
 	if len(dirs) == 0 {
-		dirs = []string{"cmd", "internal"}
+		dirs = DefaultDirs()
 	}
 	// Two passes: pass A indexes which dirs declare seam idents (the
 	// caller may sit in a file walked BEFORE the declaring file, so the

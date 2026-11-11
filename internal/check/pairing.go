@@ -2,6 +2,8 @@ package check
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -92,7 +94,7 @@ func (p *pairer) pairGroups() {
 					p.rep.add(Finding{
 						Rule: RuleWeakSite, Severity: sev, ID: s.ID, Family: s.Family(),
 						Location: firstLocation(s.Locations),
-						Message:  fmt.Sprintf("weak-tier I/O site (%s) is not declared; declare it or convert the call to a resolved form", join(s.Calls)),
+						Message:  fmt.Sprintf("weak-tier I/O site (%s) is not declared; declare it or convert the call to a resolved form", strings.Join(s.Calls, ", ")),
 					})
 				}
 
@@ -107,7 +109,7 @@ func (p *pairer) pairGroups() {
 			p.rep.add(Finding{
 				Rule: RuleUndeclared, Severity: SeverityError, ID: s.ID, Family: s.Family(),
 				Location: firstLocation(s.Locations),
-				Message:  fmt.Sprintf("undeclared I/O site (%s); declare it in facts/claims or add it to baseline with a note", join(s.Calls)),
+				Message:  fmt.Sprintf("undeclared I/O site (%s); declare it in facts/claims or add it to baseline with a note", strings.Join(s.Calls, ", ")),
 			})
 		}
 
@@ -173,7 +175,7 @@ func (p *pairer) pairGroups() {
 				continue
 			}
 			for _, loc := range p.m.Sites[id].Location {
-				if !hasString(s.Locations, loc) {
+				if !slices.Contains(s.Locations, loc) {
 					p.rep.add(Finding{
 						Rule: RuleLocationDrift, Severity: SeverityInfo, ID: id, Family: p.m.Sites[id].Family,
 						Location: loc,

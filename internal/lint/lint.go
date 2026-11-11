@@ -71,7 +71,8 @@ func Run(root string, opts Options) (*check.Report, error) {
 		}
 		sev := severityOf(def.Severity)
 		c, declared := claims[o.SiteID]
-		if declared && c.Criticality == manifest.CriticalityCritical {
+		critical := declared && c.Criticality == manifest.CriticalityCritical
+		if critical {
 			sev = escalate(sev)
 		}
 		// Durability weighs write-shaped findings (plan T21): a durable
@@ -92,7 +93,7 @@ func Run(root string, opts Options) (*check.Report, error) {
 			Location: o.Location,
 			Message:  def.Message(o),
 		}
-		if declared && c.Criticality == manifest.CriticalityCritical {
+		if critical {
 			f.Message += " [escalated: claims.criticality=critical]"
 		}
 		rep.Findings = append(rep.Findings, f)

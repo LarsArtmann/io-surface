@@ -65,6 +65,20 @@ const (
 	SeverityInfo    Severity = "info"
 )
 
+// rank orders severities strongest-first for the report sort. Lexical string
+// order does NOT ("error" < "info" < "warning"), so presentation must go
+// through this rank, never the raw string.
+func (s Severity) rank() int {
+	switch s {
+	case SeverityError:
+		return 0
+	case SeverityWarning:
+		return 1
+	default:
+		return 2
+	}
+}
+
 // Finding is one gate result.
 type Finding struct {
 	Rule     string   `json:"rule"`
@@ -296,8 +310,8 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	}
 
 	sort.SliceStable(rep.Findings, func(i, j int) bool {
-		if rep.Findings[i].Severity != rep.Findings[j].Severity {
-			return rep.Findings[i].Severity < rep.Findings[j].Severity
+		if si, sj := rep.Findings[i].Severity.rank(), rep.Findings[j].Severity.rank(); si != sj {
+			return si < sj
 		}
 		if rep.Findings[i].Rule != rep.Findings[j].Rule {
 			return rep.Findings[i].Rule < rep.Findings[j].Rule
@@ -373,10 +387,12 @@ func ownerLabel(owner string) string {
 }
 
 // effectiveDirs resolves the scan scope exactly as the extractor defaults it:
-// an empty --dirs means cmd and internal.
+// an empty --dirs means extract.DefaultDirs. The indirection is the split-brain
+// guard — the scope-hint must compute "outside" against the SAME scope the
+// extractor walked, so the default lives once (in extract) and both sides read it.
 func effectiveDirs(dirs []string) []string {
 	if len(dirs) == 0 {
-		return []string{"cmd", "internal"}
+		return extract.DefaultDirs()
 	}
 
 	return dirs
@@ -446,22 +462,6 @@ func firstLocation(locs []string) string {
 	}
 
 	return locs[0]
-}
-
-func hasString(list []string, v string) bool {
-	return slices.Contains(list, v)
-}
-
-func join(items []string) string {
-	var out strings.Builder
-	for i, c := range items {
-		if i > 0 {
-			out.WriteString(", ")
-		}
-		out.WriteString(c)
-	}
-
-	return out.String()
 }
 
 // manifestSeams learns the repo's wrapper vocabulary from the manifest: every
