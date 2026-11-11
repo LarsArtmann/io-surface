@@ -158,39 +158,37 @@ filters on `commit:`/`date:` are structural, do not remove them.
 - **BuildFlow repair tools rewrite files mid-run; the daemon commits after
   gate builds**: `go-fix` reorders imports, inserts aliases, and HAS mangled
   `testdata/` fixtures (2026-11-11: seam import pruned, embed import added —
-  3 tests red until restored from blobs). Gate reds from mid-run snapshots
-  can vanish once the run settles — re-run before acting on them.
+  3 tests red until restored from blobs). Mid-run gate reds can vanish once
+  the run settles; re-run before acting.
 - A STALE system `buildflow`/`docs-gates` binary produces FALSE gate reds.
-  Signature seen 2026-11-11: `go-mod-parity` failing with
+  Signature 2026-11-11: `go-mod-parity` failing with
   `wait for go-mod-parity: exit status 1` (old probes ran a literal
   `go-mod-parity` binary; fixed upstream `8936ca0a2`). Fix: rebuild in the
-  BuildFlow repo (`nix build .# && nix run .#reinstall`), refresh the
-  `~/.local/bin` shims (resolve BEFORE the system profile); `buildflow
-  doctor` names the delta.
+  BuildFlow repo (`nix build .# && nix run .#reinstall`), refresh shims;
+  `buildflow doctor` names the delta.
 - A `nix-checker` "vendorHash may be stale" finding can be mtime noise
   (go.sum rewritten with unchanged content) — prove with `nix build .#`.
   A step's ERROR findings can also persist in BuildFlow's result cache after
   you fix them — re-verify with `BUILDFLOW_NO_RESULT_CACHE=1` or
   `--no-result-cache-for <tool>` before debugging further.
 - docs-gates: BuildFlow findings name INTERNAL gate names ("docs gate
-  audit-all is red"), not CLI verbs. Archive ritual when cadence is red:
-  verify rows struck/routed, prepend a `> **Live remainder:**` banner,
-  `git mv` to `docs/status/archived/`.
-- Baseline suppression is canonical-key based; the hiding is by design
-  (`internal/match/collision_test.go`).
-- The extractor's unexported-type dotted IDs are lexically indistinguishable
-  from dotted-subpackage mistakes — `id-form` confirms the slash variant
-  against the extracted set instead of guessing; a declared dotted ID with
-  NO extraction classifies stale/extraction-blind as before.
+  audit-all is red"), not CLI verbs. Cadence-red ritual: verify rows
+  struck/routed, prepend a `> **Live remainder:**` banner, `git mv` to
+  `docs/status/archived/`.
+- Baseline suppression is canonical-key based; hiding same-base-name sites
+  behind one entry is by design (`internal/match/collision_test.go`).
+- Unexported-type dotted IDs are lexically indistinguishable from
+  dotted-subpackage mistakes — `id-form` confirms the slash variant against
+  the extracted set; a declared dotted ID with NO extraction classifies
+  stale/extraction-blind as before.
 - Concurrent agent sessions: never revert in-flight changes you didn't
   author. A live `buildflow --fix` loop can revert uncommitted files
   mid-edit (2026-11-07) — re-read before editing when one is running
   (`pgrep -af buildflow`) and verify edits landed on disk.
-- Fleet evidence: FP classes, T17 severity verdicts (nothing promoted — D4
-  bar is FP≈0) and pilot retro live in
+- Fleet evidence: FP classes, T17 verdicts (nothing promoted — D4 bar is
+  FP≈0) and pilot retro live in
   `docs/status/archived/2026-11-07_08-08_io-bug-radar-*.md`; reproduce via
-  `./scripts/fleetscan.sh docs/evidence/fleetscan-<date>.json` (outputs in
-  `docs/evidence/`, never /tmp).
+  `./scripts/fleetscan.sh` (outputs in `docs/evidence/`, never /tmp).
 
 ## Conventions
 
@@ -199,9 +197,8 @@ filters on `commit:`/`date:` are structural, do not remove them.
 - Go code: gofmt-clean, tabs, stdlib-first. Errors wrap context
   (`fmt.Errorf("…: %w", err)`); sentinels live in per-package `errors.go`.
 - errcheck policy (TODO #123): report writes are deliberately unchecked
-  (`_, _ =`); full rationale and scope in `docs/errcheck-policy.md`. No
-  `.golangci.yml` by design — do not "fix" the `_, _ =` sites or add config
-  without reopening the decision.
+  (`_, _ =`); rationale in `docs/errcheck-policy.md`. No `.golangci.yml` by
+  design — don't "fix" the `_, _ =` sites or add config without reopening.
 - Manifest editing: `facts.cue` is mechanical (regenerate, never hand-edit
   locations); `claims.cue`/`baseline.cue` are human judgment (never
   overwrite). `schema.cue` source of truth is `internal/scaffold/schema.cue`.
