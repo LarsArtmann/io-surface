@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Title</title>
+    <title>Pareto Plan — io-surface Full Code Review</title>
     <style>
       /* =========================================================================
          BAUHAUS DARK — Dashboard template
@@ -828,9 +828,9 @@
   <body>
     <!-- Full-bleed top bar (optional — remove for quieter reports) -->
     <div class="top-bar">
-      <span>REPORT TYPE</span>
-      <span>YYYY-MM-DD</span>
-      <span>AUTHOR / TEAM</span>
+      <span>PARETO PLAN</span>
+      <span>2026-11-11</span>
+      <span>io-surface &middot; full code review</span>
     </div>
 
     <div class="layout">
@@ -839,10 +839,11 @@
         <nav>
           <div class="label">Contents</div>
           <a href="#summary">Summary</a>
-          <a href="#findings">Findings</a>
-          <a href="#issues">Issue Cards</a>
-          <a href="#proposal">Proposal</a>
-          <a href="#plan">Plan</a>
+          <a href="#tiers">Pareto Tiers</a>
+          <a href="#tasks">Tasks</a>
+          <a href="#risks">Risks</a>
+          <a href="#graph">Graph</a>
+          <a href="#method">Method</a>
         </nav>
       </aside>
 
@@ -855,10 +856,11 @@
             <div class="square"></div>
             <div class="tri"></div>
           </div>
-          <div class="hero-badge">Report Type</div>
-          <h1>Report Title</h1>
+          <div class="hero-badge">Full Code Review Plan</div>
+          <h1>io-surface: Pareto Review Plan</h1>
           <p class="hero-subtitle">
-            One-sentence description of what this report covers.
+            Tiered plan for reviewing all 65 Go files: gate contract first,
+            extraction brain second, the rest verified end to end.
           </p>
         </div>
 
@@ -867,166 +869,236 @@
           <h3>Contents</h3>
           <ul>
             <li><a href="#summary">Summary</a></li>
-            <li><a href="#findings">Findings</a></li>
-            <li><a href="#issues">Issue Cards</a></li>
-            <li><a href="#proposal">Proposal</a></li>
-            <li><a href="#plan">Plan</a></li>
+            <li><a href="#tiers">Pareto Tiers</a></li>
+            <li><a href="#tasks">Tasks</a></li>
+            <li><a href="#risks">Risks</a></li>
+            <li><a href="#graph">Graph</a></li>
+            <li><a href="#method">Method</a></li>
           </ul>
         </nav>
 
-        <!-- Stats Dashboard -->
+<!-- Stats Dashboard -->
         <h2 id="summary"><span class="num">00</span>Summary</h2>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="stat-value">42</div>
-            <div class="stat-label">Total Items</div>
+            <div class="stat-value">65</div>
+            <div class="stat-label">Go files to visit</div>
           </div>
-          <div class="stat-card stat-bad">
-            <div class="stat-value">7</div>
-            <div class="stat-label">Critical</div>
+          <div class="stat-card">
+            <div class="stat-value">11.5k</div>
+            <div class="stat-label">Lines under review</div>
           </div>
           <div class="stat-card stat-warn">
-            <div class="stat-value">12</div>
-            <div class="stat-label">Warnings</div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Pareto tiers</div>
           </div>
           <div class="stat-card stat-good">
-            <div class="stat-value">35</div>
-            <div class="stat-label">Resolved</div>
+            <div class="stat-value">1</div>
+            <div class="stat-label">Seed finding (fleetscan zero)</div>
           </div>
         </div>
+        <p>
+          First full-code-review of the io-surface repo. Scope: every Go source
+          and test file (65 files, ~11.5k LOC), plus
+          <code>scripts/fleetscan.sh</code> and
+          <code>internal/scaffold/schema.cue</code>. Trigger: this session's
+          discovery that fleet repos without a <code>cmd/</code>+<code>internal/</code>
+          layout scan as a silent zero (project-discovery-sdk: 0 sites via the
+          default dirs, 62 sites / 37 findings via <code>--dirs .</code>).
+        </p>
+        <p>
+          Constraints the review must respect (non-negotiable, from AGENTS.md):
+          hermetic extraction stays stdlib-only; lint goldens are byte-pinned;
+          <code>facts.cue</code> is regenerated, never hand-edited; the family /
+          capability taxonomy is frozen (schema bumps are owner-gated sessions);
+          no speculative rewrites — every change leaves the system demonstrably
+          no worse (docs-health ANNOTATE discipline applies to reports).
+        </p>
 
-        <!-- Findings as Cards -->
-        <h2 id="findings"><span class="num">01</span>Findings</h2>
-
+        <h2 id="tiers"><span class="num">01</span>Pareto Tiers</h2>
         <div class="card card-problem">
-          <h4>Critical Issue</h4>
-          <p>Description of the problem and its impact.</p>
+          <h4>1% &rarr; 51%: the gate contract</h4>
+          <p>
+            <code>internal/check</code> (check.go, pairing.go) +
+            <code>internal/lint</code>. Severity flips, strict-weak escalation,
+            enforcement posture, baseline lifecycle. A bug here mis-gates every
+            adopting repo — this is where the review spends its first and
+            hardest attention.
+          </p>
         </div>
-
+        <div class="card card-warning">
+          <h4>4% &rarr; 64%: the extraction brain</h4>
+          <p>
+            <code>internal/extract</code> (extract.go, tables.go, detectors.go,
+            detectors_fn.go, observations.go, suppress.go) +
+            <code>internal/manifest</code> + <code>internal/match</code>. Table
+            drift between the three taxonomy homes, token-tier findings leaking
+            into error severity, canonical-ID pairing order.
+          </p>
+        </div>
         <div class="card card-solution">
-          <h4>Recommended Fix</h4>
-          <p>Description of the solution with rationale.</p>
-        </div>
-
-        <!-- Issue Cards -->
-        <h2 id="issues"><span class="num">02</span>Issue Cards</h2>
-
-        <div class="issue issue-critical">
-          <span class="severity severity-critical">Blocking</span>
-          <h3>Critical finding title</h3>
-          <div class="where">path/to/file.go:42-58</div>
+          <h4>20% &rarr; 80%: everything else, verified end to end</h4>
           <p>
-            Describe the problem and cite the code or behavior that proves it.
-          </p>
-          <div class="callout callout-solution">
-            <strong>Fix</strong>
-            State the concrete recommended action.
-          </div>
-        </div>
-
-        <div class="issue issue-important">
-          <span class="severity severity-important">Important</span>
-          <h3>Important finding title</h3>
-          <div class="where">path/to/another.go:12-19</div>
-          <p>
-            Explain the risk and why a careful reviewer would hesitate before
-            shipping.
+            CLI output contract (<code>cmd/io-surface</code>), leaf packages
+            (scaffold, render, absorb, capability, emit), the BuildFlow
+            provider, fleetscan.sh, schema.cue copies, and the tests that pin
+            all of it — then the full gate battery, the HTML report, and the
+            TODO_LIST harvest.
           </p>
         </div>
 
-        <div class="issue issue-nice">
-          <span class="severity severity-nice">Nice to have</span>
-          <h3>Polish suggestion</h3>
-          <div class="where">docs/ or config</div>
-          <p>
-            Minor documentation gaps or future-proofing suggestions go here.
-          </p>
-        </div>
-
-        <!-- Strengths -->
-        <h2>Strengths</h2>
-        <div class="strengths">
-          <div class="strength">
-            <div class="check">+</div>
-            <div class="text">
-              <strong>Specific strength</strong>
-              <span>Explain why it matters and what it enables.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Table with Badges -->
-        <h2>Issue Table</h2>
+        <h2 id="tasks"><span class="num">02</span>Task Table</h2>
         <table>
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Severity</th>
-              <th>Issue</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>#</th><th>Task</th><th>Tier</th><th>Effort</th><th>Status</th></tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td><span class="badge badge-critical">Critical</span></td>
-              <td>Missing error handling</td>
-              <td><span class="badge badge-fixed">Fixed</span></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><span class="badge badge-high">High</span></td>
-              <td>Race condition</td>
-              <td><span class="badge badge-low">Open</span></td>
-            </tr>
+            <tr><td>1</td><td>Write this plan (tiers, graph, risks)</td><td><span class="badge badge-high">plan</span></td><td>15min</td><td><span class="badge badge-fixed">Done</span></td></tr>
+            <tr><td>R1</td><td>Review internal/check + internal/lint (gate contract)</td><td><span class="badge badge-critical">1%</span></td><td>60min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>R2</td><td>Review internal/extract (walker, tables, detectors, observations, suppress)</td><td><span class="badge badge-critical">1%</span></td><td>75min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>R3</td><td>Review internal/manifest + internal/match (CUE load, canonical pairing)</td><td><span class="badge badge-high">4%</span></td><td>45min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>R4</td><td>Review cmd/io-surface (commands.go, main.go — output + exit-code contract)</td><td><span class="badge badge-high">4%</span></td><td>45min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>R5</td><td>Review scaffold + render + absorb + capability + emit</td><td><span class="badge badge-high">20%</span></td><td>60min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>R6</td><td>Review provider + fleetscan.sh + schema.cue copies</td><td><span class="badge badge-high">20%</span></td><td>30min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>F1</td><td>Fix findings on the spot; add inline TODOs; zero silent findings</td><td><span class="badge badge-critical">1%</span></td><td>60min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>F2</td><td>Gate battery: build, vet, test -race, gofmt, self-check, render --check, lint</td><td><span class="badge badge-high">4%</span></td><td>20min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>F3</td><td>HTML review report at docs/reviews/ (template copy, never transcribed)</td><td><span class="badge badge-high">20%</span></td><td>45min</td><td><span class="badge badge-low">Open</span></td></tr>
+            <tr><td>F4</td><td>TODO_LIST harvest: #157 fleetscan fallback + unfixed findings</td><td><span class="badge badge-high">20%</span></td><td>15min</td><td><span class="badge badge-low">Open</span></td></tr>
           </tbody>
         </table>
 
-        <!-- Before/After Comparison -->
-        <h2 id="proposal">Before / After</h2>
-        <div class="compare-header">
-          <div class="compare-before">Before</div>
-          <div class="compare-after">After</div>
+        <h2 id="risks"><span class="num">03</span>Risk Register</h2>
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Blocking</span>
+          <h3>Golden drift by accident</h3>
+          <div class="where">cmd/io-surface/testdata/lint-*.golden</div>
+          <p>
+            Lint output is byte-pinned. Any message or ordering change during
+            review silently breaks <code>go test ./cmd/io-surface</code>.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Goldens re-generate ONLY via an explicit,
+            justified <code>-update</code> run; otherwise a golden failure is a
+            review finding, not noise.
+          </div>
         </div>
-        <div class="compare-row">
-          <div>
-            <pre><code><span class="tok-comment">// Old code</span>
-<span class="tok-keyword">func</span> <span class="tok-func">process</span>(data <span class="tok-type">interface</span>{}) { }</code></pre>
+        <div class="issue issue-important">
+          <span class="severity severity-important">Important</span>
+          <h3>Facts freshness after I/O-adding edits</h3>
+          <div class="where">docs/architecture/io-surface/facts.cue</div>
+          <p>
+            The repo gates itself. Any new I/O call added while fixing findings
+            turns CI red until <code>init --force</code> refreshes facts.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Re-run <code>go run ./cmd/io-surface check
+            --root .</code> after every fix batch; refresh facts when it asks.
           </div>
-          <div>
-            <pre><code><span class="tok-comment">// New code</span>
-<span class="tok-keyword">func</span> <span class="tok-func">process</span>[T <span class="tok-type">any</span>](data T) { }</code></pre>
-          </div>
+        </div>
+        <div class="issue issue-important">
+          <span class="severity severity-important">Important</span>
+          <h3>Taxonomy freeze</h3>
+          <div class="where">internal/scaffold/schema.cue &middot; internal/manifest &middot; internal/capability</div>
+          <p>
+            Families, disciplines, and capability names exist in frozen,
+            byte-identical copies. A review must never widen them — that is a
+            schema-v1.3 session (TODO #136), owner-gated.
+          </p>
+        </div>
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Nice to have</span>
+          <h3>Verschlimmbessern guard</h3>
+          <div class="where">every proposed edit</div>
+          <p>
+            No speculative rewrites. A fix ships only when findings stay
+            identical or the improvement is provable (tests + goldens).
+          </p>
         </div>
 
-        <!-- ASCII Diagram -->
-        <h2>Dependency Tree</h2>
-        <div class="dep-tree">
-          <span class="root">root</span> ├──
-          <span class="ok">wanted-dep</span> └──
-          <span class="unwanted">unwanted-dep</span>
+        <h2 id="seed"><span class="num">04</span>Seed Finding (this session)</h2>
+        <div class="card card-solution">
+          <h4>fleetscan silent zero-scan</h4>
+          <p>
+            <code>scripts/fleetscan.sh</code> runs <code>lint</code> with the
+            default scan dirs (<code>cmd</code>, <code>internal</code>, hardcoded
+            at internal/extract/tables.go:90). A repo whose packages live
+            elsewhere (project-discovery-sdk: root + named subdirs) scans as a
+            clean 0/0 — indistinguishable from "no findings" in the aggregate.
+            Fix candidate: when the default scan yields zero extracted sites,
+            re-run with <code>--dirs .</code> (or record "no default dirs
+            found" in the report). Tracked as TODO row #157 in F4.
+          </p>
         </div>
 
-        <!-- Numbered Steps -->
-        <h2 id="plan"><span class="num">03</span>Migration Plan</h2>
+        <h2 id="graph"><span class="num">05</span>Execution Graph</h2>
+        <?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.9.0" preserveAspectRatio="xMinYMin meet" viewBox="0 0 2507 1098"><svg class="d2-2283029608 d2-svg" width="2507" height="1098" viewBox="-101 -101 2507 1098"><rect x="-101" y="-101" width="2507" height="1098" rx="0" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-2283029608 .text-bold {
+	font-family: "d2-2283029608-font-bold";
+}
+@font-face {
+	font-family: d2-2283029608-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-2283029608 .fill-N1{fill:#0A0F25;}
+		.d2-2283029608 .fill-N7{fill:#FFFFFF;}
+		.d2-2283029608 .fill-B1{fill:#0D32B2;}
+		.d2-2283029608 .fill-B6{fill:#F7F8FE;}
+		.d2-2283029608 .stroke-B1{stroke:#0D32B2;}
+		.d2-2283029608 .stroke-B2{stroke:#0D32B2;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.light-code{display: block}.dark-code{display: none}]]></style><g class="cGxhbg=="><g class="shape" ><rect x="1022" y="0" width="340" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1192" y="38.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">Full code review — io-surface (2026-11-11)</text></g><g class="Y29yZQ=="><g class="shape" ><rect x="2057" y="166" width="248" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="2181" y="204.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R1 check+lint (gate contract)</text></g><g class="ZXh0cmFjdA=="><g class="shape" ><rect x="1646" y="166" width="351" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1821.5" y="204.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R2 extract+detectors (tables, observations)</text></g><g class="bWFuaWZlc3Q="><g class="shape" ><rect x="1226" y="166" width="360" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1406" y="204.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R3 manifest+match (CUE load, canonical IDs)</text></g><g class="Y2xp"><g class="shape" ><rect x="789" y="166" width="377" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="977.5" y="204.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R4 cmd/io-surface (output contract, exit codes)</text></g><g class="bGVhZg=="><g class="shape" ><rect x="373" y="166" width="356" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="551" y="204.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R5 scaffold+render+absorb+capability+emit</text></g><g class="b3Bz"><g class="shape" ><rect x="0" y="166" width="313" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="156.5" y="204.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">R6 provider+fleetscan.sh+schema.cue</text></g><g class="Zml4ZXM="><g class="shape" ><rect x="1065" y="332" width="253" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1191.5" y="370.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">F1 fix-on-sight + inline TODOs</text></g><g class="Z2F0ZXM="><g class="shape" ><rect x="978" y="498" width="428" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1192" y="536.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">F2 gate battery (build/vet/test -race/gofmt/self-check)</text></g><g class="cmVwb3J0"><g class="shape" ><rect x="1033" y="664" width="317" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1191.5" y="702.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">F3 HTML review report (docs/reviews/)</text></g><g class="aGFydmVzdA=="><g class="shape" ><rect x="948" y="830" width="488" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="1192" y="868.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">F4 TODO_LIST harvest (#157 fleetscan fallback + open findings)</text></g><g class="KHBsYW4gLSZndDsgY29yZSlbMF0="><marker id="mk-d2-2283029608-3488378134" markerWidth="10" markerHeight="12" refX="7" refY="6" viewBox="0 0 10 12" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0,0 10,6 0,12" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 1363.99294 47.167903 C 2017.199951 102.199997 2181 126 2181 162" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KHBsYW4gLSZndDsgZXh0cmFjdClbMF0="><path d="M 1363.482644 55.262916 C 1729.5 103.800003 1821.5 126 1821.5 162" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KHBsYW4gLSZndDsgbWFuaWZlc3QpWzBd"><path d="M 1278.864822 66.7228 C 1380.199951 106 1406 126 1406 162" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KHBsYW4gLSZndDsgY2xpKVswXQ=="><path d="M 1104.635178 66.722799 C 1003.299988 106 977.5 126 977.5 162" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KHBsYW4gLSZndDsgbGVhZilbMF0="><path d="M 1019.766571 55.277924 C 645.150024 103.804001 551 126 551 162" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KHBsYW4gLSZndDsgb3BzKVswXQ=="><path d="M 1019.756397 46.788835 C 329.549011 102.125 156.5 126 156.5 162" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KGNvcmUgLSZndDsgZml4ZXMpWzBd"><path d="M 2181 234 C 2181 272 2008.449951 296.47699 1322.235995 354.051554" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KGV4dHJhY3QgLSZndDsgZml4ZXMpWzBd"><path d="M 1821.5 234 C 1821.5 272 1720.849976 295.265015 1322.215705 347.804323" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KG1hbmlmZXN0IC0mZ3Q7IGZpeGVzKVswXQ=="><path d="M 1406 234 C 1406 272 1380.199951 292 1280.729644 330.554401" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KGNsaSAtJmd0OyBmaXhlcylbMF0="><path d="M 977.5 234 C 977.5 272 1003.299988 292 1102.770356 330.554402" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KGxlYWYgLSZndDsgZml4ZXMpWzBd"><path d="M 551 234 C 551 272 653.799988 295.399994 1061.033555 348.482973" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KG9wcyAtJmd0OyBmaXhlcylbMF0="><path d="M 156.5 234 C 156.5 272 338.299988 296.600006 1061.512837 354.679799" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KGZpeGVzIC0mZ3Q7IGdhdGVzKVswXQ=="><path d="M 1191.75 400 C 1191.75 438 1191.75 458 1191.75 494" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KGdhdGVzIC0mZ3Q7IHJlcG9ydClbMF0="><path d="M 1191.75 566 C 1191.75 604 1191.75 624 1191.75 660" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><g class="KHJlcG9ydCAtJmd0OyBoYXJ2ZXN0KVswXQ=="><path d="M 1191.75 732 C 1191.75 770 1191.75 790 1191.75 826" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-2283029608-3488378134)" mask="url(#d2-2283029608)" /></g><mask id="d2-2283029608" maskUnits="userSpaceOnUse" x="-101" y="-101" width="2507" height="1098">
+<rect x="-101" y="-101" width="2507" height="1098" fill="white"></rect>
+
+</mask></svg></svg>
+
+        <p class="hero-subtitle">
+          Rendered from <code>/tmp/review-plan.d2</code> via
+          <code>d2</code> (47ms); inlined per the zero-external-dependency rule.
+        </p>
+
+        <h2 id="method"><span class="num">06</span>Per-File Method</h2>
         <div class="migration-step">
           <div class="migration-num">1</div>
           <div class="migration-content">
-            <h4>Add generic type parameter</h4>
-            <p>Update the function signature to accept a type parameter.</p>
+            <h4>READ &rarr; UNDERSTAND</h4>
+            <p>Every file visited once, in dependency order (leaf &rarr; core within each track).</p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">2</div>
           <div class="migration-content">
-            <h4>Update all call sites</h4>
-            <p>Pass explicit types at each call site for type safety.</p>
+            <h4>REVIEW &rarr; CRITICISE</h4>
+            <p>Architect checklist per file: unrepresentable states, enum-over-bool, naming honesty, split brains, duplication, file size vs the 650-line repo budget, error centralization, DDD fit.</p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">3</div>
+          <div class="migration-content">
+            <h4>FIX or TODO — nothing silent</h4>
+            <p>Fix-on-sight for local defects; inline TODO or TODO_LIST row for bounded future work; the review report records every verdict.</p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">4</div>
+          <div class="migration-content">
+            <h4>VERIFY after every batch</h4>
+            <p><code>go build ./... &amp;&amp; go vet ./... &amp;&amp; go test ./... &amp;&amp; gofmt -l .</code> + self-check; full battery at F2.</p>
           </div>
         </div>
 
-        <footer class="footer">
-          Generated YYYY-MM-DD &middot; All claims verified against source code
-          where noted
+                <footer class="footer">
+          Generated 2026-11-11 &middot; claims verified against source; every
+          number carries its producing command per repo convention
         </footer>
       </main>
     </div>
