@@ -77,8 +77,9 @@ func runVersion(_ context.Context, _ *rootFlags, flags versionFlags) error {
 }
 
 type baselineAddFlags struct {
-	Note string `flag:"note" required:"true" help:"why this site stays undeclared (a baseline entry without a reason is how the baseline stops shrinking)"`
-	Date string `flag:"date" help:"entry date YYYY-MM-DD (default: today)"`
+	Manifest string `flag:"manifest" help:"manifest package directory (default <root>/docs/architecture/io-surface)"`
+	Note     string `flag:"note" required:"true" help:"why this site stays undeclared (a baseline entry without a reason is how the baseline stops shrinking)"`
+	Date     string `flag:"date" help:"entry date YYYY-MM-DD (default: today)"`
 }
 
 type renderFlags struct {
@@ -127,6 +128,11 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 	// One emission decision for every gate outcome; the exit-code decision
 	// happens strictly after, so machines always get a parseable stdout.
 	useJSON := flags.JSON || flags.Format == "json"
+	switch flags.Format {
+	case "", "text", "json", "sarif":
+	default:
+		return fmt.Errorf("unknown --format %q (want text, json, or sarif)", flags.Format)
+	}
 	switch {
 	case flags.Format == "sarif":
 		data, sErr := emit.SARIF(rep, version)
@@ -136,7 +142,7 @@ func runCheck(_ context.Context, root *rootFlags, flags checkFlags) error {
 		if _, err = stdout.Write(data); err != nil {
 			return err
 		}
-		_, _ = fmt.Fprintln(os.Stdout)
+		_, _ = fmt.Fprintln(stdout)
 	case useJSON:
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
@@ -182,19 +188,24 @@ func printReport(rep *check.Report, w io.Writer) {
 }
 
 func runInit(_ context.Context, root *rootFlags, flags initFlags) error {
-	sites, err := extract.Extract(root.Root, extract.Options{Dirs: parseDirs(root.Dirs), Ignore: parseGlobs(root.Ignore)})
+	dirs := parseDirs(root.Dirs)
+	sites, err := extract.Extract(root.Root, extract.Options{Dirs: dirs, Ignore: parseGlobs(root.Ignore)})
 	if err != nil {
 		return err
 	}
 	if len(sites) == 0 {
-		return fmt.Errorf("no I/O sites found under %s/cmd or %s/internal", root.Root, root.Root)
+		scanned := dirs
+		if len(scanned) == 0 {
+			scanned = extract.DefaultDirs()
+		}
+		return fmt.Errorf("no I/O sites found under %s (scanned dirs: %s; widen --dirs if the I/O lives elsewhere)", root.Root, strings.Join(scanned, ", "))
 	}
 	dir, err := scaffold.Write(root.Root, sites, time.Now().UTC().Format("2006-01-02"), flags.Force)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("io-surface: wrote %s (%d sites, %d families)\n", dir, len(sites), countFamilies(sites))
-	fmt.Printf("next: io-surface check --root %s\n", root.Root)
+	_, _ = fmt.Fprintf(stdout, "io-surface: wrote %s (%d sites, %d families)\n", dir, len(sites), countFamilies(sites))
+	_, _ = fmt.Fprintf(stdout, "next: io-surface check --root %s\n", root.Root)
 
 	return nil
 }
@@ -476,7 +487,7 @@ func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags
 	}
 	id := args[0]
 
-	dir := manifestDir(root.Root, "")
+	dir := manifestDir(root.Root, flags.Manifest)
 	if _, err := manifest.Load(dir); err != nil {
 		return err
 	}
@@ -524,7 +535,11 @@ func runLint(_ context.Context, root *rootFlags, flags lintFlags) error {
 	if err != nil {
 		return err
 	}
-
+	switch flags.Format {
+	case "", "text", "json", "sarif", "github":
+	default:
+		return fmt.Errorf("unknown --format %q (want text, json, sarif, or github)", flags.Format)
+	}
 	switch flags.Format {
 	case "sarif":
 		data, sErr := emit.SARIF(rep, version)
@@ -534,7 +549,7 @@ func runLint(_ context.Context, root *rootFlags, flags lintFlags) error {
 		if _, err = stdout.Write(data); err != nil {
 			return err
 		}
-		_, _ = fmt.Fprintln(os.Stdout)
+		_, _ = fmt.Fprintln(stdout)
 	case "json":
 		enc := json.NewEncoder(stdout)
 		enc.SetIndent("", "  ")
