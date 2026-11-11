@@ -13,7 +13,7 @@ version before reporting issues found in older releases.
 
 Please do **not** open public issues for security problems. Report privately instead:
 
-- **GitHub Security Advisory**: https://github.com/lars/io-surface/security/advisories/new
+- **GitHub Security Advisory**: https://github.com/LarsArtmann/io-surface/security/advisories/new
 
 ### What to include
 
