@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Title</title>
+    <title>Full Code Review — io-surface 2026-11-11</title>
     <style>
       /* =========================================================================
          BAUHAUS DARK — Dashboard template
@@ -828,9 +828,9 @@
   <body>
     <!-- Full-bleed top bar (optional — remove for quieter reports) -->
     <div class="top-bar">
-      <span>REPORT TYPE</span>
-      <span>YYYY-MM-DD</span>
-      <span>AUTHOR / TEAM</span>
+      <span>FULL CODE REVIEW</span>
+      <span>2026-11-11</span>
+      <span>io-surface &middot; every file, one pass</span>
     </div>
 
     <div class="layout">
@@ -839,10 +839,11 @@
         <nav>
           <div class="label">Contents</div>
           <a href="#summary">Summary</a>
-          <a href="#findings">Findings</a>
-          <a href="#issues">Issue Cards</a>
-          <a href="#proposal">Proposal</a>
-          <a href="#plan">Plan</a>
+          <a href="#findings">Fixed</a>
+          <a href="#tracked">Tracked</a>
+          <a href="#observations">Observations</a>
+          <a href="#strengths">Strengths</a>
+          <a href="#verdict">Verdict</a>
         </nav>
       </aside>
 
@@ -855,10 +856,11 @@
             <div class="square"></div>
             <div class="tri"></div>
           </div>
-          <div class="hero-badge">Report Type</div>
-          <h1>Report Title</h1>
+          <div class="hero-badge">Full Code Review</div>
+          <h1>io-surface: Every File, Reviewed</h1>
           <p class="hero-subtitle">
-            One-sentence description of what this report covers.
+            65 Go files plus the fleet script and schema copies: 14 findings
+            fixed on the spot, 2 split brains closed, gates green.
           </p>
         </div>
 
@@ -867,166 +869,333 @@
           <h3>Contents</h3>
           <ul>
             <li><a href="#summary">Summary</a></li>
-            <li><a href="#findings">Findings</a></li>
-            <li><a href="#issues">Issue Cards</a></li>
-            <li><a href="#proposal">Proposal</a></li>
-            <li><a href="#plan">Plan</a></li>
+            <li><a href="#findings">Findings — Fixed</a></li>
+            <li><a href="#tracked">Findings — Tracked</a></li>
+            <li><a href="#observations">Observations</a></li>
+            <li><a href="#strengths">Strengths</a></li>
+            <li><a href="#verdict">Verdict</a></li>
           </ul>
         </nav>
 
-        <!-- Stats Dashboard -->
+<!-- Stats Dashboard -->
         <h2 id="summary"><span class="num">00</span>Summary</h2>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="stat-value">42</div>
-            <div class="stat-label">Total Items</div>
+            <div class="stat-value">65</div>
+            <div class="stat-label">Files reviewed</div>
           </div>
           <div class="stat-card stat-bad">
-            <div class="stat-value">7</div>
-            <div class="stat-label">Critical</div>
+            <div class="stat-value">14</div>
+            <div class="stat-label">Fixed on the spot</div>
           </div>
           <div class="stat-card stat-warn">
-            <div class="stat-value">12</div>
-            <div class="stat-label">Warnings</div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">Split brains closed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">TODOs added (#158&ndash;160)</div>
           </div>
           <div class="stat-card stat-good">
-            <div class="stat-value">35</div>
-            <div class="stat-label">Resolved</div>
+            <div class="stat-value">12/12</div>
+            <div class="stat-label">Packages green (test -race)</div>
+          </div>
+        </div>
+        <p>
+          First full-code-review of the repository: every Go source and test
+          file visited (65 files, ~11.5k LOC), plus
+          <code>scripts/fleetscan.sh</code> and the schema.cue copies. Session
+          trigger: the fleetscan silent-zero artifact on
+          project-discovery-sdk (0 sites via default dirs, 62 sites / 37
+          findings via <code>--dirs .</code>). Method per file: READ &rarr;
+          REVIEW &rarr; CRITICISE &rarr; fix on sight or track &mdash; nothing
+          silent. Every fix verified by the full gate battery: build, vet,
+          <code>test -race</code>, gofmt, self-check (0/0/0), facts-freshness
+          (CI-filtered diff), inventory-doc <code>--check</code>, self-lint
+          (0 findings).
+        </p>
+
+        <h2 id="findings"><span class="num">01</span>Findings &mdash; Fixed</h2>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Correctness</span>
+          <h3>Report sort buried warnings under infos</h3>
+          <div class="where">internal/check/check.go:298 (before fix)</div>
+          <p>
+            The findings sort compared <code>Severity</code> as a string, and
+            lexical order is <code>error &lt; info &lt; warning</code> &mdash;
+            so every info finding printed before every warning, contradicting
+            the type's own "strongest first" contract. The const comment was
+            the spec; the comparator never implemented it.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> <code>Severity.rank()</code> +
+            <code>sortFindings</code> (severity rank &rarr; rule &rarr; ID,
+            insertion-stable), pinned by
+            <code>TestSortFindings_StrongestFirst</code>. CHANGELOG
+            Unreleased/Fixed.
           </div>
         </div>
 
-        <!-- Findings as Cards -->
-        <h2 id="findings"><span class="num">01</span>Findings</h2>
-
-        <div class="card card-problem">
-          <h4>Critical Issue</h4>
-          <p>Description of the problem and its impact.</p>
-        </div>
-
-        <div class="card card-solution">
-          <h4>Recommended Fix</h4>
-          <p>Description of the solution with rationale.</p>
-        </div>
-
-        <!-- Issue Cards -->
-        <h2 id="issues"><span class="num">02</span>Issue Cards</h2>
-
         <div class="issue issue-critical">
-          <span class="severity severity-critical">Blocking</span>
-          <h3>Critical finding title</h3>
-          <div class="where">path/to/file.go:42-58</div>
+          <span class="severity severity-critical">Split brain</span>
+          <h3>Default scan dirs hardcoded in three places</h3>
+          <div class="where">internal/extract/tables.go:90 &middot; internal/check/check.go:379 &middot; scripts/fleetscan.sh</div>
           <p>
-            Describe the problem and cite the code or behavior that proves it.
+            <code>cmd</code>+<code>internal</code> lived as independent
+            literals in the extractor and in the scope-hint computation. If
+            one changed, the scope-hint would compute "outside" against a
+            scope the extractor never walked &mdash; silently wrong hints.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix</strong>
-            State the concrete recommended action.
+            <strong>Fix</strong> <code>extract.DefaultDirs()</code> is now the
+            single source; <code>check.effectiveDirs</code>, <code>init</code>'s
+            empty-scan error, and fleetscan's fallback all read or mirror it.
+            AGENTS.md invariant added.
           </div>
         </div>
 
         <div class="issue issue-important">
-          <span class="severity severity-important">Important</span>
-          <h3>Important finding title</h3>
-          <div class="where">path/to/another.go:12-19</div>
+          <span class="severity severity-important">Invariant</span>
+          <h3>BuildFlow provider hardcoded the manifest directory</h3>
+          <div class="where">provider/provider.go:55 (before fix)</div>
           <p>
-            Explain the risk and why a careful reviewer would hesitate before
-            shipping.
+            <code>filepath.Join(dir, "docs", "architecture", "io-surface")</code>
+            duplicated <code>manifest.Dir</code> &mdash; the exact
+            "constant exists ONCE" invariant AGENTS.md declares. A Dir change
+            would desync the provider from the CLI.
           </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Provider joins <code>manifest.Dir</code>.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Tooling</span>
+          <h3>fleetscan silent zero-scan (the session's seed finding)</h3>
+          <div class="where">scripts/fleetscan.sh</div>
+          <p>
+            Repos whose packages live outside <code>cmd/</code>+<code>internal/</code>
+            scanned as a clean 0/0 &mdash; indistinguishable from "no
+            findings" in fleet aggregates (project-discovery-sdk: really 62
+            sites, 37 findings).
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> When neither default dir exists on disk, the
+            scan reruns with <code>--dirs .</code> and the aggregate records
+            <code>dirs</code> per repo. 3-repo rerun verified: SDK 62 sites,
+            others unchanged. CHANGELOG + TODO #157 (DONE).
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">UX contract</span>
+          <h3>init bypassed the output sink and lied about scanned dirs</h3>
+          <div class="where">cmd/io-surface/commands.go &middot; runInit</div>
+          <p>
+            <code>fmt.Printf</code> wrote to real stdout, invisible to the
+            e2e test seam every other handler honors; the "no I/O sites
+            found under %s/cmd or %s/internal" error named the default dirs
+            even when <code>--dirs</code> overrode them.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Output via the <code>stdout</code> sink
+            (<code>_, _ =</code> errcheck convention); the error names the
+            dirs actually scanned with a widen-<code>--dirs</code> hint.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">UX contract</span>
+          <h3>Unknown --format silently rendered text</h3>
+          <div class="where">cmd/io-surface/commands.go &middot; runCheck + runLint</div>
+          <p>
+            <code>--format yaml</code> fell into the default case and printed
+            text &mdash; a machine consumer would parse the wrong format with
+            no error. Explicit beats implicit.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Both faces validate the format value
+            (check: text/json/sarif; lint: + github) and error with the valid
+            set (exit class 2).
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Type safety</span>
+          <h3>absorb wrote unescaped strings into CUE</h3>
+          <div class="where">internal/absorb/absorb.go &middot; quote()</div>
+          <p>
+            <code>quote(s) = "\"" + s + "\""</code> interpolated
+            operator-supplied provenance (e.g. <code>--engine-version</code>)
+            unescaped: one stray double-quote produced invalid CUE on disk.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> <code>strconv.Quote</code> &mdash; proper
+            escaping, byte-identical for all normal inputs (verified by the
+            absorb test suite).
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Consistency</span>
+          <h3>baseline add ignored --manifest</h3>
+          <div class="where">cmd/io-surface/commands.go &middot; runBaselineAdd</div>
+          <p>
+            Every manifest-reading command accepts <code>--manifest</code>;
+            <code>baseline add</code> hardcoded the default directory, so a
+            repo with a non-conventional manifest location could not target
+            its own baseline.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Flag added and threaded through
+            <code>manifestDir</code>, matching the sibling commands.
+          </div>
         </div>
 
         <div class="issue issue-nice">
-          <span class="severity severity-nice">Nice to have</span>
-          <h3>Polish suggestion</h3>
-          <div class="where">docs/ or config</div>
+          <span class="severity severity-nice">Hygiene</span>
+          <h3>Stale/lying comments and duplicated doc lines</h3>
+          <div class="where">manifest.go (phantom <code>ContractVersionMax</code> symbol; "ids returns") &middot; scaffold.go (four-file list missing capabilities.cue; Dir comment duplicated a sentence)</div>
           <p>
-            Minor documentation gaps or future-proofing suggestions go here.
+            Comments described symbols that do not exist or facts that were
+            half-true &mdash; the kind of drift that misleads the next
+            reviewer more than a missing comment would.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> All four rewritten to state the truth.
+          </div>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Hygiene</span>
+          <h3>Stdlib-reimplementation wrappers and a sink-bypassing newline</h3>
+          <div class="where">check.go (<code>join</code>, <code>hasString</code>) &middot; extract.go (<code>contains</code>, 10 sites) &middot; commands.go SARIF newline &rarr; os.Stdout</div>
+          <p>
+            Thin wrappers around <code>strings.Join</code> /
+            <code>slices.Contains</code> added indirection with zero
+            meaning; the SARIF trailing newline bypassed the swappable sink
+            (real stdout bytes unchanged, but the capture seam lied).
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong> Wrappers deleted (direct stdlib calls); the
+            newline follows its data into the sink &mdash; the lint-sarif
+            golden gained exactly the one newline the real output always had
+            (deliberate <code>-update</code>, diff reviewed).
+          </div>
+        </div>
+
+        <h2 id="tracked"><span class="num">02</span>Findings &mdash; Tracked, not fixed</h2>
+        <p>
+          Deliberately deferred with a TODO row each (TODO_LIST.md &sect;Full
+          code review): unfixed findings are forward-looking work, not
+          report-entombed trivia.
+        </p>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Severity</th><th>File</th><th>Issue</th><th>Track</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>158</td><td><span class="badge badge-low">Low</span></td><td><code>internal/emit/emit.go:109</code></td><td>Empty-location findings anchor SARIF at the pseudo-file <code>io-surface</code> (RuleMissingLocation); the honest shape needs go-finding's empty-path contract verified first</td><td><span class="badge badge-low">TODO</span></td></tr>
+            <tr><td>159</td><td><span class="badge badge-low">Low</span></td><td><code>internal/lint/lint.go</code></td><td>Lint prints findings in walk order while check sorts strongest-first; aligning re-pins the lint goldens deliberately</td><td><span class="badge badge-low">TODO</span></td></tr>
+            <tr><td>160</td><td><span class="badge badge-low">Low</span></td><td><code>internal/extract/detectors.go</code></td><td><code>RuleDef.Severity</code> is a raw string; a registry typo silently degrades to info in <code>lint.severityOf</code> &mdash; typed enum is an API change (owner call)</td><td><span class="badge badge-low">TODO</span></td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="observations"><span class="num">03</span>Observations (no action owed)</h2>
+        <div class="card card-warning">
+          <h4>Near-dead table row: <code>callFamily["net"]["Resolver"]</code></h4>
+          <p>
+            Fires only on a <code>net.Resolver(v)</code> type-conversion call
+            (the struct literal and the Dial-field assignment are handled by
+            other cases). Harmless documentation of intent; removal would be
+            churn with zero behavioral gain.
+          </p>
+        </div>
+        <div class="card card-warning">
+          <h4>Redundant blank check in detectCloserMissing</h4>
+          <p>
+            <code>binding.Name == "_" || slices.Contains(c.blanks, 0)</code>
+            &mdash; position-0 blank and underscore name are the same fact.
+            Harmless belt-and-braces; left as-is.
+          </p>
+        </div>
+        <div class="card card-warning">
+          <h4>embedVarName's 200-position window</h4>
+          <p>
+            The "//go:embed &rarr; following var" attribution uses a position
+            distance heuristic rather than AST comment association. Fragile
+            in theory, fixture-covered in practice; a rewrite is not worth
+            the risk while the goldens hold.
           </p>
         </div>
 
-        <!-- Strengths -->
-        <h2>Strengths</h2>
+        <h2 id="strengths"><span class="num">04</span>Strengths to preserve</h2>
         <div class="strengths">
           <div class="strength">
             <div class="check">+</div>
             <div class="text">
-              <strong>Specific strength</strong>
-              <span>Explain why it matters and what it enables.</span>
+              <strong>Load-bearing package doc comments</strong>
+              <span>Every package opens with the rationale (why hermetic, why tiers, why pairing order) &mdash; the architecture documentation lives where the code is.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Fleet-evidence-carve-out tables</strong>
+              <span>errResults documents WHY each absent entry is absent (io.ReadAll, filepath.Glob, rand.Read) with sampled evidence and dates &mdash; false-positive tuning as reviewable data.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Deliberate confidence tiers</strong>
+              <span>Resolved-vs-token is enforced structurally: token sites can never fail a gate or reach a detector. The unsafe shortcut simply does not exist.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Suppression grammar with mandatory reasons</strong>
+              <span>Malformed directives emit their own finding instead of suppressing &mdash; a typo can never quietly eat a real bug.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Formatter-canonical table rendering</strong>
+              <span>render emits dprint/prettier-aligned markdown so the generated block is a formatter no-op &mdash; drift gates stop failing on formatting passes nobody made.</span>
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Self-hosting gate</strong>
+              <span>The tool gates its own tree in CI (facts freshness, self-check, self-render, self-lint SARIF) &mdash; every fix in this review was verified by the same battery it ships.</span>
             </div>
           </div>
         </div>
 
-        <!-- Table with Badges -->
-        <h2>Issue Table</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Severity</th>
-              <th>Issue</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td><span class="badge badge-critical">Critical</span></td>
-              <td>Missing error handling</td>
-              <td><span class="badge badge-fixed">Fixed</span></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><span class="badge badge-high">High</span></td>
-              <td>Race condition</td>
-              <td><span class="badge badge-low">Open</span></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Before/After Comparison -->
-        <h2 id="proposal">Before / After</h2>
-        <div class="compare-header">
-          <div class="compare-before">Before</div>
-          <div class="compare-after">After</div>
-        </div>
-        <div class="compare-row">
-          <div>
-            <pre><code><span class="tok-comment">// Old code</span>
-<span class="tok-keyword">func</span> <span class="tok-func">process</span>(data <span class="tok-type">interface</span>{}) { }</code></pre>
-          </div>
-          <div>
-            <pre><code><span class="tok-comment">// New code</span>
-<span class="tok-keyword">func</span> <span class="tok-func">process</span>[T <span class="tok-type">any</span>](data T) { }</code></pre>
-          </div>
+        <h2 id="verdict"><span class="num">05</span>Verdict</h2>
+        <div class="card card-solution">
+          <h4>Architecture sound; quality bar holds; findings were polish-grade</h4>
+          <p>
+            No critical defects in the gate semantics: pairing order, severity
+            modulation, enforcement posture, and the baseline lifecycle all
+            behave as documented, and the tests pin the contracts that matter.
+            The 14 fixes are correctness-of-presentation, invariant hygiene,
+            and user-facing honesty &mdash; the kind of debt that compounds
+            quietly if ignored. The two split brains (default dirs, manifest
+            dir) are closed with single-source constants and new invariants in
+            AGENTS.md. Gates green: build, vet, <code>test -race</code>
+            (12 packages), gofmt-empty, self-check 0/0/0, facts-fresh,
+            inventory-doc fresh, self-lint 0 findings.
+          </p>
         </div>
 
-        <!-- ASCII Diagram -->
-        <h2>Dependency Tree</h2>
-        <div class="dep-tree">
-          <span class="root">root</span> ├──
-          <span class="ok">wanted-dep</span> └──
-          <span class="unwanted">unwanted-dep</span>
-        </div>
-
-        <!-- Numbered Steps -->
-        <h2 id="plan"><span class="num">03</span>Migration Plan</h2>
-        <div class="migration-step">
-          <div class="migration-num">1</div>
-          <div class="migration-content">
-            <h4>Add generic type parameter</h4>
-            <p>Update the function signature to accept a type parameter.</p>
-          </div>
-        </div>
-        <div class="migration-step">
-          <div class="migration-num">2</div>
-          <div class="migration-content">
-            <h4>Update all call sites</h4>
-            <p>Pass explicit types at each call site for type safety.</p>
-          </div>
-        </div>
-
-        <footer class="footer">
-          Generated YYYY-MM-DD &middot; All claims verified against source code
-          where noted
+                <footer class="footer">
+          Generated 2026-11-11 &middot; every claim carries its verifying command;
+          findings ledger cross-referenced in TODO_LIST.md rows #157-160
         </footer>
       </main>
     </div>
