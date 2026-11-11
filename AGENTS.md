@@ -168,7 +168,13 @@ cross-package method sets) is out of scope BY DESIGN: such sites get
   enums in `internal/scaffold/schema.cue`, the `Families`/`Disciplines` vars in
   `internal/manifest/manifest.go`, and README prose. A new family is a schema
   version bump, not a casual edit.
-- The manifest dir constant exists ONCE: `manifest.Dir` (scaffold aliases it).
+- The manifest dir constant exists ONCE: `manifest.Dir` (scaffold aliases it;
+  the BuildFlow provider joins it too — no hardcoded copies, 2026-11-11
+  review fix).
+- The default scan dirs exist ONCE: `extract.DefaultDirs()` —
+  `check.effectiveDirs`, `init`'s empty-scan error, and fleetscan's
+  zero-scan fallback all read or mirror it; do not re-hardcode
+  `cmd`/`internal`.
 - Schema is v1.2: `claims.criticality` ("low|normal|critical", default
   materializes on unification) and `claims.durability`
   ("ephemeral|recoverable|durable"). The deployed copy

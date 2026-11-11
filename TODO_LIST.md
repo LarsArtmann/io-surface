@@ -205,6 +205,24 @@
 | 126 | Series sweep: `docs/reviews/` + `docs/research/` overlap check + supersedes convention for the audit series                                                                  | ✅ `DONE` (2026-11-08) | Low    | 30min  | sweep verdict: NOTHING TO SWEEP — `docs/reviews/` and `docs/research/` do not exist (verified `ls docs/`: architecture, evidence, planning, review, status); the only review series is `docs/review/libs/` (24 reports + index.html, one topic). Supersedes convention: the series updates reports IN PLACE with dated re-scores ("re-scored 2026-11-08" notes) rather than superseding files — recorded here as the convention; revisit if a second series ever lands                                                                                                                                                                        |
 | 127 | Audit rendering checks: mobile check (render index.html at 320 px; only 1280 px was screenshotted) + visual pass of the 22 .md report files on GitHub (tables/badges render) | 🔴 `TODO`              | Low    | 30min  | status report §f.19+20; pareto plan M21                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
+## Full code review (2026-11-11)
+
+> Source: first full-code-review of every Go file (~11.5k LOC) + fleetscan.sh +
+> schema.cue. Report: `docs/reviews/2026-11-11_11-42_full-code-review.html`;
+> plan: `docs/planning/2026-11-11_11-45_io-surface-full-code-review-plan.html`.
+> 14 findings fixed on the spot (severity sort, default-dirs split brain,
+> provider manifest-dir invariant, fleetscan silent zero, init sink/error text,
+> --format validation, baseline add --manifest, absorb quote escaping, wrapper
+> helpers, stale comments); gates green after (build/vet/test -race/gofmt/
+> self-check/facts-fresh/inventory-doc/self-lint 0). Unfixed items below.
+
+| #   | Task                                                                                                                                 | Status                 | Impact | Effort | Evidence                                                                                                                                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 157 | fleetscan silent zero-scan: repos without `cmd/`+`internal/` scan as a clean 0 (project-discovery-sdk artifact)                      | ✅ `DONE` (2026-11-11) | Med    | 30min  | `scripts/fleetscan.sh` now rescans with `--dirs .` when NEITHER default dir exists on disk and records per-repo `dirs`; 3-repo rerun: SDK 62 sites / 37 findings, others unchanged |
+| 158 | `emit.positionOf`: an empty location anchors SARIF at the pseudo-file `io-surface` (RuleMissingLocation) — decide the honest shape   | 🔴 `TODO`              | Low    | 15min  | `internal/emit/emit.go:109` anchors empty locations at `finding.FilePath(ToolName)`; go-finding's empty-path contract unverified                  |
+| 159 | lint face prints findings in walk order; check sorts strongest-first — align lint's presentation (re-pins lint goldens deliberately) | 🔴 `TODO`              | Low    | 30min  | `lint.Run` appends in observation order; `check.Run` sorts via `sortFindings` (severity rank, fixed in this review)                                 |
+| 160 | `extract.RuleDef.Severity` is a raw string: a registry typo silently degrades to info in `lint.severityOf` — make it a typed enum    | 🔴 `TODO`              | Low    | 30min  | `detectorRules` literals + `lint.severityOf` default branch; registry API change (owner call), zero fleet impact while all rules ship info         |
+
 ## Remainder plan (harvested 2026-11-08, superb-remainder plan)
 
 > Source: pareto plan remainder M13.2–M24 + execution report

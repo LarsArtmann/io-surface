@@ -14,10 +14,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   info to error, so a repo can adopt teeth for heuristic extraction without
   changing the default — without the flag the weak tier stays advisory
   forever.
+- `baseline add --manifest`: the baseline command now accepts the same
+  `--manifest` flag as every other manifest-reading command instead of being
+  hardwired to the default directory.
+- `fleetscan.sh` rescans a repo with `--dirs .` when neither `cmd/` nor
+  `internal/` exists, so repos whose packages live at the root no longer
+  scan as a silent zero (the project-discovery-sdk artifact, 2026-11-11);
+  the aggregate records the scanned dirs per repo.
 
 ### Fixed
 
-- Nothing yet.
+- `check` report ordering is now strongest-first (error, warning, info).
+  The sort previously compared severity strings lexically, which buries
+  warnings under infos (`"error" < "info" < "warning"`).
+- `--format` validates its value: an unknown format (e.g. `--format yaml`)
+  errors with the valid set instead of silently rendering text.
+- `init`'s "no I/O sites found" error names the dirs actually scanned
+  (respecting `--dirs`) instead of always claiming `cmd`/`internal`, and its
+  success output goes through the same output sink as every other command.
+- The BuildFlow provider reads the manifest directory from
+  `manifest.Dir` (the single source) instead of a hardcoded copy.
+- `absorb`'s CUE rendering escapes string values, so an `--engine-version`
+  containing a quote can no longer produce invalid CUE.
 
 ## [0.5.1] - 2026-11-08
 
