@@ -169,6 +169,9 @@ filters on `commit:`/`date:` are structural, do not remove them.
   doctor` names the delta.
 - A `nix-checker` "vendorHash may be stale" finding can be mtime noise
   (go.sum rewritten with unchanged content) — prove with `nix build .#`.
+  A step's ERROR findings can also persist in BuildFlow's result cache after
+  you fix them — re-verify with `BUILDFLOW_NO_RESULT_CACHE=1` or
+  `--no-result-cache-for <tool>` before debugging further.
 - docs-gates: BuildFlow findings name INTERNAL gate names ("docs gate
   audit-all is red"), not CLI verbs. Archive ritual when cadence is red:
   verify rows struck/routed, prepend a `> **Live remainder:**` banner,
