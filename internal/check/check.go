@@ -309,18 +309,25 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 		}
 	}
 
-	sort.SliceStable(rep.Findings, func(i, j int) bool {
-		if si, sj := rep.Findings[i].Severity.rank(), rep.Findings[j].Severity.rank(); si != sj {
-			return si < sj
-		}
-		if rep.Findings[i].Rule != rep.Findings[j].Rule {
-			return rep.Findings[i].Rule < rep.Findings[j].Rule
-		}
-
-		return rep.Findings[i].ID < rep.Findings[j].ID
-	})
+	sortFindings(rep.Findings)
 
 	return rep, nil
+}
+
+// sortFindings orders findings strongest-first (severity rank), then rule,
+// then ID, insertion-stable within ties — the deterministic presentation
+// contract for every consumer (text, JSON, SARIF).
+func sortFindings(fs []Finding) {
+	sort.SliceStable(fs, func(i, j int) bool {
+		if si, sj := fs[i].Severity.rank(), fs[j].Severity.rank(); si != sj {
+			return si < sj
+		}
+		if fs[i].Rule != fs[j].Rule {
+			return fs[i].Rule < fs[j].Rule
+		}
+
+		return fs[i].ID < fs[j].ID
+	})
 }
 
 // shadowCapabilities emits one info per package whose DIRECT reachability

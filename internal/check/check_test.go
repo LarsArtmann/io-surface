@@ -149,3 +149,24 @@ func runFixture(t *testing.T, m *manifest.Manifest, opts Options) *Report {
 
 	return rep
 }
+
+// TestSortFindings_StrongestFirst pins the presentation contract: errors
+// before warnings before infos, regardless of insertion order. Lexical
+// severity string order would bury warnings under infos ("error" < "info"
+// < "warning") — the exact regression this guards.
+func TestSortFindings_StrongestFirst(t *testing.T) {
+	fs := []Finding{
+		{Rule: RuleScopeHint, Severity: SeverityInfo, ID: "z"},
+		{Rule: RuleUndeclared, Severity: SeverityError, ID: "a"},
+		{Rule: RuleClaimConflict, Severity: SeverityWarning, ID: "m"},
+		{Rule: RuleScopeHint, Severity: SeverityInfo, ID: "a"},
+		{Rule: RuleClaimConflict, Severity: SeverityWarning, ID: "a"},
+	}
+	sortFindings(fs)
+	want := []Severity{SeverityError, SeverityWarning, SeverityWarning, SeverityInfo, SeverityInfo}
+	for i, f := range fs {
+		if f.Severity != want[i] {
+			t.Fatalf("position %d: got %s, want %s (full order: %v)", i, f.Severity, want[i], fs)
+		}
+	}
+}

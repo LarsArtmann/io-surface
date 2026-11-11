@@ -5,8 +5,8 @@
 package io_surface
 
 audit: {
-	commit: "e8a102b"
-	date:   "2026-11-08"
+	commit: "59e54c5"
+	date:   "2026-11-11"
 	claims: 23
 	method: "io-surface extract (AST, stdlib-only)"
 }
@@ -127,8 +127,8 @@ sites: {
 	}
 	"internal/extract.runExtract": {
 		location: [
-			"internal/extract/tables.go:109",
-			"internal/extract/tables.go:98",
+			"internal/extract/tables.go:103",
+			"internal/extract/tables.go:114",
 		]
 		family: "file-read"
 		facts: {
