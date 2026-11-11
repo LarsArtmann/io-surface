@@ -40,7 +40,7 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 | `version`                                  | 🟢 `FULLY_FUNCTIONAL` | `runVersion` in `commands.go`; `TestVersionJSON`                                     | Prints `io-surface 0.4.0`; `--json` adds commit/date provenance                                                                             |
 | `doctor` / `describe` (cmdguard batteries) | 🟢 `FULLY_FUNCTIONAL` | cmdguard auto-registration at Execute                                                | `doctor` trivially green (no DI checks); `describe` hidden JSON contract                                                                    |
 | Exit-code contract 0/1/2                   | 🟢 `FULLY_FUNCTIONAL` | `exitCode` in `cmd/io-surface/main.go`; `TestExitCode` + e2e in `main_test.go`       | 0 clean, 1 gate findings, 2 usage/internal                                                                                                  |
-| CLI framework — cmdguard v4                | 🟢 `FULLY_FUNCTIONAL` | `cmd/io-surface/main.go` (`newApp`); cmdguard-lint: 0 findings                       | Typed flag structs, batteries, styled help/errors; output contract byte-preserved                                                           |
+| CLI framework — cmdguard v5                | 🟢 `FULLY_FUNCTIONAL` | `cmd/io-surface/main.go` (`newApp`); cmdguard-lint: 0 findings                       | Typed flag structs, batteries, styled help/errors; output contract byte-preserved                                                           |
 
 ## Extraction (`internal/extract`)
 

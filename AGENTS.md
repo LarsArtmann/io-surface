@@ -6,7 +6,7 @@ manifest, and fails the build on I/O nobody documented — AND (since v0.3.0,
 io-bug-radar) a detector layer that finds bad I/O via `io-surface lint`
 (manifestless, exit 0 unless `--enforce`; rules ship at info, promotion is
 evidence-gated). Single Go module (`go 1.27`), four direct dependencies
-(`cuelang.org/go` for the manifest, `cmdguard/v4` for the CLI, `go-finding`
+(`cuelang.org/go` for the manifest, `cmdguard/v5` for the CLI, `go-finding`
 for SARIF, `go-atomic-write` for the tool's own file writes — the gate core
 `internal/extract` itself stays stdlib-only). `flake.nix` (fleet
 `go-standard` module, go 1.27, linux-only) exists since 2026-11-08 — the
