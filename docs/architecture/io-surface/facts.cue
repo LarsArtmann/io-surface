@@ -5,9 +5,9 @@
 package io_surface
 
 audit: {
-	commit: "61b393b-dirty"
+	commit: "dd032ab"
 	date:   "2026-11-11"
-	claims: 23
+	claims: 24
 	method: "io-surface extract (AST, stdlib-only)"
 }
 
@@ -35,7 +35,7 @@ scope: {
 sites: {
 	"cmd/io-surface.applyDoc": {
 		location: [
-			"cmd/io-surface/commands.go:331",
+			"cmd/io-surface/commands.go:330",
 		]
 		family: "file-read"
 		facts: {
@@ -44,8 +44,8 @@ sites: {
 	}
 	"cmd/io-surface.runAbsorb": {
 		location: [
-			"cmd/io-surface/commands.go:228",
-			"cmd/io-surface/commands.go:257",
+			"cmd/io-surface/commands.go:227",
+			"cmd/io-surface/commands.go:256",
 		]
 		family: "file-write"
 		facts: {
@@ -54,7 +54,7 @@ sites: {
 	}
 	"cmd/io-surface.runRender": {
 		location: [
-			"cmd/io-surface/commands.go:307",
+			"cmd/io-surface/commands.go:306",
 		]
 		family: "file-write"
 		facts: {
@@ -63,7 +63,7 @@ sites: {
 	}
 	"cmd/io-surface.writeDocVerified": {
 		location: [
-			"cmd/io-surface/commands.go:316",
+			"cmd/io-surface/commands.go:315",
 		]
 		family: "file-write"
 		facts: {
@@ -168,10 +168,11 @@ sites: {
 			"internal/scaffold/scaffold.go:61",
 			"internal/scaffold/scaffold.go:64",
 			"internal/scaffold/scaffold.go:77",
+			"internal/scaffold/scaffold.go:81",
 		]
 		family: "file-write"
 		facts: {
-			call: ["os.MkdirAll", "os.Stat"]
+			call: ["atomicwrite.WriteWithPerm", "os.MkdirAll", "os.Stat"]
 		}
 	}
 	"internal/scaffold.git": {

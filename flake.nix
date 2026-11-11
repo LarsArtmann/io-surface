@@ -63,6 +63,6 @@
       # prunes the fixture's unresolvable seam import and rewrites the embed
       # import, breaking seam tests and location pins — formatters must not
       # touch testdata. The CI gofmt gate stays whole-tree.
-      perSystem.treefmt.settings.exclude = [ "testdata/**" ];
+      perSystem.treefmt.settings.excludes = [ "**/testdata/**" ];
     };
 }
