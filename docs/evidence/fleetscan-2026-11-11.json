@@ -1,0 +1,41 @@
+{
+ "generatedBy": "scripts/fleetscan.sh (io-surface lint face)",
+ "discovered": 3,
+ "scanned": 3,
+ "scanFailures": [],
+ "reposWithFindings": 2,
+ "findingsByRule": {
+  "io-surface/client-no-timeout": 2,
+  "io-surface/write-non-atomic": 2,
+  "io-surface/io-in-loop": 1
+ },
+ "repos": [
+  {
+   "project": "overview",
+   "path": "/home/lars/projects/overview",
+   "sites": 27,
+   "resolved": 24,
+   "findings": {
+    "io-surface/client-no-timeout": 2,
+    "io-surface/io-in-loop": 1,
+    "io-surface/write-non-atomic": 1
+   }
+  },
+  {
+   "project": "project-discovery-sdk",
+   "path": "/home/lars/projects/project-discovery-sdk",
+   "sites": 0,
+   "resolved": 0,
+   "findings": {}
+  },
+  {
+   "project": "project-discovery-daemon",
+   "path": "/home/lars/projects/project-discovery-daemon",
+   "sites": 11,
+   "resolved": 11,
+   "findings": {
+    "io-surface/write-non-atomic": 1
+   }
+  }
+ ]
+}
