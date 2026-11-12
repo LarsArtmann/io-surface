@@ -46,7 +46,7 @@
         ];
         src = packageSrc;
         subPackages = [ "cmd/io-surface" ];
-        vendorHash = "sha256-uWSnfQ3zxnb+oRe4NNrzC2Ye6cF2itHAK+3P9V5/Jrw=";
+        vendorHash = "sha256-HPggmhV7yPt441HeeIf0WMinA/r2+YrID9tydlBzcsI=";
         # Match the fleet build: vendoring via the module proxy.
         proxyVendor = true;
         enableTestCheck = true;
