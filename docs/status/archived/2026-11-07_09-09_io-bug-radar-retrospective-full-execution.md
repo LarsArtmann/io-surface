@@ -238,7 +238,7 @@ untested; extract to a committed python file with a test).
 **Docs**
 44. README: document the `--enforce` × `criticality: critical` interaction.
 45. README: rule table with FP classes (see 20).
-46. AGENTS.md: add `lint` to the Commands block.
+~~46. AGENTS.md: add `lint` to the Commands block.~~ done (docs-health pass done (verified 2026-11-15: AGENTS.md Commands block line 28 carries `go run ./cmd/io-surface lint --root .` — landed with the detector line))
 47. ROADMAP Theme 2 cross-link for write-non-atomic (planned-but-skipped).
 48. Status report: link the fleet JSON location decision (see 3).
 49. Describe contract: lint already registered; verify `describe --output

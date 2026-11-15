@@ -99,6 +99,12 @@ go run ./cmd/io-surface check --root . --format sarif > "$ARTIFACTS/io-surface.s
 step "emit lint SARIF (artifact-only policy, TODO #61)"
 go run ./cmd/io-surface lint --root . --format sarif > "$ARTIFACTS/io-surface-lint.sarif"
 
+step "docs pointers (AGENTS/README/CONTRIBUTING references resolve)"
+scripts/check-docs-pointers.sh ||
+	fail "a docs/ path referenced by the living docs is missing (list above)" \
+		"AGENTS.md/README.md direct every session; a broken pointer sends readers to a dead file." \
+		"fix the reference in the named living doc (or restore the missing file)"
+
 step "docs gates (pin read from ci.yml)"
 GATES_REV="$(sed -n 's/.*docs-gates@\([0-9a-f]*\).*/\1/p' .github/workflows/ci.yml | head -1)"
 if [[ -z "$GATES_REV" ]]; then

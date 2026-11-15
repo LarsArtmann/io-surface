@@ -103,6 +103,13 @@ jobs:
           path: io-surface-lint.sarif
           if-no-files-found: error
 
+      # Docs pointers: every docs/ path named in AGENTS.md/README.md/
+      # CONTRIBUTING.md must exist — the living docs direct every session,
+      # so their pointers are load-bearing (examples in code fences are
+      # excluded; the script owns that split).
+      - name: Docs pointers resolve
+        run: scripts/check-docs-pointers.sh
+
       # Docs battery: the five doc gates (freshness, audit-all, annotate,
       # routing, cadence) as one standing gate. Pinned to a docs-gates rev so
       # a fleet-side rule change cannot redden this repo silently — bump the

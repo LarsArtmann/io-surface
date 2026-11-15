@@ -219,7 +219,7 @@ the path is asserted today).
 
 **Docs**
 43. README: `--enforce` × `criticality` interaction.
-44. AGENTS.md Commands block: add `lint`.
+~~44. AGENTS.md Commands block: add `lint`.~~ done (docs-health pass done (verified 2026-11-15: AGENTS.md Commands block carries the `io-surface lint` line — landed with the detector line))
 45. ROADMAP Theme 2 cross-link for write-non-atomic.
 46. CHANGELOG v0.3.0 section: state `--enforce` escalation semantics
 precisely (it currently says rules never fail; modulation can escalate).
