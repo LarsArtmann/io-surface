@@ -12,12 +12,14 @@
 package emit
 
 import (
+	"path"
 	"strconv"
 	"strings"
 
 	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
+	"github.com/larsartmann/io-surface/internal/manifest"
 )
 
 // ToolName is the tool identity inside go-finding reports and SARIF output.
@@ -46,7 +48,7 @@ func ToFindings(rep *check.Report) []finding.Finding {
 			ToolName,
 			f.Message,
 			severityOf(f.Severity),
-			positionOf(f.Location),
+			positionOf(f.Rule, f.Location, rep.Enforcement),
 			1.0,
 		)
 		if def, ok := detectorRuleDescription(f.Rule); ok {
@@ -103,10 +105,12 @@ func severityOf(s check.Severity) finding.Severity {
 
 // positionOf parses a repo-relative "path:line" location. Locations without a
 // line (the manifest itself, family-level findings) keep the path with line 0,
-// which go-finding treats as "not set".
-func positionOf(loc string) finding.Position {
+// which go-finding treats as "not set". An entirely empty location (the
+// missing-location rule, scope hints, baseline and validation findings) has
+// no real path:line to anchor — see anchorFor.
+func positionOf(rule, loc, enforcement string) finding.Position {
 	if loc == "" {
-		return finding.Pos(finding.FilePath(ToolName), 0, 0)
+		return finding.Pos(anchorFor(rule, enforcement), 0, 0)
 	}
 	path, line := loc, 0
 	if i := strings.LastIndex(loc, ":"); i >= 0 {
@@ -116,4 +120,24 @@ func positionOf(loc string) finding.Position {
 	}
 
 	return finding.Pos(finding.FilePath(path), line, 0)
+}
+
+// anchorFor decides where a location-less finding anchors in SARIF. An empty
+// artifact URI is not an option: go-finding renders it as uri:"" with a
+// zero region, which SARIF consumers reject, and the old fallback (a
+// pseudo-file named "io-surface") sent clicks nowhere real. The honest
+// anchor is the manifest file where the fix happens: baseline entries are
+// edited in baseline.cue, everything else (a missing location to fill, a
+// dirs-scope hint, a validation failure) is fixed in facts.cue. The lint
+// face has no manifest — its defensive empty-location case (no current
+// detector produces one) keeps the tool-identity pseudo-file.
+func anchorFor(rule, enforcement string) finding.FilePath {
+	if enforcement == "lint" {
+		return finding.FilePath(ToolName)
+	}
+	if rule == check.RuleBaselineUnused || rule == check.RuleBaselineExpired {
+		return finding.FilePath(path.Join(manifest.Dir, "baseline.cue"))
+	}
+
+	return finding.FilePath(path.Join(manifest.Dir, "facts.cue"))
 }

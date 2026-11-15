@@ -107,6 +107,11 @@ func Run(root string, opts Options) (*check.Report, error) {
 		}
 	}
 
+	// Same presentation contract as the gate: strongest-first (severity
+	// rank, then rule, then ID) — the text, JSON and SARIF faces of lint
+	// and check order findings identically.
+	check.SortFindings(rep.Findings)
+
 	return rep, nil
 }
 
@@ -143,11 +148,11 @@ func escalate(s check.Severity) check.Severity {
 	return s
 }
 
-func severityOf(s string) check.Severity {
+func severityOf(s extract.Severity) check.Severity {
 	switch s {
-	case "error":
+	case extract.SeverityError:
 		return check.SeverityError
-	case "warning":
+	case extract.SeverityWarning:
 		return check.SeverityWarning
 	}
 

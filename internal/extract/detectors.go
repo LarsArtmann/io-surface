@@ -27,11 +27,24 @@ type fnDetector struct {
 	run  func(e *extractor, fn *ast.FuncDecl, imports map[string]string, id string) []Observation
 }
 
+// Severity is a detector rule's evidence-gated promotion level. A named
+// type (not a bare string) makes an off-vocabulary registry entry a compile
+// error at the assignment site; the registry-validation test still walks
+// every entry so data-driven construction cannot sneak a value past either.
+// Rules ship at SeverityInfo and move only on fleet evidence (D4).
+type Severity string
+
+const (
+	SeverityInfo    Severity = "info"
+	SeverityWarning Severity = "warning"
+	SeverityError   Severity = "error"
+)
+
 // RuleDef is the published half of the rule contract: the stable name, the
 // current severity, and the finding message builder the lint face uses.
 type RuleDef struct {
 	Name        string
-	Severity    string // "info" until T17 evidence-gated promotion (D4)
+	Severity    Severity // SeverityInfo until T17 evidence-gated promotion (D4)
 	Description string
 	Message     func(o Observation) string
 	// MetadataOnly marks rules emitted directly by machinery (today: the
@@ -66,7 +79,7 @@ var fnDetectors = []fnDetector{
 var detectorRules = []RuleDef{
 	{
 		Name:        RuleErrDropped,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a watched call's error return is discarded",
 		Message: func(o Observation) string {
 			return o.Evidence + " — the error return is unchecked; handle it or ignore deliberately with `_ =`"
@@ -74,7 +87,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleCloserMissing,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a value from a closable constructor is never closed or handed off",
 		Message: func(o Observation) string {
 			return o.Evidence + " — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
@@ -82,7 +95,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleCtxDropped,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a context.Context is in scope but the call uses the context-blind variant",
 		Message: func(o Observation) string {
 			return o.Evidence
@@ -90,7 +103,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleDeferInLoop,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a deferred close or I/O call runs inside a loop but executes at function exit",
 		Message: func(o Observation) string {
 			return o.Evidence
@@ -98,7 +111,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleClientNoTimeout,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "an HTTP client or helper without a timeout",
 		Message: func(o Observation) string {
 			return o.Evidence
@@ -106,7 +119,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleStatThenOpen,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
 		Message: func(o Observation) string {
 			return o.Evidence
@@ -114,7 +127,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleIOInLoop,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a watched I/O call sits inside a loop body (N+1 shape)",
 		Message: func(o Observation) string {
 			return o.Evidence
@@ -122,7 +135,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleWriteNonAtomic,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a direct final-path write without a temp+rename in the same function",
 		Message: func(o Observation) string {
 			return o.Evidence + " — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
@@ -130,7 +143,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleTinyBuffer,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a sub-page buffer feeds a read/write helper (syscall amplification)",
 		Message: func(o Observation) string {
 			return o.Evidence
@@ -138,7 +151,7 @@ var detectorRules = []RuleDef{
 	},
 	{
 		Name:        RuleIgnoreInvalid,
-		Severity:    "info",
+		Severity:    SeverityInfo,
 		Description: "a suppression directive is malformed (unknown rule or missing reason)",
 		Message: func(o Observation) string {
 			return o.Evidence + " — grammar: //io-surface:ignore <rule> <reason…>; " + o.Call + ", so nothing was suppressed"

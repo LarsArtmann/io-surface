@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/larsartmann/io-surface/internal/check"
+	"github.com/larsartmann/io-surface/internal/extract"
 )
 
 // TestRun_FixtureReport pins the package-level contract: the bug fixture
@@ -54,14 +55,16 @@ func TestRun_FixtureReport(t *testing.T) {
 	}
 }
 
-// TestSeverityOf pins the promotion vocabulary mapping.
+// TestSeverityOf pins the promotion vocabulary mapping. Off-vocabulary
+// values (including the empty string) degrade to info — the same default
+// the registry ships at.
 func TestSeverityOf(t *testing.T) {
-	cases := map[string]check.Severity{
-		"error":   check.SeverityError,
-		"warning": check.SeverityWarning,
-		"info":    check.SeverityInfo,
-		"":        check.SeverityInfo,
-		"bogus":   check.SeverityInfo,
+	cases := map[extract.Severity]check.Severity{
+		extract.SeverityError:     check.SeverityError,
+		extract.SeverityWarning:   check.SeverityWarning,
+		extract.SeverityInfo:      check.SeverityInfo,
+		"":                        check.SeverityInfo,
+		extract.Severity("bogus"): check.SeverityInfo,
 	}
 	for in, want := range cases {
 		if got := severityOf(in); got != want {

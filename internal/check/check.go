@@ -314,9 +314,15 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	return rep, nil
 }
 
-// sortFindings orders findings strongest-first (severity rank), then rule,
+// SortFindings orders findings strongest-first (severity rank), then rule,
 // then ID, insertion-stable within ties — the deterministic presentation
-// contract for every consumer (text, JSON, SARIF).
+// contract for every consumer (text, JSON, SARIF). Exported so the lint
+// face presents identically to the gate face.
+func SortFindings(fs []Finding) {
+	sortFindings(fs)
+}
+
+// sortFindings is the internal implementation; see SortFindings.
 func sortFindings(fs []Finding) {
 	sort.SliceStable(fs, func(i, j int) bool {
 		if si, sj := fs[i].Severity.rank(), fs[j].Severity.rank(); si != sj {
