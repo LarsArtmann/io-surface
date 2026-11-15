@@ -134,5 +134,22 @@ the durability modulation, and the first ignore-directive suppression counts
 (the self-tree carries 2+). When it runs, refresh the N/FP columns above and
 re-sample FP classes N ≥ 30 per §7 before any promotion decision.
 
+**Re-scan RUN (2026-11-15, v0.5.1 binary — `docs/evidence/fleetscan-2026-11-15.json`):**
+170 repos scanned (fleet grew 160 → 170), 115 with findings (was 91; the #157
+`--dirs .` silent-zero fix unlocked previously unscanned root-package repos).
+Volumes (vs 2026-11-07): write-non-atomic 340 → **412** (76 → 99 repos),
+io-in-loop 351 → **320** across MORE repos (62 → 67 — per-repo density down;
+the T16 refinement held as the fleet grew), stat-then-open 50 → **71**
+(29 → 40), err-dropped 11 → **28** (17 of 28 concentrate in `template-readme`
+— a cluster, not a fleet trend), client-no-timeout 13 → 12, ctx-dropped 3 → 5,
+defer-in-loop 1 → 1. The FP columns in the ledger above are still the
+2026-11-07 samples — this run refreshes N/volume only; a §7-compliant N ≥ 30
+re-sample per rule is owed before any severity decision. **Verdict: nothing
+promotes** — the D4 bar (FP ≈ 0) is unmet by every rule and the volume trends
+move away from it, not toward it. Scan-hygiene note: `discordsync` and
+`DiscordSync` appear as two discovery entries with identical site counts
+(294) — verify whether pma double-lists a case-variant path before the next
+run treats them as distinct repos.
+
 The ledger is updated by every evidence run. It is the single table the owner
 reads to see whether anything _could_ promote.
