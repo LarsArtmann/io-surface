@@ -34,14 +34,14 @@ func TestRegenInventory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("read %s: %v", docPath, err)
 	}
-	applied, err := ApplyToDoc(string(raw), m)
+	applied, err := ApplyToDoc(string(raw), Block(m))
 	if err != nil {
 		t.Fatalf("apply to doc: %v", err)
 	}
 	if err := os.WriteFile(docPath, []byte(applied), 0o644); err != nil {
 		t.Fatalf("write %s: %v", docPath, err)
 	}
-	stored, fresh, err := CheckDoc(applied, m)
+	stored, fresh, err := CheckDoc(applied, Block(m))
 	if err != nil || stored != fresh {
 		t.Fatalf("regen did not converge (err=%v)", err)
 	}

@@ -19,7 +19,7 @@ More hand-written prose after the block.
 `
 
 func TestApplyToDoc_ReplacesOnlyInsideBlock(t *testing.T) {
-	got, err := ApplyToDoc(proseDoc, fixtureManifest())
+	got, err := ApplyToDoc(proseDoc, Block(fixtureManifest()))
 	if err != nil {
 		t.Fatalf("ApplyToDoc: %v", err)
 	}
@@ -46,11 +46,11 @@ func TestApplyToDoc_ReplacesOnlyInsideBlock(t *testing.T) {
 }
 
 func TestApplyToDoc_Idempotent(t *testing.T) {
-	once, err := ApplyToDoc(proseDoc, fixtureManifest())
+	once, err := ApplyToDoc(proseDoc, Block(fixtureManifest()))
 	if err != nil {
 		t.Fatalf("first apply: %v", err)
 	}
-	twice, err := ApplyToDoc(once, fixtureManifest())
+	twice, err := ApplyToDoc(once, Block(fixtureManifest()))
 	if err != nil {
 		t.Fatalf("second apply: %v", err)
 	}
@@ -71,7 +71,7 @@ func TestApplyToDoc_Errors(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if _, err := ApplyToDoc(tc.doc, fixtureManifest()); err == nil {
+			if _, err := ApplyToDoc(tc.doc, Block(fixtureManifest())); err == nil {
 				t.Errorf("expected error for %s", tc.name)
 			}
 		})
@@ -79,11 +79,11 @@ func TestApplyToDoc_Errors(t *testing.T) {
 }
 
 func TestCheckDoc_FreshAndStale(t *testing.T) {
-	fresh, err := ApplyToDoc(proseDoc, fixtureManifest())
+	fresh, err := ApplyToDoc(proseDoc, Block(fixtureManifest()))
 	if err != nil {
 		t.Fatalf("apply: %v", err)
 	}
-	stored, want, err := CheckDoc(fresh, fixtureManifest())
+	stored, want, err := CheckDoc(fresh, Block(fixtureManifest()))
 	if err != nil {
 		t.Fatalf("check fresh: %v", err)
 	}
@@ -92,7 +92,7 @@ func TestCheckDoc_FreshAndStale(t *testing.T) {
 	}
 
 	stale := strings.Replace(fresh, "process start", "CHANGED", 1)
-	stored, want, err = CheckDoc(stale, fixtureManifest())
+	stored, want, err = CheckDoc(stale, Block(fixtureManifest()))
 	if err != nil {
 		t.Fatalf("check stale: %v", err)
 	}

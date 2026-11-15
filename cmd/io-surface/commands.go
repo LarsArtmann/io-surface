@@ -86,6 +86,7 @@ type renderFlags struct {
 	Out      string `flag:"out" help:"write to FILE instead of stdout"`
 	Doc      string `flag:"doc" help:"apply the inventory into FILE between the io-surface markers (in place, prose preserved)"`
 	Check    bool   `flag:"check" help:"with --doc: report drift instead of rewriting (exit 1 when the block is stale)"`
+	Lint     bool   `flag:"lint" help:"append the lint radar (detector findings) as an appendix — repeat the same flags on --check"`
 }
 
 type extractFlags struct {
@@ -292,11 +293,33 @@ func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
 		return err
 	}
 
+	lintOpts := lint.Options{
+		Dirs:     parseDirs(root.Dirs),
+		Ignore:   parseGlobs(root.Ignore),
+		Manifest: manifestDir(root.Root, flags.Manifest),
+	}
+
 	if flags.Doc != "" {
-		return applyDoc(flags.Doc, m, flags.Check)
+		block := render.Block(m)
+		if flags.Lint {
+			section, lErr := lintSection(root.Root, lintOpts)
+			if lErr != nil {
+				return lErr
+			}
+			block += section
+		}
+
+		return applyDoc(flags.Doc, block, flags.Check)
 	}
 
 	docStr := render.Markdown(m)
+	if flags.Lint {
+		section, lErr := lintSection(root.Root, lintOpts)
+		if lErr != nil {
+			return lErr
+		}
+		docStr += section
+	}
 	if flags.Out == "" {
 		_, _ = fmt.Fprint(stdout, docStr)
 
@@ -304,6 +327,18 @@ func runRender(_ context.Context, root *rootFlags, flags renderFlags) error {
 	}
 
 	return atomicwrite.WriteWithPerm(flags.Out, []byte(docStr), 0o644)
+}
+
+// lintSection runs the detector radar for the render appendix. The report
+// arrives sorted (severity, then rule, then ID), so the rendered section is
+// deterministic.
+func lintSection(root string, opts lint.Options) (string, error) {
+	rep, err := lint.Run(root, opts)
+	if err != nil {
+		return "", err
+	}
+
+	return render.LintSection(rep), nil
 }
 
 // writeDocVerified is the doc seam's read-modify-write commit: it writes the
@@ -326,14 +361,14 @@ func writeDocVerified(path string, updated []byte, fp atomicwrite.Fingerprint) e
 // applyDoc is the doc-embedding path: rewrite the block in place, or verify
 // it when checking. Drift names the divergence so the author knows WHAT went
 // stale, and the fix hint names the exact command.
-func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
+func applyDoc(path, block string, checkOnly bool) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
 	fp := atomicwrite.FingerprintFromBytes(data)
 	if checkOnly {
-		stored, fresh, err := render.CheckDoc(string(data), m)
+		stored, fresh, err := render.CheckDoc(string(data), block)
 		if err != nil {
 			return err
 		}
@@ -359,7 +394,7 @@ func applyDoc(path string, m *manifest.Manifest, checkOnly bool) error {
 
 		return errFindings
 	}
-	updated, err := render.ApplyToDoc(string(data), m)
+	updated, err := render.ApplyToDoc(string(data), block)
 	if err != nil {
 		return err
 	}

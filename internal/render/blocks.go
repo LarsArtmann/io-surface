@@ -23,29 +23,34 @@ func Block(m *manifest.Manifest) string {
 	return sections(m)
 }
 
-// ApplyToDoc replaces the content between the doc markers in doc with a fresh
-// render of m and returns the updated document. The prose outside the markers
-// is preserved byte-for-byte. An absent, unbalanced, or duplicated marker
-// pair is an error: guessing where generated content belongs is how
-// generators eat hand-written documents.
-func ApplyToDoc(doc string, m *manifest.Manifest) (string, error) {
+// ApplyToDoc replaces the content between the doc markers in doc with block
+// (the caller-composed fresh block content, markers excluded) and returns the
+// updated document. The prose outside the markers is preserved byte-for-byte.
+// An absent, unbalanced, or duplicated marker pair is an error: guessing where
+// generated content belongs is how generators eat hand-written documents.
+//
+// The API takes rendered content, not a manifest: the caller decides which
+// faces the doc carries (gate sections alone, or plus the lint-radar
+// appendix), and the splice stays a single responsibility.
+func ApplyToDoc(doc, block string) (string, error) {
 	start, end, err := docBlock(doc)
 	if err != nil {
 		return "", err
 	}
 
-	return doc[:start] + BeginMarker + "\n\n" + Block(m) + doc[end:], nil
+	return doc[:start] + BeginMarker + "\n\n" + block + doc[end:], nil
 }
 
-// CheckDoc reports whether the generated block in doc matches a fresh render
-// of m, returning the stored block and the fresh block for diagnostics.
-func CheckDoc(doc string, m *manifest.Manifest) (stored, fresh string, err error) {
+// CheckDoc reports whether the generated block in doc matches the fresh block
+// the caller composed, returning the stored block and the fresh block for
+// diagnostics.
+func CheckDoc(doc, block string) (stored, fresh string, err error) {
 	start, end, err := docBlock(doc)
 	if err != nil {
 		return "", "", err
 	}
 	stored = strings.Trim(doc[start+len(BeginMarker):end], "\n")
-	fresh = strings.Trim(Block(m), "\n")
+	fresh = strings.Trim(block, "\n")
 
 	return stored, fresh, nil
 }
