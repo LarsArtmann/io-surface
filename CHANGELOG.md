@@ -25,6 +25,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   scan as a silent zero (the project-discovery-sdk artifact, 2026-11-11);
   the aggregate records the scanned dirs per repo.
 
+### Changed
+
+- `lint` findings now print strongest-first (severity rank, then rule, then
+  ID) — the same presentation contract as `check`, so the text, JSON and
+  SARIF faces of both commands order findings identically. The lint goldens
+  are re-pinned to the new order (deliberate, reviewed).
+- SARIF: location-less gate findings (`missing-location`, `scope-hint`,
+  baseline lifecycle, `manifest-validation`) anchor at the manifest file
+  where the fix happens (`facts.cue`, or `baseline.cue` for baseline rules)
+  instead of a pseudo-file named `io-surface`; a SARIF consumer's click now
+  lands somewhere real. The lint face keeps the tool pseudo-file for its
+  defensive empty-location case (no current detector produces one).
+
 ### Fixed
 
 - `check` report ordering is now strongest-first (error, warning, info).
