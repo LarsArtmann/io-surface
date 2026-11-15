@@ -11,19 +11,19 @@
       },
       "results": [
         {
-          "ruleId": "io-surface/ctx-dropped",
+          "ruleId": "io-surface/client-no-timeout",
           "level": "note",
           "message": {
-            "text": "exec.Command(\"git\", \"status\") — the enclosing function takes a context.Context; prefer exec.CommandContext"
+            "text": "http.Client{Transport: http.DefaultTransport} — no Timeout field; a hung server hangs this client forever"
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "cmd/app/ctx.go"
+                  "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 14,
+                  "startLine": 73,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -35,9 +35,425 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:14",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:73",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a context.Context is in scope but the call uses the context-blind variant",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Client{} — no Timeout field; a hung server hangs this client forever"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 69,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:69",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:33",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Post(url, \"application/json\", nil) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 81,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:81",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 62,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:62",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:11",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 47,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:47",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(\"https://host.test/x\") — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/ctx.go"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/ctx.go:34",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:21",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/client-no-timeout",
+          "level": "note",
+          "message": {
+            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 58,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:58",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:11",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/http.go"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:21",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "internal/store/closers.go"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:11",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/closer-missing",
+          "level": "note",
+          "message": {
+            "text": "f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "internal/store/closers.go"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:21",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -107,10 +523,10 @@
           }
         },
         {
-          "ruleId": "io-surface/client-no-timeout",
+          "ruleId": "io-surface/ctx-dropped",
           "level": "note",
           "message": {
-            "text": "http.Get(\"https://host.test/x\") — the default client has no timeout; use a client with Timeout set (or a request with context)"
+            "text": "exec.Command(\"git\", \"status\") — the enclosing function takes a context.Context; prefer exec.CommandContext"
           },
           "locations": [
             {
@@ -119,7 +535,7 @@
                   "uri": "cmd/app/ctx.go"
                 },
                 "region": {
-                  "startLine": 34,
+                  "startLine": 14,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -131,9 +547,9 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/ctx.go:34",
+            "go-finding/id": "io-surface:io-surface/ctx-dropped:cmd/app/ctx.go:14",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/meta/ruleDescription": "a context.Context is in scope but the call uses the context-blind variant",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -171,358 +587,6 @@
           }
         },
         {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 11,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:11",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/closer-missing",
-          "level": "note",
-          "message": {
-            "text": "resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 11,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:11",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 21,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:21",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/closer-missing",
-          "level": "note",
-          "message": {
-            "text": "resp, err := http.Get(url) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 21,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/closer-missing:cmd/app/http.go:21",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 33,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:33",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 47,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:47",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 58,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:58",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Get(url) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/http.go"
-                },
-                "region": {
-                  "startLine": 62,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/http.go:62",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/io-in-loop",
-          "level": "note",
-          "message": {
-            "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 116,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:116",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/tiny-buffer",
-          "level": "note",
-          "message": {
-            "text": "buf = make([]byte, 512) feeds io.ReadFull — 512-byte reads amplify syscalls; size to >= 4096 (or use bufio.Scanner)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 116,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/tiny-buffer:cmd/app/loops.go:116",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a sub-page buffer feeds a read/write helper (syscall amplification)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/io-in-loop",
-          "level": "note",
-          "message": {
-            "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 136,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:136",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
           "ruleId": "io-surface/defer-in-loop",
           "level": "note",
           "message": {
@@ -550,134 +614,6 @@
             "go-finding/id": "io-surface:io-surface/defer-in-loop:cmd/app/loops.go:17",
             "go-finding/meta/enforcement": "lint",
             "go-finding/meta/ruleDescription": "a deferred close or I/O call runs inside a loop but executes at function exit",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/err-dropped",
-          "level": "note",
-          "message": {
-            "text": "data, _ := os.ReadFile(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 175,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:175",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/io-in-loop",
-          "level": "note",
-          "message": {
-            "text": "os.ReadFile(path) — I/O inside a loop (N+1 shape); consider hoisting or batching"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 175,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:175",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/io-in-loop",
-          "level": "note",
-          "message": {
-            "text": "os.Stat(path) — I/O inside a loop (N+1 shape); consider hoisting or batching"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 176,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:176",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/err-dropped",
-          "level": "note",
-          "message": {
-            "text": "data, _ := os.ReadFile(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 183,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:183",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -747,10 +683,10 @@
           }
         },
         {
-          "ruleId": "io-surface/stat-then-open",
+          "ruleId": "io-surface/err-dropped",
           "level": "note",
           "message": {
-            "text": "os.ReadFile of path (stat'd at cmd/app/loops.go:42) — double syscall and a TOCTOU window; open and handle the error instead"
+            "text": "data, _ := os.ReadFile(p) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
           },
           "locations": [
             {
@@ -759,7 +695,7 @@
                   "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 46,
+                  "startLine": 183,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -771,169 +707,9 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:46",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:183",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/stat-then-open",
-          "level": "note",
-          "message": {
-            "text": "os.WriteFile of path (stat'd at cmd/app/loops.go:50) — double syscall and a TOCTOU window; open and handle the error instead"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 57,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:57",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/write-non-atomic",
-          "level": "note",
-          "message": {
-            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 57,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/loops.go:57",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Client{} — no Timeout field; a hung server hangs this client forever"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 69,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:69",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Client{Transport: http.DefaultTransport} — no Timeout field; a hung server hangs this client forever"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 73,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:73",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
-          "ruleId": "io-surface/client-no-timeout",
-          "level": "note",
-          "message": {
-            "text": "http.Post(url, \"application/json\", nil) — the default client has no timeout; use a client with Timeout set (or a request with context)"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/loops.go"
-                },
-                "region": {
-                  "startLine": 81,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/client-no-timeout:cmd/app/loops.go:81",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "an HTTP client or helper without a timeout",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1035,19 +811,19 @@
           }
         },
         {
-          "ruleId": "io-surface/write-non-atomic",
+          "ruleId": "io-surface/err-dropped",
           "level": "note",
           "message": {
-            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "cmd/app/main.go"
+                  "uri": "cmd/app/suppress.go"
                 },
                 "region": {
-                  "startLine": 56,
+                  "startLine": 35,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -1059,9 +835,73 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/main.go:56",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:35",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "data, _ := os.ReadFile(path) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 175,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/loops.go:175",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/err-dropped",
+          "level": "note",
+          "message": {
+            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/suppress.go"
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:40",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
@@ -1131,38 +971,6 @@
           }
         },
         {
-          "ruleId": "io-surface/err-dropped",
-          "level": "note",
-          "message": {
-            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "cmd/app/suppress.go"
-                },
-                "region": {
-                  "startLine": 35,
-                  "startColumn": 0,
-                  "endLine": 0,
-                  "endColumn": 0
-                }
-              }
-            }
-          ],
-          "rank": 100,
-          "properties": {
-            "go-finding/confidence": 1,
-            "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:35",
-            "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
-            "go-finding/severity": "info",
-            "go-finding/toolName": "io-surface"
-          }
-        },
-        {
           "ruleId": "io-surface/ignore-invalid",
           "level": "note",
           "message": {
@@ -1195,19 +1003,19 @@
           }
         },
         {
-          "ruleId": "io-surface/err-dropped",
+          "ruleId": "io-surface/io-in-loop",
           "level": "note",
           "message": {
-            "text": "os.Remove(path) (results discarded) — the error return is unchecked; handle it or ignore deliberately with `_ =`"
+            "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "cmd/app/suppress.go"
+                  "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 40,
+                  "startLine": 136,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -1219,27 +1027,27 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/err-dropped:cmd/app/suppress.go:40",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:136",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a watched call's error return is discarded",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
         },
         {
-          "ruleId": "io-surface/closer-missing",
+          "ruleId": "io-surface/io-in-loop",
           "level": "note",
           "message": {
-            "text": "f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+            "text": "os.ReadFile(path) — I/O inside a loop (N+1 shape); consider hoisting or batching"
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "internal/store/closers.go"
+                  "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 11,
+                  "startLine": 175,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -1251,27 +1059,27 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:11",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:175",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }
         },
         {
-          "ruleId": "io-surface/closer-missing",
+          "ruleId": "io-surface/io-in-loop",
           "level": "note",
           "message": {
-            "text": "f, err := os.Open(path) — nothing closes it in this function; add `defer <name>.Close()` or hand off ownership"
+            "text": "os.Stat(path) — I/O inside a loop (N+1 shape); consider hoisting or batching"
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "internal/store/closers.go"
+                  "uri": "cmd/app/loops.go"
                 },
                 "region": {
-                  "startLine": 21,
+                  "startLine": 176,
                   "startColumn": 0,
                   "endLine": 0,
                   "endColumn": 0
@@ -1283,9 +1091,201 @@
           "properties": {
             "go-finding/confidence": 1,
             "go-finding/fixStrategy": "none",
-            "go-finding/id": "io-surface:io-surface/closer-missing:internal/store/closers.go:21",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:176",
             "go-finding/meta/enforcement": "lint",
-            "go-finding/meta/ruleDescription": "a value from a closable constructor is never closed or handed off",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/io-in-loop",
+          "level": "note",
+          "message": {
+            "text": "io.ReadFull(f, buf) — I/O inside a loop (N+1 shape); consider hoisting or batching"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 116,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/io-in-loop:cmd/app/loops.go:116",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a watched I/O call sits inside a loop body (N+1 shape)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/stat-then-open",
+          "level": "note",
+          "message": {
+            "text": "os.WriteFile of path (stat'd at cmd/app/loops.go:50) — double syscall and a TOCTOU window; open and handle the error instead"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:57",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/stat-then-open",
+          "level": "note",
+          "message": {
+            "text": "os.ReadFile of path (stat'd at cmd/app/loops.go:42) — double syscall and a TOCTOU window; open and handle the error instead"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 46,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/stat-then-open:cmd/app/loops.go:46",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "the same path expression is stat'd and then opened (double syscall, TOCTOU)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/tiny-buffer",
+          "level": "note",
+          "message": {
+            "text": "buf = make([]byte, 512) feeds io.ReadFull — 512-byte reads amplify syscalls; size to >= 4096 (or use bufio.Scanner)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 116,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/tiny-buffer:cmd/app/loops.go:116",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a sub-page buffer feeds a read/write helper (syscall amplification)",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/write-non-atomic",
+          "level": "note",
+          "message": {
+            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/main.go"
+                },
+                "region": {
+                  "startLine": 56,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/main.go:56",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
+            "go-finding/severity": "info",
+            "go-finding/toolName": "io-surface"
+          }
+        },
+        {
+          "ruleId": "io-surface/write-non-atomic",
+          "level": "note",
+          "message": {
+            "text": "os.WriteFile(path, data, 0o644) — direct final-path write without a temp+rename in this function; a crash mid-write tears the file — a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "cmd/app/loops.go"
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 0,
+                  "endLine": 0,
+                  "endColumn": 0
+                }
+              }
+            }
+          ],
+          "rank": 100,
+          "properties": {
+            "go-finding/confidence": 1,
+            "go-finding/fixStrategy": "none",
+            "go-finding/id": "io-surface:io-surface/write-non-atomic:cmd/app/loops.go:57",
+            "go-finding/meta/enforcement": "lint",
+            "go-finding/meta/ruleDescription": "a direct final-path write without a temp+rename in the same function",
             "go-finding/severity": "info",
             "go-finding/toolName": "io-surface"
           }

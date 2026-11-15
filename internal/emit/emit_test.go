@@ -4,8 +4,10 @@ import (
 	"encoding/json/v2"
 	"testing"
 
+	"github.com/larsartmann/go-finding"
 	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
+	"github.com/larsartmann/io-surface/internal/extract"
 )
 
 func sampleReport() *check.Report {
@@ -254,5 +256,44 @@ func TestSARIF_CapabilityRuleIDsFlowByteStable(t *testing.T) {
 	}
 	if !got[check.RuleShadowCapability] || !got[absorb.RuleCapabilityDrift] {
 		t.Errorf("capability ruleIds must pass through unchanged, got %v", got)
+	}
+}
+
+// TestAnchorFor pins the honest-shape decision for location-less findings
+// (TODO #158): a SARIF consumer's click must land in the file where the fix
+// happens, never at a pseudo-file or an empty URI (which go-finding renders
+// as uri:"" with a zero region — invalid SARIF).
+func TestAnchorFor(t *testing.T) {
+	cases := []struct {
+		rule        string
+		enforcement string
+		want        string
+	}{
+		{check.RuleMissingLocation, "gate", "docs/architecture/io-surface/facts.cue"},
+		{check.RuleScopeHint, "audit", "docs/architecture/io-surface/facts.cue"},
+		{check.RuleManifestValidation, "gate", "docs/architecture/io-surface/facts.cue"},
+		{check.RuleBaselineUnused, "gate", "docs/architecture/io-surface/baseline.cue"},
+		{check.RuleBaselineExpired, "gate", "docs/architecture/io-surface/baseline.cue"},
+		{extract.RuleErrDropped, "lint", "io-surface"},
+	}
+	for _, tc := range cases {
+		if got := string(anchorFor(tc.rule, tc.enforcement)); got != tc.want {
+			t.Errorf("anchorFor(%q, %q) = %q, want %q", tc.rule, tc.enforcement, got, tc.want)
+		}
+	}
+}
+
+// TestPositionOf_EmptyLocationGateFace pins the end-to-end anchor choice:
+// a gate-face finding with no location carries the manifest anchor, a
+// lint-face finding keeps the tool pseudo-file.
+func TestPositionOf_EmptyLocationGateFace(t *testing.T) {
+	got := positionOf(check.RuleMissingLocation, "", "gate").File
+	if want := finding.FilePath("docs/architecture/io-surface/facts.cue"); got != want {
+		t.Errorf("gate-face empty location anchored at %q, want %q", got, want)
+	}
+
+	got = positionOf(extract.RuleErrDropped, "", "lint").File
+	if want := finding.FilePath("io-surface"); got != want {
+		t.Errorf("lint-face empty location anchored at %q, want %q", got, want)
 	}
 }
