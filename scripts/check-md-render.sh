@@ -44,7 +44,7 @@ PYEOF
 	while IFS=: read -r ln ref; do
 		path_part=$(printf '%s' "$ref" | sed -E 's/^!\[[^]]*\]\(([^)]+)\).*/\1/')
 		case "$path_part" in
-			http://*|https://*|#*) : ;;  # remote or anchor: recorded, not fetched
+			http://*|https://*|'#'*) : ;;  # remote or anchor: recorded, not fetched
 			*)
 				if [[ ! -e "$(dirname "$f")/$path_part" && ! -e "$path_part" ]]; then
 					echo "BADGE-UNRESOLVED: $f:$ln $path_part"
