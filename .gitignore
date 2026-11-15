@@ -68,3 +68,6 @@ result-*
 /bin/
 # nix build output link (the daemon committed a 35MB binary once already)
 /result
+
+## docs-gates pre-flight land-parity ledger (local editor state, never shared)
+.docs-gates-preflight.json

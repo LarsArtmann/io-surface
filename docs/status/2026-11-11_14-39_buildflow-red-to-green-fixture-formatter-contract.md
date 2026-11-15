@@ -225,8 +225,8 @@ verdict (or pin the exclusion with rationale).
 "stale target" warning.
 17. Resolve the push question (see §g-Q1) — 14 local daemon commits, CI runs
 on GitHub only after push.
-18. docs-health HARVEST: route this report's §f items into
-TODO_LIST/ROADMAP (the skill mandates it once the session continues).
+18. ~~docs-health HARVEST: route this report's §f items into~~ done (docs-health pass 2026-11-15)
+~~TODO_LIST/ROADMAP (the skill mandates it once the session continues).~~
 19. Give the 16 archived reports per-report tailored Live-remainder banners
 (docs-health ANNOTATE rigor).
 20. Update CONTRIBUTING.md — it advertises golangci-lint, which is
