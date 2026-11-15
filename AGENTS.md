@@ -188,7 +188,11 @@ filters on `commit:`/`date:` are structural, do not remove them.
 - Fleet evidence: FP classes, T17 verdicts (nothing promoted — D4 bar is
   FP≈0) and pilot retro live in
   `docs/status/archived/2026-11-07_08-08_io-bug-radar-*.md`; reproduce via
-  `./scripts/fleetscan.sh` (outputs in `docs/evidence/`, never /tmp).
+  `./scripts/fleetscan.sh` (outputs in `docs/evidence/`, never /tmp — the
+  `fleetscan-*.json` artifacts and `portfolio-io-insights.html` are
+  GITIGNORED: they carry absolute `/home/lars/...` paths and 160-220 local
+  project names, and the `github` remote is a public mirror. Commit
+  provenance in `docs/evidence/README.md`, never the JSON).
 
 ## Conventions
 

@@ -71,3 +71,9 @@ result-*
 
 ## docs-gates pre-flight land-parity ledger (local editor state, never shared)
 .docs-gates-preflight.json
+
+## Private fleet artifacts: absolute /home/lars paths + 160-220 local project
+## names. Regenerate locally with scripts/fleetscan.sh; never commit (the
+## GitHub remote is a public mirror).
+/docs/evidence/fleetscan-*.json
+/portfolio-io-insights.html

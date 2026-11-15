@@ -14,6 +14,12 @@ tiny-buffer 0.
 Policy: every fleet-scanned number cited anywhere in the repo must live here
 (or be re-derivable by the named command). /tmp is not evidence.
 
+Privacy: the `fleetscan-*.json` artifacts themselves are gitignored. They
+carry absolute `/home/lars/projects/...` paths and 160+ local project names,
+and the GitHub remote is a public mirror. The committed record is this file
+(provenance + aggregate numbers), not the JSON; regenerate locally with the
+command named per entry.
+
 fleetscan-2026-11-07-t16-refined.json
 Produced by: `./scripts/fleetscan.sh docs/evidence/fleetscan-2026-11-07-t16-refined.json`
 (post-T16 same-path refinement). io-in-loop 351 -> 248 (-103, the per-item
