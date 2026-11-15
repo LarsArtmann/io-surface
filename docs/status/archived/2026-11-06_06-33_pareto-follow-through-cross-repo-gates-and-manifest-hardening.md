@@ -104,7 +104,7 @@ _(Ranked by impact; the first ~15 are TODO_LIST carry-overs with owner-verified 
 4. **#19b extraction families**: `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio.NewReader/NewWriter`, `http.ServeContent` (+ facts regen + INVENTORY).
 5. **#48 cut v0.1.1** — the P0 criteria landed (#2-#6 + today's rules); go-release flow, re-tag discipline.
 6. **#23 schema version field** (`version: "io-surface/v1"`) — pairs with v0.1.1; also guards the new optional baseline fields.
-7. **#14 enforcement policy field** (D4) — a repo cannot silently opt out.
+~~7. **#14 enforcement policy field** (D4) — a repo cannot silently opt out.~~ done (docs-health pass done 2026-11-15: SHIPPED — facts.cue carries enforcement: "gate"|"audit"; the gate demotes errors under audit; --enforce overrides for one run (README: The manifest))
 8. **#22 `io-surface baseline add <id> --note --date`** — stop hand-editing CUE; also the natural place to prompt for `owner`/`expires` (today's #8).
 9. **#24 `--ignore` globs** for generated code (`*_templ.go`, `zz_generated*`).
 10. **#27 dnsblockd reverse mode** in `check-io-surface.sh` + Nix check wiring + retire `tools/io-extract` (lock free).
