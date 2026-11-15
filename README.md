@@ -422,6 +422,16 @@ appends a note+date entry surgically).
 ## Development
 
 ```bash
+scripts/self-gate.sh   # the whole ci.yml test job, locally, one command — run before pushing
+```
+
+The script mirrors CI step for step (build, vet, `go test -race`, gofmt,
+self-check, facts freshness, self-render, inventory-doc freshness, dprint
+parity, SARIF emits, docs-gates) and reads the docs-gates pin from
+`ci.yml` at runtime, so it can never drift from what CI enforces. The
+individual stages:
+
+```bash
 go build ./...
 go test ./...
 go vet ./...

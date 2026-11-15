@@ -18,6 +18,7 @@ agents working ON the tool.
 ## Commands
 
 ```bash
+scripts/self-gate.sh                    # THE WHOLE ci.yml test job locally — run before pushing
 go build ./...                          # build
 go vet ./...                            # vet
 go test ./...                           # tests (fast, hermetic)
