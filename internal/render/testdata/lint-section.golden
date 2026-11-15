@@ -1,0 +1,15 @@
+## Lint radar (findings)
+
+> Advisory: undocumented-bug detectors below the gate contract. Rules ship at
+> info until fleet evidence promotes one (policy D4); this section never fails
+> a build.
+
+> 4 finding(s): 1 error, 1 warning, 2 info — sorted by severity, then rule.
+
+| Severity | Rule                           | Location             | Message                           |
+| -------- | ------------------------------ | -------------------- | --------------------------------- |
+| error    | `io-surface/stale-declaration` | —                    | declared site no longer extracted |
+| warning  | `io-surface/write-non-atomic`  | `internal/c/c.go:8`  | os.WriteFile\|truncate risk       |
+| info     | `io-surface/err-dropped`       | `internal/a/a.go:12` | error from Close dropped          |
+| info     | `io-surface/io-in-loop`        | `internal/b/b.go:30` | per-item Read inside range loop   |
+

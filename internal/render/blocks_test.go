@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/manifest"
 )
 
@@ -108,5 +109,43 @@ func TestBlock_EmptyManifest(t *testing.T) {
 	}
 	if !strings.Contains(got, "Taxonomy at a glance") {
 		t.Error("block lost the taxonomy header")
+	}
+}
+
+// TestApplyToDoc_ComposedBlock is the one-doc-both-faces contract (TODO
+// #153): the caller composes the gate block plus the lint-radar appendix and
+// the splice carries it inside the markers; checking the same composition is
+// fresh, and checking a flag-different composition (appendix dropped) is
+// drift — the --check invocation must repeat the writing invocation's flags.
+func TestApplyToDoc_ComposedBlock(t *testing.T) {
+	m := fixtureManifest()
+	composed := Block(m) + LintSection(&check.Report{Enforcement: "lint"})
+
+	applied, err := ApplyToDoc(proseDoc, composed)
+	if err != nil {
+		t.Fatalf("apply composed block: %v", err)
+	}
+	if !strings.Contains(applied, "## Lint radar (findings)") {
+		t.Error("appendix did not land inside the block")
+	}
+	if !strings.Contains(applied, EndMarker) || strings.Index(applied, "## Lint radar") > strings.Index(applied, EndMarker) {
+		t.Error("appendix leaked outside the end marker")
+	}
+
+	storedBlock, freshBlock, err := CheckDoc(applied, composed)
+	if err != nil {
+		t.Fatalf("check composed: %v", err)
+	}
+	if storedBlock != freshBlock {
+		t.Error("freshly applied composed block does not match its own composition")
+	}
+
+	gateOnly := Block(m)
+	storedBlock, freshBlock, err = CheckDoc(applied, gateOnly)
+	if err != nil {
+		t.Fatalf("check flag-different: %v", err)
+	}
+	if storedBlock == freshBlock {
+		t.Error("checking without the writing invocation's flags must report drift")
 	}
 }

@@ -20,6 +20,8 @@ var regenInventory = flag.Bool("regen-inventory", false, "rewrite docs/architect
 
 // TestRegenInventory is the maintenance entry point for the embedded
 // inventory block; without the flag it is a no-op so the suite stays hermetic.
+// The composition matches the committed CI contract (gate block + lint
+// appendix) so a regen cannot produce a doc the freshness check rejects.
 func TestRegenInventory(t *testing.T) {
 	if !*regenInventory {
 		t.Skip("inventory regen only runs with -regen-inventory")

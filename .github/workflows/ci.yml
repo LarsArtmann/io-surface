@@ -63,9 +63,11 @@ jobs:
         run: go run ./cmd/io-surface render --root . > /dev/null
 
       # Document freshness: the embedded inventory block in INVENTORY.md must
-      # match the committed manifest.
+      # match the committed manifest AND carry the lint appendix (--lint must
+      # repeat the writing invocation's flags or the check would flag the
+      # appendix as drift).
       - name: Inventory doc is fresh
-        run: go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --check
+        run: go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --lint --check
 
       # Formatter parity (TODO #58): the generated block must survive a
       # dprint pass, or the first local `dprint fmt` after an honest render

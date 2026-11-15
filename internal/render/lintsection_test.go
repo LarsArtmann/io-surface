@@ -58,8 +58,11 @@ func TestLintSection_EmptyReport(t *testing.T) {
 	}
 }
 
-func TestLintSection_Deterministic(t *testing.T) {
-	if LintSection(lintSectionReport()) != LintSection(lintSectionReport()) {
-		t.Error("LintSection is not deterministic for the same report")
+func TestLintSection_DoesNotMutateReport(t *testing.T) {
+	rep := lintSectionReport()
+	want := len(rep.Findings)
+	_ = LintSection(rep)
+	if len(rep.Findings) != want {
+		t.Errorf("rendering mutated the report: %d findings remain, want %d", len(rep.Findings), want)
 	}
 }
