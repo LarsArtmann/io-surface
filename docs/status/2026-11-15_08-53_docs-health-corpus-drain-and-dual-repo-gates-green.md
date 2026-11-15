@@ -126,7 +126,7 @@ uncommitted io-surface edits (3 files at write time).
 4. **The 2026-09-24_18-49 report (crush-config)** still carries ID-cell-only
    strikes (check-rows PARTIAL class) and bare §f tables; the re-scoped TODO
    row tracks it; nothing re-annotated this session.
-5. **`suggestions/archive` (15 foreign 2026-0* proposal files)** remain
+5. __`suggestions/archive` (15 foreign 2026-0_ proposal files)_* remain
    verdict-less by their location-is-the-verdict convention; the new
    suggestions/README.md documents that convention but no per-file verdicts
    were (or, per convention, should be) added.
