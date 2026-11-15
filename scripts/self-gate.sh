@@ -75,7 +75,7 @@ if ! git diff --quiet \
 fi
 
 step "self-render (render must not crash)"
-go run ./cmd/io-surface render --root . > /dev/null
+go run ./cmd/io-surface render --root . >/dev/null
 
 step "inventory doc freshness"
 go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --lint --check ||
@@ -84,7 +84,7 @@ go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVEN
 		"go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --lint && commit"
 
 step "inventory survives dprint"
-if command -v dprint > /dev/null 2>&1; then
+if command -v dprint >/dev/null 2>&1; then
 	dprint check docs/architecture/io-surface/INVENTORY.md ||
 		fail "dprint check failed on INVENTORY.md" \
 			"the generated block must survive a dprint pass or the first local fmt reddens CI's --check gate." \
@@ -94,10 +94,10 @@ else
 fi
 
 step "emit gate SARIF (proves the emission path)"
-go run ./cmd/io-surface check --root . --format sarif > "$ARTIFACTS/io-surface.sarif"
+go run ./cmd/io-surface check --root . --format sarif >"$ARTIFACTS/io-surface.sarif"
 
 step "emit lint SARIF (artifact-only policy, TODO #61)"
-go run ./cmd/io-surface lint --root . --format sarif > "$ARTIFACTS/io-surface-lint.sarif"
+go run ./cmd/io-surface lint --root . --format sarif >"$ARTIFACTS/io-surface-lint.sarif"
 
 step "docs pointers (AGENTS/README/CONTRIBUTING references resolve)"
 scripts/check-docs-pointers.sh ||

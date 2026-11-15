@@ -38,11 +38,11 @@ why #27 cannot retire the tool yet.
 
 ## Options
 
-| # | Option | Cost | Tradeoff |
-| - | ------ | ---- | -------- |
-| A | Implement manifest-first `--force` in io-surface (seed regen from the existing manifest: union of extracted + declared-blind sites; skip scope when declared) | ~1 session (scaffold writer + fixture tests; schema unchanged — v1.2 suffices) | The clean fix; benefits every fleet repo with seam sites, not just dnsblockd |
-| B | dnsblockd keeps `tools/io-extract` forever, never runs io-surface `init --force` | 0 upstream cost | Permanent fork of the regen path; the tool the pilot was meant to retire stays; every facts refresh is a bespoke script run |
-| C | Manual merge ritual: run `--force`, then re-apply the 29 blind sites from a saved copy (`apply-extractable-sites.py` pattern, already in the manifest dir) | 0 upstream cost, ~15 min per refresh | Works today; relies on ritual discipline; a missed merge fails the gate LOUDLY (undeclared-site errors turn into silent drift only if baseline hides them) |
+| # | Option                                                                                                                                                        | Cost                                                                           | Tradeoff                                                                                                                                                   |
+| - | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A | Implement manifest-first `--force` in io-surface (seed regen from the existing manifest: union of extracted + declared-blind sites; skip scope when declared) | ~1 session (scaffold writer + fixture tests; schema unchanged — v1.2 suffices) | The clean fix; benefits every fleet repo with seam sites, not just dnsblockd                                                                               |
+| B | dnsblockd keeps `tools/io-extract` forever, never runs io-surface `init --force`                                                                              | 0 upstream cost                                                                | Permanent fork of the regen path; the tool the pilot was meant to retire stays; every facts refresh is a bespoke script run                                |
+| C | Manual merge ritual: run `--force`, then re-apply the 29 blind sites from a saved copy (`apply-extractable-sites.py` pattern, already in the manifest dir)    | 0 upstream cost, ~15 min per refresh                                           | Works today; relies on ritual discipline; a missed merge fails the gate LOUDLY (undeclared-site errors turn into silent drift only if baseline hides them) |
 
 ## Recommendation
 

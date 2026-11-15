@@ -221,6 +221,7 @@ GitHub mirror and CI have seen nothing since the morning push).
 ## §f — UP TO 50 THINGS TO GET DONE NEXT
 
 Immediate finishers (this plan):
+
 1. P23: visually review both 320px screenshots; close #127 with the evidence pointers.
 2. Wire `check-md-render.sh` into self-gate.sh + ci.yml (new step, mirrors the local gate).
 3. Turn the 320px recipe into `scripts/320px-shot.sh` (nix-declared deps, no /tmp reliance).

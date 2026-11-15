@@ -175,12 +175,7 @@ func DetectorRule(name string) (RuleDef, bool) {
 
 // DetectorRules lists every rule's published metadata, in registry order —
 // the vocabulary source for docs and SARIF rule descriptions.
-func DetectorRules() []RuleDef {
-	out := make([]RuleDef, len(detectorRules))
-	copy(out, detectorRules)
-
-	return out
-}
+func DetectorRules() []RuleDef { return slices.Clone(detectorRules) }
 
 // detectErrDropped implements D8 exactly: a blank error slot in a named
 // assignment is flagged (`x, _ := os.ReadFile(p)`), a fully blank assignment

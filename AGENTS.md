@@ -58,19 +58,19 @@ snapshot. Touching `.go` under `cmd/`/`internal/`: added an I/O call →
 Data flow: `cmd/io-surface` (flag dispatch) → `internal/extract` (AST walk) →
 `internal/scaffold` (`init`) or `internal/check` (gate) → `internal/render`.
 
-| Package               | Role                                                                                                                                          |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `cmd/io-surface`      | cmdguard CLI, typed flag structs, exit codes 0/1/2 (`exitCode` in `main.go`), version const.                                                    |
+| Package               | Role                                                                                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmd/io-surface`      | cmdguard CLI, typed flag structs, exit codes 0/1/2 (`exitCode` in `main.go`), version const.                                                               |
 | `internal/extract`    | Hermetic AST walker (NO `go/packages` — Nix-sandbox-safe, `GOPROXY=off`); detectors: `observations.go` + `detectors.go` (10 rules), tables in `tables.go`. |
-| `internal/manifest`   | In-process CUE load (no `cue` binary); non-empty `violations` fails unification; sentinels `ErrNotInitialized`/`ErrEmpty`.                       |
-| `internal/check`      | The bidirectional gate: 14 finding rules, exact-ID pairing first then canonical (`id-drift`).                                                   |
-| `internal/match`      | Receiver-insensitive ID canonicalization (`pkg.Type.Method` ≡ `pkg.Method`).                                                                   |
-| `internal/scaffold`   | `init` writer; `schema.cue` embedded — edit `internal/scaffold/schema.cue`, not deployed copies.                                                |
-| `internal/render`     | Claims-aware markdown renderer; BEGIN/END doc embedding with `--check`.                                                                        |
-| `internal/absorb`     | Pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `--check` = advisory drift, never fails.                                           |
-| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping, per-package sets.                                                           |
-| `internal/emit`       | Findings → go-finding model (SARIF); rule IDs/severities map 1:1, confidence 1.0.                                                              |
-| `internal/lint`       | Manifestless radar face; claim modulation when a manifest exists; exit 0 unless `--enforce`.                                                   |
+| `internal/manifest`   | In-process CUE load (no `cue` binary); non-empty `violations` fails unification; sentinels `ErrNotInitialized`/`ErrEmpty`.                                 |
+| `internal/check`      | The bidirectional gate: 14 finding rules, exact-ID pairing first then canonical (`id-drift`).                                                              |
+| `internal/match`      | Receiver-insensitive ID canonicalization (`pkg.Type.Method` ≡ `pkg.Method`).                                                                               |
+| `internal/scaffold`   | `init` writer; `schema.cue` embedded — edit `internal/scaffold/schema.cue`, not deployed copies.                                                           |
+| `internal/render`     | Claims-aware markdown renderer; BEGIN/END doc embedding with `--check`.                                                                                    |
+| `internal/absorb`     | Pinned Capslock JSON → `capabilities.cue` (its ONLY writer); `--check` = advisory drift, never fails.                                                      |
+| `internal/capability` | Reachability vocabulary: name validity, capability→family mapping, per-package sets.                                                                       |
+| `internal/emit`       | Findings → go-finding model (SARIF); rule IDs/severities map 1:1, confidence 1.0.                                                                          |
+| `internal/lint`       | Manifestless radar face; claim modulation when a manifest exists; exit 0 unless `--enforce`.                                                               |
 
 ### Where detection rules live
 

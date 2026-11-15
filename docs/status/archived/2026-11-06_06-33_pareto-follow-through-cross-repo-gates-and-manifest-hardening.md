@@ -104,50 +104,50 @@ _(Ranked by impact; the first ~15 are TODO_LIST carry-overs with owner-verified 
 4. **#19b extraction families**: `os.Stdin/Stdout/Stderr`, `syscall.Mmap`, `net.ListenConfig`, `bufio.NewReader/NewWriter`, `http.ServeContent` (+ facts regen + INVENTORY).
 5. **#48 cut v0.1.1** — the P0 criteria landed (#2-#6 + today's rules); go-release flow, re-tag discipline.
 6. **#23 schema version field** (`version: "io-surface/v1"`) — pairs with v0.1.1; also guards the new optional baseline fields.
-~~7. **#14 enforcement policy field** (D4) — a repo cannot silently opt out.~~ done (docs-health pass done 2026-11-15: SHIPPED — facts.cue carries enforcement: "gate"|"audit"; the gate demotes errors under audit; --enforce overrides for one run (README: The manifest))
-8. **#22 `io-surface baseline add <id> --note --date`** — stop hand-editing CUE; also the natural place to prompt for `owner`/`expires` (today's #8).
-9. **#24 `--ignore` globs** for generated code (`*_templ.go`, `zz_generated*`).
-10. **#27 dnsblockd reverse mode** in `check-io-surface.sh` + Nix check wiring + retire `tools/io-extract` (lock free).
-11. **#20 derive seams from manifest `via` values** (kill the hardcoded `seamIdent` table).
-12. **#21 cross-package seam support** (`pkg/` helper owning the raw call).
-13. **#18 BuildFlow provider** via go-finding/toolsdk so `./bin/dev` runs the gate.
-14. **#15/#16 local pre-commit gates** (self-check + gofmt/vet pins, not CI-only).
-15. **#39 review/merge the open Dependabot actions PR**.
-16. **NEW: unexported-type method fixture in `testdata/extract`** — permanent regression guard for the id-form rule's narrowness.
-17. **NEW: dnsblockd claims prose** (rationale) for the 4 new sites — adoption quality, not just gate-green.
-18. **NEW: re-run dnsblockd `scripts/check-io-surface.sh`** — `audit.claims: 141` parity may have drifted after 4 new claims entries.
-19. **NEW: io-surface CHANGELOG/README adoption entries** for the dnsblockd + InboxClean pilots (§f-9 debt).
-20. **NEW: InboxClean re-gate proof** once billing is fixed — capture the green run for the pilot record.
-21. **NEW: wire `io-surface check` into dnsblockd's flake checks** (CI-side enforcement, pairs with #27 reverse mode).
-22. **NEW: id-drift single-dotted pairing case** currently emits a generic warning — make it name the correct form like id-form does.
-23. **NEW: `displayWidth`/wide-range unit tests** — the CJK handling ships with zero direct tests.
-24. **NEW: narrow-column table edge test** (min-width-3 separator path).
-25. **NEW: emit confidence modeling** — info findings at <1.0 confidence.
-26. **NEW: constraintError dedupe strategy** — one deterministic conjunct-walk instead of two overlapping ones.
-27. **NEW: document the `init --force` + git-restore ritual** in README (adoption safety for judgment files).
-28. **NEW: SARIF → GitHub code-scanning upload policy** (carry-over §g decision; artifact-only today).
-29. **NEW: dprint-parity CI step for INVENTORY.md** — prove the formatter no-op, not just `--check` freshness.
-30. **NEW: InboxClean gate pin policy** — `@v0.1.0` today; decide `@latest` vs. pinned (tag-lag risk).
-31. **NEW: dnsblockd cross-repo edit protocol** — document lock-acquire expectation for manifest-only edits (I edited with check-only, worked because free).
-32. **NEW: TODO_LIST row 36 is stale** (v0.1.0 already tagged) — docs-health sweep should drop it.
-33. ~~**#28 `.Do`/`.Close` token ambiguity** classification.~~ RESOLVED 2026-11-06: TODO_LIST #28 DONE — bare `.Do` records no family (`methodToken["Do"] = ""`, the manifest claim decides); the 0.3.0 detector line classifies `Close` calls structurally (closer-missing), independent of family tokenization.
-34. **#29 `extract --stats`** per-package histogram.
-35. ~~**#30 `version --json`** with commit + build date.~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE.
-36. **#31 taxonomy-freeze documentation**.
-37. **#32 ID-migration documentation** (package move = new ID set).
-38. **#33 register the repo in the fleet inventory** (meta/stack-selection).
-39. **#34 `-race` + very-large-repo run**, record results.
-40. **#35 fleet distribution study** (crush-daily + ~10 daemon repos).
-41. **#43 docs-gates standing CI gate**, pinned rev.
-42. **#45 verified-how discipline** (name the command per claim) in future health reports.
-43. **#46 seed `.docs-gates.json` thresholds** for this repo.
-44. **#47 evidence line-number re-derivation** at the next docs audit.
-45. **#40 Forgejo API token** (user action) → **#41** push mirror (ends dual-push) → **#42** visibility flip.
-46. **NEW: `check` subcommand `--strict-dirs`** (fail instead of hint when declared sites are excluded) — natural extension of #9.
-47. **NEW: `unused-baseline` → error after a grace flag** (e.g. `--allow-unused-baseline`) for teams wanting teeth on #7.
-48. **NEW: manifest.Load Dir-anchored error context** — include the offending file name when a decode fails (today it says "decoding sites" only).
-49. **NEW: cmdguard `describe` output test** — pin the machine-readable CLI contract the parallel session added.
-50. **NEW: status-report index** — the 04:27 and this report should be indexed per dnsblockd's `docs/status/README.md` pattern (io-surface has no index yet).
+   ~~7. **#14 enforcement policy field** (D4) — a repo cannot silently opt out.~~ done (docs-health pass done 2026-11-15: SHIPPED — facts.cue carries enforcement: "gate"|"audit"; the gate demotes errors under audit; --enforce overrides for one run (README: The manifest))
+7. **#22 `io-surface baseline add <id> --note --date`** — stop hand-editing CUE; also the natural place to prompt for `owner`/`expires` (today's #8).
+8. **#24 `--ignore` globs** for generated code (`*_templ.go`, `zz_generated*`).
+9. **#27 dnsblockd reverse mode** in `check-io-surface.sh` + Nix check wiring + retire `tools/io-extract` (lock free).
+10. **#20 derive seams from manifest `via` values** (kill the hardcoded `seamIdent` table).
+11. **#21 cross-package seam support** (`pkg/` helper owning the raw call).
+12. **#18 BuildFlow provider** via go-finding/toolsdk so `./bin/dev` runs the gate.
+13. **#15/#16 local pre-commit gates** (self-check + gofmt/vet pins, not CI-only).
+14. **#39 review/merge the open Dependabot actions PR**.
+15. **NEW: unexported-type method fixture in `testdata/extract`** — permanent regression guard for the id-form rule's narrowness.
+16. **NEW: dnsblockd claims prose** (rationale) for the 4 new sites — adoption quality, not just gate-green.
+17. **NEW: re-run dnsblockd `scripts/check-io-surface.sh`** — `audit.claims: 141` parity may have drifted after 4 new claims entries.
+18. **NEW: io-surface CHANGELOG/README adoption entries** for the dnsblockd + InboxClean pilots (§f-9 debt).
+19. **NEW: InboxClean re-gate proof** once billing is fixed — capture the green run for the pilot record.
+20. **NEW: wire `io-surface check` into dnsblockd's flake checks** (CI-side enforcement, pairs with #27 reverse mode).
+21. **NEW: id-drift single-dotted pairing case** currently emits a generic warning — make it name the correct form like id-form does.
+22. **NEW: `displayWidth`/wide-range unit tests** — the CJK handling ships with zero direct tests.
+23. **NEW: narrow-column table edge test** (min-width-3 separator path).
+24. **NEW: emit confidence modeling** — info findings at <1.0 confidence.
+25. **NEW: constraintError dedupe strategy** — one deterministic conjunct-walk instead of two overlapping ones.
+26. **NEW: document the `init --force` + git-restore ritual** in README (adoption safety for judgment files).
+27. **NEW: SARIF → GitHub code-scanning upload policy** (carry-over §g decision; artifact-only today).
+28. **NEW: dprint-parity CI step for INVENTORY.md** — prove the formatter no-op, not just `--check` freshness.
+29. **NEW: InboxClean gate pin policy** — `@v0.1.0` today; decide `@latest` vs. pinned (tag-lag risk).
+30. **NEW: dnsblockd cross-repo edit protocol** — document lock-acquire expectation for manifest-only edits (I edited with check-only, worked because free).
+31. **NEW: TODO_LIST row 36 is stale** (v0.1.0 already tagged) — docs-health sweep should drop it.
+32. ~~**#28 `.Do`/`.Close` token ambiguity** classification.~~ RESOLVED 2026-11-06: TODO_LIST #28 DONE — bare `.Do` records no family (`methodToken["Do"] = ""`, the manifest claim decides); the 0.3.0 detector line classifies `Close` calls structurally (closer-missing), independent of family tokenization.
+33. **#29 `extract --stats`** per-package histogram.
+34. ~~**#30 `version --json`** with commit + build date.~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE.
+35. **#31 taxonomy-freeze documentation**.
+36. **#32 ID-migration documentation** (package move = new ID set).
+37. **#33 register the repo in the fleet inventory** (meta/stack-selection).
+38. **#34 `-race` + very-large-repo run**, record results.
+39. **#35 fleet distribution study** (crush-daily + ~10 daemon repos).
+40. **#43 docs-gates standing CI gate**, pinned rev.
+41. **#45 verified-how discipline** (name the command per claim) in future health reports.
+42. **#46 seed `.docs-gates.json` thresholds** for this repo.
+43. **#47 evidence line-number re-derivation** at the next docs audit.
+44. **#40 Forgejo API token** (user action) → **#41** push mirror (ends dual-push) → **#42** visibility flip.
+45. **NEW: `check` subcommand `--strict-dirs`** (fail instead of hint when declared sites are excluded) — natural extension of #9.
+46. **NEW: `unused-baseline` → error after a grace flag** (e.g. `--allow-unused-baseline`) for teams wanting teeth on #7.
+47. **NEW: manifest.Load Dir-anchored error context** — include the offending file name when a decode fails (today it says "decoding sites" only).
+48. **NEW: cmdguard `describe` output test** — pin the machine-readable CLI contract the parallel session added.
+49. **NEW: status-report index** — the 04:27 and this report should be indexed per dnsblockd's `docs/status/README.md` pattern (io-surface has no index yet).
 
 ## g) Questions I cannot answer myself
 
