@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`--format` is the canonical output flag** (owner decision, TODO #154):
+  every consumer and fleet script uses `--format json|sarif|github`; the
+  `--json` shorthand stays functional and documented for interactive use,
+  never removed (removal would churn callers for zero gain). README wording
+  now leads with `--format`.
 - `lint` findings now print strongest-first (severity rank, then rule, then
   ID) — the same presentation contract as `check`, so the text, JSON and
   SARIF faces of both commands order findings identically. The lint goldens

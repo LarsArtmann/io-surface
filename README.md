@@ -113,7 +113,7 @@ to warnings, so a repo's own recorded posture decides whether BuildFlow fails.
 | Command                                                                                                                                            | What it does                                                                                                                                                                                                                                                            |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `io-surface init [--root DIR] [--force]`                                                                                                           | Extract the tree and write the CUE package (green by construction; `--force` refreshes `facts.cue` only)                                                                                                                                                                |
-| `io-surface check [--root] [--manifest] [--json] [--format text\|json\|sarif] [--advisory] [--strict] [--enforce] [--strict-dirs] [--strict-weak] [--allow-unused-baseline]`                                   | The bidirectional gate (exit 1 on error findings); `--format sarif` emits SARIF 2.1.0; `--enforce` overrides an audit enforcement policy; `--strict-weak` (opt-in, ROADMAP Q3) escalates undeclared weak-tier sites from info to error — default stays advisory forever |
+| `io-surface check [--root] [--manifest] [--format text\|json\|sarif] [--json] [--advisory] [--strict] [--enforce] [--strict-dirs] [--strict-weak] [--allow-unused-baseline]`                                   | The bidirectional gate (exit 1 on error findings); `--format` is the canonical output flag; `--format sarif` emits SARIF 2.1.0; `--enforce` overrides an audit enforcement policy; `--strict-weak` (opt-in, ROADMAP Q3) escalates undeclared weak-tier sites from info to error — default stays advisory forever |
 | `io-surface render [--root] [--out FILE]`                                                                                                          | Render the inventory markdown from the manifest (claims-aware)                                                                                                                                                                                                          |
 | `io-surface render --doc FILE [--check]`                                                                                                           | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                                                                                                                                                                   |
 | `io-surface extract [--root] [--include-tests] [--stats]`                                                                                          | Print the raw extraction as JSON (debugging, counts); `--stats` prints a per-package site histogram instead (spot outlier packages)                                                                                                                                     |
@@ -125,10 +125,14 @@ to warnings, so a repo's own recorded posture decides whether BuildFlow fails.
 
 Exit codes: `0` clean, `1` gate findings, `2` usage or internal error.
 
-With `--json`, every gate outcome — clean, findings, or a manifest that fails
-validation (rule `io-surface/manifest-validation`) — is a machine-parseable
-report on stdout: `{"stats": {...}, "findings": [...]}`. Usage/internal
-errors (exit 2) are not gate results and print to stderr.
+With `--format json` (shorthand: `--json`), every gate outcome — clean,
+findings, or a manifest that fails validation (rule
+`io-surface/manifest-validation`) — is a machine-parseable report on stdout:
+`{"stats": {...}, "findings": [...]}`. Usage/internal errors (exit 2) are
+not gate results and print to stderr. DECIDED 2026-11-15 (owner, TODO
+#154): `--format` is the canonical flag — every consumer and fleet script
+uses it; the `--json` shorthand stays functional for interactive use and
+is documented, never removed (removal would churn callers for zero gain).
 
 ### Embedding the inventory in a hand-written doc
 
