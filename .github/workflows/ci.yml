@@ -108,7 +108,7 @@ jobs:
       # a fleet-side rule change cannot redden this repo silently — bump the
       # pin deliberately, rerun the battery locally first.
       - name: Docs gates
-        run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@2278406afdfd run
+        run: go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@v0.3.1 run
 
   # Capability facts (v1.1, advisory): the reachability half of the unified
   # gate. This is the ONLY place the external engine runs — the `test` job

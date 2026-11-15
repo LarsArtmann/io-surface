@@ -1,0 +1,15 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:recommended"],
+	"customManagers": [
+		{
+			"customType": "regex",
+			"managerFilePatterns": ["/\\.github/workflows/[^/]+\\.ya?ml$/"],
+			"matchStrings": [
+				"docs-gates@(?<currentValue>v\\d+\\.\\d+\\.\\d+|[0-9a-f]{7,40})"
+			],
+			"datasourceTemplate": "go",
+			"depNameTemplate": "github.com/Artmann-Technologies/docs-gates/cmd/docs-gates"
+		}
+	]
+}
