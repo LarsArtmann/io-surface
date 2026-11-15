@@ -130,11 +130,20 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
   buildflow`) and verify edits landed on disk. Mid-run gate reds can vanish
   once the run settles; re-run before acting.
 - A STALE system `buildflow`/`docs-gates` binary produces FALSE gate reds.
-  Fix recipe: rebuild in the BuildFlow repo (`nix build .# && nix run
-  .#reinstall`), refresh shims; `buildflow doctor` names the delta.
-- A `nix-checker` "vendorHash may be stale" finding can be mtime noise —
-  prove with `nix build .#`. Step ERROR findings can persist in BuildFlow's
-  result cache after a fix — re-verify with `BUILDFLOW_NO_RESULT_CACHE=1`.
+  Fix recipe (re-verified 2026-11-15): rebuild in the BuildFlow repo
+  (`nix build .# && nix run .#reinstall`); if `buildflow doctor` still
+  reports stale afterwards, check PATH precedence first (`type -a buildflow`
+  — a stale `~/go/bin/buildflow` shadows the fresh profile binary,
+  BuildFlow#81). doctor's env/binary-freshness finding is advisory with its
+  own triage hint.
+- A REAL vendorHash red (distinct from noise): a go-modules hash mismatch
+  after a go.sum change (2026-11-15, io-surface pin bump) — set
+  `vendorHash.nix` to the hash from the nix error output, `nix build .#`.
+  Mtime noise is the variant where go.sum content is UNCHANGED — prove with
+  `nix build .#`. Step ERROR findings can persist in BuildFlow's result
+  cache after a fix — re-verify with `BUILDFLOW_NO_RESULT_CACHE=1`.
+  `buildflow doctor` listing ~29 not-installed tools (bandit/eslint/cargo-*)
+  is foreign-language availability noise for a Go-only repo, not gate reds.
 - docs-gates: BuildFlow findings name INTERNAL gate names ("docs gate
   audit-all is red"), not CLI verbs. Cadence-red ritual: verify rows
   struck/routed, prepend a `> **Live remainder:**` banner, `git mv` to
