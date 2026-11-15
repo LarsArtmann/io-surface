@@ -73,6 +73,7 @@ signal), `ON_HOLD` (a pending scope/design decision blocks it),
 | Family summary + per-site table    | 🟢 `FULLY_FUNCTIONAL` | `internal/render/render.go:20-66`                               | Claimed/rationale counts per family            |
 | Judgments section (verbatim prose) | 🟢 `FULLY_FUNCTIONAL` | `render.go:68-89`                                               | Exception + rationale passed through untouched |
 | BEGIN/END generated blocks         | 🟢 `FULLY_FUNCTIONAL` | `render.CheckDoc`/`ApplyToDoc`; CI inventory-doc freshness step | Drift exits 1 with a stored-vs-fresh diff      |
+| `--lint` radar appendix (one doc, both faces) | 🟢 `FULLY_FUNCTIONAL` | `render.LintSection`; `TestLintSection_Golden`; `TestRenderLint_DocConsistency` e2e | Appendix inside the markers; `--check` must repeat the writing flags (flag-different check = drift, by design) |
 
 ## Detector layer (`internal/extract` detectors, `internal/lint`, v0.3.0)
 

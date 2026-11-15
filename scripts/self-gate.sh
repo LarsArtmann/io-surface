@@ -78,10 +78,10 @@ step "self-render (render must not crash)"
 go run ./cmd/io-surface render --root . > /dev/null
 
 step "inventory doc freshness"
-go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --check ||
+go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --lint --check ||
 	fail "INVENTORY.md is stale vs the manifest" \
-		"the embedded inventory block drifted from the committed manifest." \
-		"go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md && commit"
+		"the embedded inventory block drifted from the committed manifest (the block carries the lint appendix; --check must repeat --lint)." \
+		"go run ./cmd/io-surface render --root . --doc docs/architecture/io-surface/INVENTORY.md --lint && commit"
 
 step "inventory survives dprint"
 if command -v dprint > /dev/null 2>&1; then

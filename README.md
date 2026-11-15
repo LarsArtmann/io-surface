@@ -115,7 +115,8 @@ to warnings, so a repo's own recorded posture decides whether BuildFlow fails.
 | `io-surface init [--root DIR] [--force]`                                                                                                           | Extract the tree and write the CUE package (green by construction; `--force` refreshes `facts.cue` only)                                                                                                                                                                |
 | `io-surface check [--root] [--manifest] [--format text\|json\|sarif] [--json] [--advisory] [--strict] [--enforce] [--strict-dirs] [--strict-weak] [--allow-unused-baseline]`                                   | The bidirectional gate (exit 1 on error findings); `--format` is the canonical output flag; `--format sarif` emits SARIF 2.1.0; `--enforce` overrides an audit enforcement policy; `--strict-weak` (opt-in, ROADMAP Q3) escalates undeclared weak-tier sites from info to error — default stays advisory forever |
 | `io-surface render [--root] [--out FILE]`                                                                                                          | Render the inventory markdown from the manifest (claims-aware)                                                                                                                                                                                                          |
-| `io-surface render --doc FILE [--check]`                                                                                                           | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                                                                                                                                                                   |
+| `io-surface render --doc FILE [--check]`                                                                                                           | Rewrite the generated block inside FILE (prose preserved); `--check` exits 1 on drift                                                                                             |
+| `io-surface render … --lint`                                                                                                                       | Append the lint radar (detector findings) as an appendix inside the same block — one doc, both faces; repeat `--lint` on `--check`                                             |
 | `io-surface extract [--root] [--include-tests] [--stats]`                                                                                          | Print the raw extraction as JSON (debugging, counts); `--stats` prints a per-package site histogram instead (spot outlier packages)                                                                                                                                     |
 | `io-surface lint [--root] [--format text\|json\|sarif\|github] [--manifest] [--enforce] [--include-tests]`                                        | Detector findings without a manifest (exit 0 unless `--enforce` and error-severity findings); any Go tree lints; `--manifest` enables claims-based severity modulation when one exists                                                                                  |
 | `io-surface absorb --capslock REPORT [--check] [--module] [--engine-version]`                                                                      | Fold a pinned Capslock JSON report into `capabilities.cue` (that file only); `--check` reports advisory drift, never exits 1                                                                                                                                            |
@@ -151,10 +152,25 @@ Hand-written context, review notes, exceptions.
 ```bash
 io-surface render --doc docs/architecture/IO.md         # rewrite the block
 io-surface render --doc docs/architecture/IO.md --check # exit 1 when stale
+io-surface render --doc docs/architecture/IO.md --lint  # block + lint-radar appendix
+io-surface render --doc docs/architecture/IO.md --lint --check # same flags on check
 ```
 
 Put the `--check` form in CI and the published inventory can never silently
-go stale; regenerate with the plain form after manifest edits.
+go stale; regenerate with the plain form after manifest edits. Add `--lint`
+to embed the detector findings as an appendix inside the generated block —
+one document carries both the gate inventory and the bug radar. `--check`
+must repeat the writing invocation's flags exactly: a check that does not
+render the appendix flags it as drift, by design (the appendix is part of
+the freshness contract, not decoration).
+
+### The lint radar as a document appendix
+
+`--lint` runs the same detectors as `io-surface lint` (see below) and renders
+the findings as a `Lint radar` section after the gate tables, sorted by
+severity. It is advisory content in an advisory medium: the appendix never
+fails a build, it informs the readers of the inventory. The lint *command*
+stays the CI face (SARIF artifact); the appendix is the human face.
 
 ### Reachability facts (optional, advisory): `absorb`
 

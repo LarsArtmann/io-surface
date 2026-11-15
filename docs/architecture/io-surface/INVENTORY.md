@@ -94,6 +94,18 @@ CI fails when this block goes stale (`render --doc … --check`).
 - kernel-internal I/O (epoll, page cache)
 - process stdio (stdout/stderr — user feedback, not durable state; DECIDED 2026-11-08, TODO #49)
 
+## Lint radar (findings)
+
+> Advisory: undocumented-bug detectors below the gate contract. Rules ship at
+> info until fleet evidence promotes one (policy D4); this section never fails
+> a build.
+
+> 1 finding(s): 0 error, 0 warning, 1 info — sorted by severity, then rule.
+
+| Severity | Rule                    | Location                           | Message                                                                                                            |
+| -------- | ----------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| info     | `io-surface/io-in-loop` | `internal/scaffold/scaffold.go:81` | atomicwrite.WriteWithPerm(path, files[name], 0o644) — I/O inside a loop (N+1 shape); consider hoisting or batching |
+
 <!-- io-surface:end -->
 
 Prose and context live around the block; only the generated section between

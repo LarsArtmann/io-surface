@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `render --lint`: the lint radar embeds into the inventory document as an
+  appendix inside the generated block — one doc carries both the gate
+  inventory and the detector findings, and `--doc --check` freshness covers
+  both faces. `--check` must repeat the writing invocation's flags: a check
+  that does not render the appendix flags it as drift, by design. The
+  repository's own INVENTORY.md self-hosts the appendix and CI checks it.
 - `extract.Severity`: detector rule severities are a named type (an
   off-vocabulary registry entry is now a compile error), with a
   registry-validation test walking every published rule.

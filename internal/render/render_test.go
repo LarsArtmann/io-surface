@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/larsartmann/io-surface/internal/lint"
 	"github.com/larsartmann/io-surface/internal/manifest"
 )
 
@@ -21,7 +22,8 @@ var regenInventory = flag.Bool("regen-inventory", false, "rewrite docs/architect
 // TestRegenInventory is the maintenance entry point for the embedded
 // inventory block; without the flag it is a no-op so the suite stays hermetic.
 // The composition matches the committed CI contract (gate block + lint
-// appendix) so a regen cannot produce a doc the freshness check rejects.
+// appendix, ci.yml's freshness step runs --lint) so a regen cannot produce a
+// doc the freshness check rejects.
 func TestRegenInventory(t *testing.T) {
 	if !*regenInventory {
 		t.Skip("inventory regen only runs with -regen-inventory")
@@ -31,19 +33,24 @@ func TestRegenInventory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("load manifest: %v", err)
 	}
+	rep, err := lint.Run(filepath.Join("..", ".."), lint.Options{Manifest: dir})
+	if err != nil {
+		t.Fatalf("lint: %v", err)
+	}
+	block := Block(m) + LintSection(rep)
 	docPath := filepath.Join(dir, "INVENTORY.md")
 	raw, err := os.ReadFile(docPath)
 	if err != nil {
 		t.Fatalf("read %s: %v", docPath, err)
 	}
-	applied, err := ApplyToDoc(string(raw), Block(m))
+	applied, err := ApplyToDoc(string(raw), block)
 	if err != nil {
 		t.Fatalf("apply to doc: %v", err)
 	}
 	if err := os.WriteFile(docPath, []byte(applied), 0o644); err != nil {
 		t.Fatalf("write %s: %v", docPath, err)
 	}
-	stored, fresh, err := CheckDoc(applied, Block(m))
+	stored, fresh, err := CheckDoc(applied, block)
 	if err != nil || stored != fresh {
 		t.Fatalf("regen did not converge (err=%v)", err)
 	}
