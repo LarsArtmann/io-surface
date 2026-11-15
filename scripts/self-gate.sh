@@ -106,7 +106,7 @@ scripts/check-docs-pointers.sh ||
 		"fix the reference in the named living doc (or restore the missing file)"
 
 step "docs gates (pin read from ci.yml)"
-GATES_REV="$(sed -n 's/.*docs-gates@\([0-9a-f]*\).*/\1/p' .github/workflows/ci.yml | head -1)"
+GATES_REV="$(sed -n 's/.*docs-gates@\([0-9a-zA-Z][0-9a-zA-Z.-]*\).*/\1/p' .github/workflows/ci.yml | head -1)"
 if [[ -z "$GATES_REV" ]]; then
 	fail "no docs-gates@<rev> pin found in .github/workflows/ci.yml" \
 		"this script mirrors CI by reading its pin; ci.yml's Docs gates step changed shape." \
