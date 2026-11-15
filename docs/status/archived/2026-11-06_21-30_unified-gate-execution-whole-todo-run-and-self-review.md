@@ -6,6 +6,15 @@ standing loop (fix T20 → then execute the entire TODO_LIST per the owner's
 **Final HEAD:** `fef645d`, pushed to both remotes, CI green on the tip,
 docs-gates battery PASS, all local gates green.
 
+> **Live remainder:** the owner/external-blocked cluster this report routed
+> is STILL open as of 2026-11-15 and lives in TODO_LIST: #40/#41/#42
+> (Forgejo token → mirror → visibility, prep packets in the SUPERB plan
+> P25), #63 (cmdguard-lint, parked on the upstream replace-free release),
+> #50 (Capslock upstream repro, P24), plus the #49 stdout/stderr and #61
+> SARIF-upload owner decisions. Everything else this report named — T20
+> families, #26/#38, the P0 correctness debt — is DONE (struck inline or
+> closed in the ledger).
+
 ---
 
 ## a) FULLY DONE (verified this session)
