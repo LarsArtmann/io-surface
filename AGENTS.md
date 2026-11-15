@@ -154,6 +154,11 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
 
 ## Conventions
 
+- A stale `result` symlink (e.g. pointing at an old treefmt-check derivation)
+  makes vulnix/nix-checker flag a stale target: rebuild it with
+  `nix build .# -o result` and move on. `result` is a gitignored local
+  artifact — never commit it.
+
 - Package doc comments are load-bearing (why hermetic, why tiers, why
   pairing order) — extend them when changing design rationale.
 - Go code: gofmt-clean, tabs, stdlib-first. Errors wrap context; sentinels
