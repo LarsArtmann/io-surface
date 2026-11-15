@@ -53,10 +53,12 @@ stop calling the inventory complete.
 - Opt-in `--precise` tier using `golang.org/x/tools/go/packages` (boundary
   recorded in Theme 5: the v0.3.0 detector layer consumes resolved-tier AST
   captures only — precise stays this theme's own track)
-- Seams declared as data (manifest `via`) instead of a hardcoded table;
-  cross-package seams
-- Extract `--stats` face for outlier packages; confidence distribution visible
-  in every report
+- Confidence distribution visible in every report (the `extract --stats`
+  histogram shipped 2026-11-15; per-site confidence is still not extracted)
+
+(Shipped out of this theme: seams declared as data — manifest `via` values
+override the built-in table, TODO 20 — and cross-package seams, TODO 21,
+both 2026-11-06.)
 
 ### 4. Unified I/O insights: sites (hermetic) × reachability (Capslock)
 
