@@ -33,6 +33,7 @@ triage lives in CV's docs/architecture/io-surface/claims.cue and
 docs/status/2026-11-17_16-45_io-surface-review-wave-status.md. This is a
 MANUAL verification sample (policy §2 vocabulary), not a fleetscan run.
 Per rule (hits / FP-by-policy-definition / verified-fixed):
+
 - io-in-loop 18 / 18 / 0 — every hit correct as written: distinct-target
   per-item loops 13 (retention sweep, per-document validation, fixture
   materializer, import/export loops, env overrides, parent-walk root
@@ -49,5 +50,5 @@ Per rule (hits / FP-by-policy-definition / verified-fixed):
 - stat-then-open 1 / 1 / 0 — the boundary-table generator's stat preserves
   the input file's permission bits before writing; removing the stat is
   the WRONG fix there (perm must be read before write).
-Caveat: N per rule is below the policy's W4 floor (30) — this sample
-strengthens the FP-class taxonomy, it does not qualify any promotion.
+  Caveat: N per rule is below the policy's W4 floor (30) — this sample
+  strengthens the FP-class taxonomy, it does not qualify any promotion.
