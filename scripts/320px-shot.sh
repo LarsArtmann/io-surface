@@ -49,14 +49,14 @@ declare -A SONAME_PKG=(
   [libnss3.so]=nss
   [libnssutil3.so]=nss
   [libudev.so.1]=udev
-  [libX11.so.6]=xorg.libX11
-  [libxcb.so.1]=xorg.libxcb
-  [libXcomposite.so.1]=xorg.libXcomposite
-  [libXdamage.so.1]=xorg.libXdamage
-  [libXext.so.6]=xorg.libXext
-  [libXfixes.so.3]=xorg.libXfixes
+  [libX11.so.6]=libx11
+  [libxcb.so.1]=libxcb
+  [libXcomposite.so.1]=libxcomposite
+  [libXdamage.so.1]=libxdamage
+  [libXext.so.6]=libxext
+  [libXfixes.so.3]=libxfixes
   [libxkbcommon.so.0]=libxkbcommon
-  [libXrandr.so.2]=xorg.libXrandr
+  [libXrandr.so.2]=libxrandr
 )
 
 ldpath=""
@@ -69,7 +69,22 @@ for so in $(missing_sonames); do
   fi
   [ -n "${resolved[$attr]:-}" ] && continue
   resolved[$attr]=1
-  store_path=$(nix eval "nixpkgs#$attr.out.outPath" --raw)
+
+  # Multi-output derivations resolve differently: `.out.outPath` names the
+  # `out` output (glib's libs), while output attrs like `dbus.lib` need
+  # `.outPath` (their `.out` would silently point back at the out output).
+  # Verify the soname actually exists in whichever store path we pick.
+  store_path=""
+  for form in "$attr.out.outPath" "$attr.outPath"; do
+    if candidate=$(nix eval "nixpkgs#$form" --raw 2>/dev/null) && [ -e "$candidate/lib/$so" ]; then
+      store_path=$candidate
+      break
+    fi
+  done
+  if [ -z "$store_path" ]; then
+    echo "320px-shot: '$so' not found under nixpkgs#$attr (tried .out.outPath and .outPath)" >&2
+    exit 1
+  fi
   ldpath="$ldpath$store_path/lib:"
 done
 export LD_LIBRARY_PATH="${ldpath}${LD_LIBRARY_PATH:-}"
