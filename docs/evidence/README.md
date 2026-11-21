@@ -52,3 +52,16 @@ Per rule (hits / FP-by-policy-definition / verified-fixed):
   the WRONG fix there (perm must be read before write).
   Caveat: N per rule is below the policy's W4 floor (30) — this sample
   strengthens the FP-class taxonomy, it does not qualify any promotion.
+
+320px-audit/ (2026-11-21, TODO #127 — mobile render evidence)
+Produced by: `scripts/320px-shot.sh <page.html>` (repo root; chrome-headless-shell
+152.0.7977.30, shared libs resolved from nixpkgs per soname — no /tmp recipe).
+Per page: the page rendered at 320x2400; the horizontal scrollbar arrows in a
+PNG are the overflow detector (scrollWidth measured 305 <= 320 for all three
+after the fix, via the CDP-less iframe probe used during the audit).
+- index-320.png — docs/review/libs/index.html (library-audit landing page)
+- 2026-11-11_11-42_full-code-review-320.png — the full-code-review report
+- 2026-11-11_11-45_io-surface-full-code-review-plan-320.png — its plan page
+Verdict: legible, no page-level horizontal overflow; the wide comparison
+tables scroll inside their .table-wrap. Pre-fix PNGs (which showed the
+overflow) were superseded and removed; re-render any page with the script.

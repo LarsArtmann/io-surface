@@ -112,6 +112,13 @@ jobs:
       - name: Docs pointers resolve
         run: scripts/check-docs-pointers.sh
 
+      # Markdown render audit (TODO #127): the docs/status corpus is read on
+      # GitHub — an unbalanced fence swallows the rest of a report as code, a
+      # table without a separator row is dropped whole, and a dead badge path
+      # hides evidence. All three are mechanical, so they gate here.
+      - name: Markdown render audit
+        run: scripts/check-md-render.sh
+
       # Docs battery: the five doc gates (freshness, audit-all, annotate,
       # routing, cadence) as one standing gate. Pinned to a docs-gates rev so
       # a fleet-side rule change cannot redden this repo silently — bump the

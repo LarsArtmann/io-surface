@@ -105,6 +105,12 @@ scripts/check-docs-pointers.sh ||
 		"AGENTS.md/README.md direct every session; a broken pointer sends readers to a dead file." \
 		"fix the reference in the named living doc (or restore the missing file)"
 
+step "markdown render audit (GitHub-facing corpus)"
+scripts/check-md-render.sh ||
+	fail "check-md-render found a GitHub-render breaker (fences/tables/badges)" \
+		"docs/status reports are read on GitHub; a swallowed fence or dropped table hides evidence." \
+		"fix the named file (balance the fences, add the table separator row, or fix the badge path)"
+
 step "docs gates (pin read from ci.yml)"
 GATES_REV="$(sed -n 's/.*docs-gates@\([0-9a-zA-Z][0-9a-zA-Z.-]*\).*/\1/p' .github/workflows/ci.yml | head -1)"
 if [[ -z "$GATES_REV" ]]; then
