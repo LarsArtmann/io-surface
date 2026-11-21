@@ -13,7 +13,8 @@ for SARIF, `go-atomic-write` for the tool's own file writes — the gate core
 is the sandbox-native gate. No Makefile/justfile.
 
 `README.md` documents the tool for users. This file documents the repo for
-agents working ON the tool.
+agents working ON the tool. Domain language (sites, families, tiers, claims):
+`docs/DOMAIN_LANGUAGE.md`.
 
 ## Commands
 

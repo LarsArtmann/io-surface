@@ -19,7 +19,7 @@ instead of trust (`grep` + file:line).
 | **Capabilities**      | Per-package reachability from an external SSA engine (Capslock), folded in by `absorb`. Closed-enum names `FILES`/`NETWORK`/`EXEC`, per package as `direct` (own code) and `deep` (transitive). Advisory, never gate-failing.    | `schema.cue:108`, `internal/capability`       |
 | **Gate**              | The bidirectional check: every declared site still exists, every extracted site is declared. Exit 1 on error findings. Distinct from a linter — it enforces a documented contract, not style.                                   | `internal/check`                              |
 | **Radar (lint face)** | Detector findings over ANY Go tree without a manifest. Every rule ships at `info`; exit 0 unless `--enforce`. The gate wants a manifest; the bugs don't.                                                                        | `internal/lint`                               |
-| **Finding**           | One rule violation with rule ID, severity, location. The stable contract: rule IDs become SARIF `ruleId`s and suppression keys — renaming is breaking.                                                                         | `internal/check/check.go:40`, `internal/emit`  |
+| **Finding**           | One rule violation with rule ID, severity, location. The stable contract: rule IDs become SARIF rule IDs and suppression keys — renaming is breaking.                                                                         | `internal/check/check.go:40`, `internal/emit`  |
 
 ## Extraction tiers
 
