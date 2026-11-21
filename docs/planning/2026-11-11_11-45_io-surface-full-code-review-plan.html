@@ -596,6 +596,14 @@
       .compare-row pre {
         margin: 0;
       }
+      /* Grid items refuse to shrink below their content by default; without
+         this the 1fr/auto tracks floor at min-content and wide code blocks
+         push the page past small viewports. */
+      .strength > *,
+      .compare-row > *,
+      .migration-step > * {
+        min-width: 0;
+      }
 
       /* --- Code blocks + syntax highlighting --- */
       pre {
