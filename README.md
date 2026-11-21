@@ -448,7 +448,10 @@ scripts/self-gate.sh   # the whole ci.yml test job, locally, one command — run
 The script mirrors CI step for step (build, vet, `go test -race`, gofmt,
 self-check, facts freshness, self-render, inventory-doc freshness, dprint
 parity, SARIF emits, docs-gates) and reads the docs-gates pin from
-`ci.yml` at runtime, so it can never drift from what CI enforces. The
+`ci.yml` at runtime, so it can never drift from what CI enforces. This
+repository's own inventory doc (`docs/architecture/io-surface/INVENTORY.md`)
+self-hosts both faces — the gate inventory and the lint-radar appendix —
+and the `--check` freshness gate covers them together. The
 individual stages:
 
 ```bash

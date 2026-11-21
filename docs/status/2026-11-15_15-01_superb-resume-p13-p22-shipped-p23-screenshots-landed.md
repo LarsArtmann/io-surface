@@ -218,7 +218,7 @@ GitHub mirror and CI have seen nothing since the morning push).
 7. **The `#`-in-case-pattern bash trap** (`|#*)` parses `#` as a comment
    start) cost two syntax errors in check-md-render.sh — quote the pattern.
 
-## §f — UP TO 50 THINGS TO GET DONE NEXT
+## f) UP TO 50 THINGS TO GET DONE NEXT
 
 Immediate finishers (this plan):
 

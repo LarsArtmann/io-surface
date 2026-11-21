@@ -121,6 +121,8 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
 - `cmd/io-surface` has e2e tests (`main_test.go`): every test drives the real
   cmdguard execution via `runApp` with a swappable `stdout` sink, plus the
   exitCode 0/1/2 table. Table-driven stdlib tests only, no mocks (hermetic).
+  The sink is process-global and serial: never `t.Parallel()` a `runApp`
+  test (the 2026-11-15 session trap — parallel faces interleave on one sink).
 
 ## Sharp edges (current constraints)
 
