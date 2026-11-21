@@ -167,7 +167,7 @@ Nothing shipped broken — but three things went wrong and deserve recording:
 | 18 | #142 InboxClean gate confirm (blocked on GitHub billing or the Forgejo pivot)                                                        | High   | 5min   |
 | 19 | #155 Forgejo CI migration: enable runner (needs Forgejo admin token), port io-surface ci.yml first (drop windows jobs)               | Med    | 3h     |
 | 20 | #136 schema v1.3 train: runtime-power capabilities first-class + claims.ownership (one combined session, ratified)                   | Med    | 4h     |
-| 21 | #135 implement ownership v1.3 closer-missing semantics (same train as #136)                                                          | Med    | 2h     |
+| 21 | #135 implement ownership v1.3 closer-missing semantics (same train as #136) **→ routed to TODO_LIST Medium Impact #135 row (ownership v1.3 implementation, schema-v1.3 train with #136)** | Med    | 2h     |
 | 22 | #143 root-cause fleet tooling deployment: refresh system buildflow/docs-gates pins so ~/.local/bin shims become unnecessary          | Med    | 30min  |
 | 23 | #144 exercise `nix flake check` (never run) + settle the vendorHash mtime false-positive question                                    | Med    | 20min  |
 | 24 | #150 sweep BuildFlow's io-surface provider pin to v0.5.1 (go-ecosystem-upgrade loop)                                                 | Med    | 40min  |

@@ -155,7 +155,7 @@ stash — deliberately untouched.
 | 9  | Grow the mutation corpus: named-return, goroutine-closure, embedded-method mutators                                          | turns the recall floor into a rate                     |
 | 10 | Implement #116 manifest unknown-major version refusal                                                                        | oldest harvested gap                                   |
 | 11 | #115 applyDoc seam test (render fingerprint capture)                                                                         | mirrors the AppendBaseline seam test                   |
-| 12 | gogenfilter: push (owner) so the SARIF artifact step runs in real CI                                                         | the step is locally verified only                      |
+| ~~12~~ | ~~gogenfilter: push (owner) so the SARIF artifact step runs in real CI~~ done — TODO #98 DONE (gogenfilter step landed and verified) | ~~the step is locally verified only~~ |
 | 13 | InboxClean: owner reviews the PILOT-REVIEW bundle, then decides ci.yml pin bump + SARIF step                                 | unblocks T9's second half                              |
 | 14 | dnsblockd: owner runs the v1.2 runbook (2 undeclared sites first)                                                            | turns the runbook into a green gate                    |
 
@@ -195,7 +195,7 @@ stash — deliberately untouched.
 | 34 | LSP stale-cache noise: restart gopls once and verify the phantom typecheck errors disappear        |
 | 35 | scripts/self-gate.sh mirroring ci.yml's test job (other session's §f9, still open)                 |
 | 36 | README: suppression section link from FEATURES.md                                                  |
-| 37 | Roadmap Theme 5: record the artifact-only SARIF policy's first pilot artifact (gogenfilter run)    |
+| ~~37~~ | ~~Roadmap Theme 5: record the artifact-only SARIF policy's first pilot artifact (gogenfilter run)~~ done — TODO #98 DONE + ROADMAP Theme 5 (gogenfilter = first pilot artifact) |
 | 38 | Consider `io-surface lint --format github` adoption in THIS repo's CI (annotations on PRs)         |
 | 39 | Add a `make`-free local battery script (fmt+build+vet+test+check+docs-gates) to kill manual chains |
 | 40 | Prune `cmd/io-surface/io-surface` binary-blob question (#Q4) if still parked                       |
@@ -206,7 +206,7 @@ stash — deliberately untouched.
 | -- | ----------------------------------------------------------------------------------------------- |
 | 41 | Fleet re-scan cadence: decide a standing interval (per-release vs weekly)                       |
 | 42 | Pilot retro #2: run the findings→actions metric once artifact history exists (T23's definition) |
-| 43 | capabilities: Q5 decision (Capslock runtime-power vocabulary in or out)                         |
+| ~~43~~ | ~~capabilities: Q5 decision (Capslock runtime-power vocabulary in or out)~~ done — ROADMAP Q5 decided FIRST-CLASS 2026-11-08 (implementation row #136) |
 | 44 | Forgejo API token + push mirror (carried birth-report Q1/Q2 — ends manual dual-push)            |
 | 45 | Dependabot PR on InboxClean (carried)                                                           |
 | 46 | Write the "how to add a detector rule" doc from the registry pattern (T8/T10 proved the loop)   |

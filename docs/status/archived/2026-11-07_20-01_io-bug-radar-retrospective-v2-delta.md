@@ -186,10 +186,10 @@ first).
 22. Fix the opaque validation message (TODO #3) — unblocks 21.
 23. Land InboxClean's four pilot files (question 3), then triage its ~21
 token-tier advisory sites (declare or baseline).
-24. Port claims/criticality for gogenfilter's 5 sites (finish pilot #2).
+24. ~~Port claims/criticality for gogenfilter's 5 sites (finish pilot #2).~~ done — TODO #109 DONE (gogenfilter claims port)
 25. `lint` SARIF artifact step in InboxClean/gogenfilter CI (Theme 5 policy:
 artifact-only until promotion) — builds the upload evidence base.
-26. Self-lint CI step for io-surface.
+26. ~~Self-lint CI step for io-surface.~~ done — TODO #95 DONE (CI self-lint step, report-only)
 27. go-taskqueue pilot (37 findings — biggest untriaged signal pool).
 28. Wire `lint` into the fleet BuildFlow DAG as an opt-in tool.
 29. Pilot retro #2: did criticality claims change triage behavior?

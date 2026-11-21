@@ -160,7 +160,7 @@ docs-gates battery PASS, all local gates green.
    parent, red-in-window CI due to the dstep bug, zero Go-code delta).
 2. Decide: cut **v0.2.1** from the current green tip (`fef645d`: tables split,
    dprint gate fixed) so a tag exists whose own CI run is green — recommended.
-3. Fix README line 76: `describe --output json` → `describe` (no such flag).
+3. ~~Fix README line 76: `describe --output json` → `describe` (no such flag).~~ done — README fixed 2026-11-21: describe carries no --output flag (exit-1 verified); contract pinned TODO #53
 4. File the BuildFlow pre-commit template bug upstream (missing outer
    `done`/`fi` + `$( )` close — fixed locally in io-surface, the fleet
    template is still broken for everyone else).

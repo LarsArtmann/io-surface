@@ -138,7 +138,7 @@ TODO rows flipped to DONE this session: **13** (#117, #118, #93, #116, #49,
 
 **Immediate (the wrap tail):**
 
-1. Push both remotes: `git push origin master && git push github master` (M24/#—; 13 commits).
+1. ~~Push both remotes: `git push origin master && git push github master` (M24/#—; 13 commits).~~ done — TODO #128 DONE (aa89942, CI run 42451613161) + TODO #171 DONE (mirror current 2026-11-21)
 2. Re-run the full CI battery post-push and confirm GitHub CI green on the new HEAD (converts "tree-relative facts-fresh" to CI-green evidence).
 3. Finish M13.2: prove the io-surface step fires under `buildflow --dry-run`/targeted run with BOTH faces visible; record evidence in #125 (M13.3).
 4. Push the InboxClean pin commit `418ff69d` (owner call) + run their on-demand gates their hook skipped (nix flake check / lint / test).

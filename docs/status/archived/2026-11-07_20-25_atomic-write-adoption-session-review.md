@@ -165,7 +165,7 @@ waited out both buildflow pids, re-applied, and repaired the fallout
 **Repo hygiene:**
 26. lesson → crush-config `references/lessons.md` (by commit): "pgrep buildflow before edit batches in daemon repos".
 27. TODO_LIST numbering convention decision: per-section namespaces vs global monotonic (owner call).
-28. Verify the second buildflow loop's owner (other session?) is done before any next batch edit.
+28. ~~Verify the second buildflow loop's owner (other session?) is done before any next batch edit.~~ done — session-local coordination; both loops closed 2026-11-07
 29. `git stash list` audit across fleet repos — buildflow leaves stashes; sweep quietly.
 30. facts.cue audit lines: consider whether `init --force` during a multi-writer storm should refuse to write when HEAD moved mid-write (tiny race today, tolerated by CI filters).
 31. INVENTORY.md regen belongs in my personal battery script (item 9 covers).
@@ -179,8 +179,8 @@ waited out both buildflow pids, re-applied, and repaired the fallout
 37. gogenfilter: push + watch CI; claims pass for 5 sites.
 38. ~~dnsblockd v1→v1.2 migration (owner-gated).~~ done — dnsblockd MIGRATION-v1.2.md 5.2 review landed 2026-11-15 (dnsblockd 83f35759 b16bc0cc); io-surface TODO #139 DONE
 39. Pilot CI observation loop (retro §f8/§f10).
-40. Next pilot cohort (go-taskqueue 37 findings).
-41. Forgejo push mirror (TODO #41, blocked on token).
+40. ~~Next pilot cohort (go-taskqueue 37 findings).~~ done — TODO #87 + #140 DONE (go-taskqueue onboarded, 232/232 claimed 2026-11-15)
+41. Forgejo push mirror (TODO #41, blocked on token). **→ routed to TODO_LIST Medium Impact #41 row (blocked on the Forgejo API token, TODO #40)**
 42. Forgejo visibility flip (TODO #42, blocked on token).
 43. Capslock phantom-edge upstream report (blocked per verify-before-filing).
 44. cmdguard-lint CI wiring (TODO #63, blocked upstream).

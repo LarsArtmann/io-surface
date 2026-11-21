@@ -155,8 +155,8 @@ Every claim below names the command or commit that verifies it.
 8. **P20** dnsblockd packet (#27 + #146 + §5 warnings; #139 done by
    concurrent session — verify their diff first).
 9. **P21** M20 capability promotion evidence table → Q5 decision input.
-10. **P22** schema v1.3 design doc (ownership + runtime-power; bump
-    owner-gated).
+10. ~~**P22** schema v1.3 design doc (ownership + runtime-power; bump~~ done — spike landed docs/planning/2026-11-15_schema-v13-spike.md (rows #135/#136)
+    ~~owner-gated).~~
 11. **P23** 320px mobile audit of the docs site + small CSS fixes.
 12. **P24** #50 Capslock minimal repro + #133 go-finding propertyBag drafts
     (verify-before-filing; owner gate before filing).
@@ -166,8 +166,8 @@ Every claim below names the command or commit that verifies it.
     (post-scope-shift), #147 old GitHub Releases retention check, #148
     billing blast-radius audit note.
 15. **Push both remotes** when you say so (18 commits waiting).
-16. TODO reconciliation pass 2 after Waves 3-4 land (renumber audit +
-    battery).
+16. ~~TODO reconciliation pass 2 after Waves 3-4 land (renumber audit +~~ done — 2026-11-21 docs-health purge dissolved the duplicate row IDs; battery green
+    ~~battery).~~
 17. Renovate App activation (owner) → first automated pin PR.
 18. #167: confirm intent on `portfolio-io-insights.html`, then remove
     (owner staged the deletion once; a commit re-added it).
@@ -178,7 +178,7 @@ Every claim below names the command or commit that verifies it.
     inventory-doc `--check` gate.
 22. After P16: if any rule meets FP≈0, route the promotion decision to
     you (never self-promote).
-23. After P19: go-taskqueue push (their repo's gate first).
+23. ~~After P19: go-taskqueue push (their repo's gate first).~~ done — TODO #141 DONE (pushed through aa5ab099, their gate PASSED)
 24. After P25: everything in the fleet-unblock chain becomes 5-minute
     decisions the moment you drop the Forgejo token.
 25. Wire `scripts/check-docs-pointers.sh` into the other fleet repos'

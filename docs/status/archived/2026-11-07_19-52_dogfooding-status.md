@@ -66,7 +66,7 @@ mode one level deeper.
 
 1. `git push origin master && git push github master` (3 commits, today's proof).
 2. Commit InboxClean's 4 pilot files in InboxClean (owner-policy question §g).
-3. Add CI step: `go run ./cmd/io-surface lint --root . --format sarif > lint.sarif` + artifact upload.
+3. ~~Add CI step: `go run ./cmd/io-surface lint --root . --format sarif > lint.sarif` + artifact upload.~~ done — TODO #91 DONE (CI lint SARIF artifact step)
 4. Push gogenfilter, then watch its CI run green (retro §f8).
 5. TODO row for the 11 self-lint infos + the location.go:28 residual note.
 6. Watch InboxClean CI once billing allows; record the green link (retro §f10).

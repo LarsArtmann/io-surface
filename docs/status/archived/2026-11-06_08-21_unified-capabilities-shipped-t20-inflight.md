@@ -97,7 +97,7 @@ _(First ~8 are this session's tail; the rest are TODO_LIST carry-overs re-ranked
 16. #33 fleet inventory registration (meta).
 17. #51 unexported-type method fixture in `testdata/extract` (id-form regression guard).
 18. #52 renderer `displayWidth` + narrow-column unit tests.
-19. #53 cmdguard `describe` contract test.
+19. ~~#53 cmdguard `describe` contract test.~~ done — TODO #53 DONE (describe contract pinned by test)
 20. #54 `manifest.Load` decode errors name the offending file.
 21. #55 `check --strict-dirs`.
 22. #56 `--allow-unused-baseline` grace flag.

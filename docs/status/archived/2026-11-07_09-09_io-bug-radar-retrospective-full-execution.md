@@ -196,9 +196,9 @@ symbol-level messages (better SARIF UX).
 the owner (needs judgment context per write).
 22. Fix the opaque manifest-validation message (TODO #3) — unblocks 21.
 23. Declare or baseline InboxClean's 21 new token-tier advisory sites.
-24. Port claims/criticality for gogenfilter's 5 sites (finish the pilot).
-25. Wire `lint` into InboxClean/gogenfilter CI as artifact-only SARIF step
-(per Theme 5 policy) to build upload evidence.
+24. ~~Port claims/criticality for gogenfilter's 5 sites (finish the pilot).~~ done — TODO #109 DONE (gogenfilter 5 claims + criticality, gate green)
+25. ~~Wire `lint` into InboxClean/gogenfilter CI as artifact-only SARIF step~~ done — TODO #98 DONE (gogenfilter SARIF artifact step landed and verified; InboxClean D6-documented)
+~~(per Theme 5 policy) to build upload evidence.~~
 26. Self-lint CI step for io-surface (`lint --root .` — report-only until a
 rule promotes).
 27. Wire `lint` into the fleet's BuildFlow DAG as an opt-in tool.

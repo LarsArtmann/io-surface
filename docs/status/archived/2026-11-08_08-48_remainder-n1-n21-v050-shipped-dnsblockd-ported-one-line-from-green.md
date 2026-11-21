@@ -163,7 +163,7 @@ both remotes** through `c5fb7b6`.
 10. dnsblockd: re-render the io-surface doc so manifest↔doc token parity survives the port.
 11. go-taskqueue onboarding execution: `init --root ~/projects/go-taskqueue`, triage scaffold, claims with UNREVIEWED markers.
 12. go-taskqueue: fix the 1 `client-no-timeout` finding (real one-liner).
-13. go-taskqueue: batch-review the 20 `write-non-atomic` sites (queue-state durability judgment).
+13. ~~go-taskqueue: batch-review the 20 `write-non-atomic` sites (queue-state durability judgment).~~ done — TODO #140 DONE (wna triage: 4 real routed to their TODO_LIST, 9 dropped ephemeral)
 14. go-taskqueue: per-site io-in-loop review (32 — declare/ignore/fix).
 15. go-taskqueue: verify the BuildFlow gate face on root-manifest + leaf modules (plan risk #1).
 16. go-taskqueue: CI pin @v0.5.0; commit; push.

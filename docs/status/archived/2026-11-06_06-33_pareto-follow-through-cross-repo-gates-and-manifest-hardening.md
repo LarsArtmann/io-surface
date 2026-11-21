@@ -127,7 +127,7 @@ _(Ranked by impact; the first ~15 are TODO_LIST carry-overs with owner-verified 
 26. **NEW: document the `init --force` + git-restore ritual** in README (adoption safety for judgment files).
 27. **NEW: SARIF → GitHub code-scanning upload policy** (carry-over §g decision; artifact-only today).
 28. **NEW: dprint-parity CI step for INVENTORY.md** — prove the formatter no-op, not just `--check` freshness.
-29. **NEW: InboxClean gate pin policy** — `@v0.1.0` today; decide `@latest` vs. pinned (tag-lag risk).
+29. ~~**NEW: InboxClean gate pin policy** — `@v0.1.0` today; decide `@latest` vs. pinned (tag-lag risk).~~ done — DECIDED pinned: InboxClean pin bumped to @v0.5.1 across TODO #87/#117/#134 (never @latest)
 30. **NEW: dnsblockd cross-repo edit protocol** — document lock-acquire expectation for manifest-only edits (I edited with check-only, worked because free).
 31. **NEW: TODO_LIST row 36 is stale** (v0.1.0 already tagged) — docs-health sweep should drop it.
 32. ~~**#28 `.Do`/`.Close` token ambiguity** classification.~~ RESOLVED 2026-11-06: TODO_LIST #28 DONE — bare `.Do` records no family (`methodToken["Do"] = ""`, the manifest claim decides); the 0.3.0 detector line classifies `Close` calls structurally (closer-missing), independent of family tokenization.

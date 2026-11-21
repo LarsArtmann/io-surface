@@ -221,9 +221,9 @@ Category: Bug/Feature/Quality/Cleanup/Documentation/Process
 | #  | Task                                                                                                                          | Impact   | Effort | Category      |
 | -- | ----------------------------------------------------------------------------------------------------------------------------- | -------- | ------ | ------------- |
 | 1  | Run docs-health HARVEST: route section (f) below into TODO_LIST.md / ROADMAP.md                                               | Critical | S      | Process       |
-| 2  | Push both remotes (`origin` + `github`) per AGENTS.md publish rule — 410ce52, 5a6c289, daemon commits are local-only          | Critical | S      | Process       |
+| ~~2~~  | ~~Push both remotes (`origin` + `github`) per AGENTS.md publish rule — 410ce52, 5a6c289, daemon commits are local-only~~ done — TODO #128 DONE (aa89942 2026-11-08; mirror current since 2026-11-21 TODO #171) | ~~Critical~~ | ~~S~~ | ~~Process~~ |
 | 3  | After the other session finishes: one final full CI-bar run on the settled tree, then push                                    | Critical | S      | Process       |
-| 4  | Verify remote GitHub CI green after push (local replication ≠ remote run)                                                     | High     | S      | Process       |
+| ~~4~~  | ~~Verify remote GitHub CI green after push (local replication ≠ remote run)~~ done — CI success run 42451613161 on aa89942 (TODO #128) | ~~High~~ | ~~S~~ | ~~Process~~ |
 | 5  | Investigate claims pairing: facts audit says `claims: 20` but INVENTORY rendered `Claimed 0` for all sites — reconcile        | High     | M      | Bug           |
 | 6  | Review the 2 baseline entries added late-session: what they suppress, whether claim prose should own them instead             | High     | S      | Quality       |
 | 7  | Verify README documents the `absorb` subcommand (flags, Capslock pinning, --check mode)                                       | High     | S      | Documentation |
