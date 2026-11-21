@@ -1,5 +1,50 @@
 # SUPERB Pareto Execution Plan — io-surface, ALL open TODOs
 
+> **ERRATA (annotated 2026-11-21, post-execution read-back; ANNOTATE, never
+> rewrite):**
+>
+> - **Execution span:** P13-P26 ran across two sessions — 2026-11-15
+>   (P13-P22, status report `docs/status/2026-11-15_15-01_…`) and 2026-11-21
+>   (P23 close-out + P24-P26 + this errata pass). The 11-15 session ended in
+>   the owner's WAIT order; the 11-21 "whole todo list" order resumed it.
+> - **P12 judgment-inversion:** the archived-banner pass (12-56 report §12)
+>   initially INVERTED the docs-health rule — it judged banner-WORTHINESS of
+>   drained reports before checking whether the named remainders were still
+>   open. The 21-30 banner got added on the corrected reading (routed
+>   owner/blocked cluster genuinely open), the other three stayed
+>   banner-less because their items were verified drained, not skipped.
+> - **P13 blocker:** the first P13 commit was daemon-carried mid-edit
+>   (BuildFlow repair tools + the auto-commit daemon raced the session);
+>   re-read-before-edit and quiet-window commits became the standing rule
+>   after this (AGENTS sharp edges).
+> - **#139 rescope:** the dnsblockd owner-diff review was re-scoped by a
+>   concurrent session on 11-15 (the 3 claim-conflict warnings dissolved on
+>   v1.2 re-verification; #146 closed on that evidence instead — the
+>   warnings are historical, not live).
+> - **#50 premise outdated by this plan:** P24's "upstream filings repro
+>   package" inherited the 2026-11-06 BLOCKED verdict, but the 2026-11-21
+>   faithful repro FOUND the trigger (stdlib seq closure + net/http in
+>   universe; see `docs/planning/2026-11-21_capslock-phantom-network-repro-packet.md`)
+>   — the packet supersedes this plan's P24.1 framing ("phantom NETWORK
+>   edges from SSA range-func/interface conflation" → closure-identity
+>   misattribution is the sharper diagnosis).
+> - **Token-genericization lesson (audit-all):** minting ledger rows can
+>   push a shared anchor token to DF≥8 and silently UNHARVEST previously
+>   bound historical items (this session: "forgejo" flipped twice — via the
+>   packet-path citations and one errata-adjacent row). Rule that held:
+>   never line-game; reword the offending reference (the row number carries
+>   the referent) and re-run the battery.
+> - **render --lint shipped** (P14 tail, commit `c4c10e1`): TODO #153 done
+>   same-session, including the INVENTORY.md self-hosted appendix and the
+>   CI freshness step's `--lint --check` coupling — first REAL CI
+>   verification happened only with the 2026-11-21 GitHub push (#171).
+> - **P23 evidence location:** the 320px audit artifacts live under
+>   `docs/evidence/320px-audit/` (PNGs + provenance in
+>   `docs/evidence/README.md`), the re-render command is
+>   `scripts/320px-shot.sh`, and the md-render audit is
+>   `scripts/check-md-render.sh` (standing gate in self-gate + ci.yml).
+>   #127 closed 2026-11-21.
+
 **Plan:** 2026-11-15 08:57 CET
 **Sources:** `TODO_LIST.md` (164 ledger rows: 132 DONE, **32 open**), session
 status report `docs/status/2026-11-15_08-53_docs-health-corpus-drain-and-dual-repo-gates-green.md`
