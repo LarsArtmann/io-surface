@@ -264,13 +264,13 @@ direct consequences of THIS session.
 | 25 | #8 Baseline `owner` + `expires`; expired entries fail                                                                                                               | TODO | Med    | 1-2h   |
 | 26 | #9 Hint when declared sites fall outside `--dirs`                                                                                                                   | TODO | Med    | 30min  |
 | 27 | #14 Enforcement-policy field in the manifest (repo can't silently opt out)                                                                                          | TODO | Med    | 2h     |
-| 28 | ~~#23 manifest `version` field + schema bump rule~~ RESOLVED 2026-11-07: split — decode shipped with v1.1; the unknown-major refusal is harvested as TODO_LIST #116 |      | TODO   | Med    |
+| ~~28~~ | ~~#23 manifest `version` field + schema bump rule~~ RESOLVED 2026-11-07: split — decode shipped with v1.1; the unknown-major refusal is harvested as TODO_LIST #116 | ~~ ~~ | ~~TODO~~ | ~~Med~~ |
 | 29 | #24 `--ignore` globs for generated code                                                                                                                             | TODO | Med    | 1h     |
 | 30 | #22 `baseline add` subcommand (stop hand-editing CUE)                                                                                                               | TODO | Med    | 1h     |
 | 31 | #21 Cross-package seam support (`pkg/` helper owning the raw call)                                                                                                  | TODO | Med    | 2-3h   |
 | 32 | #25 Gate InboxClean: commit manifest + CI check (cross-repo)                                                                                                        | TODO | Med    | 30min  |
 | 33 | #26 dnsblockd: declare/baseline its 5 errors (cross-repo)                                                                                                           | TODO | Med    | 1h     |
-| 34 | #43 Wire docs-gates into CI, pinned                                                                                                                                 | TODO | Med    | 1h     |
+| ~~34~~ | ~~#43 Wire docs-gates into CI, pinned~~ done at `2ac0519` | ~~TODO~~ | ~~Med~~ | ~~1h~~ |
 | 35 | #44 CI job installing the module from the public path (module-path tripwire)                                                                                        | TODO | Med    | 30min  |
 | 36 | #39 Handle the open Dependabot PR (actions bump)                                                                                                                    | TODO | Med    | 15min  |
 | 37 | 🆕 Decide buildflow-vs-CI-bar reconciliation (g2): 350-line limit, golangci, -race — adopt fleet bar or document divergence                                         | 🆕   | Med    | 30min  |

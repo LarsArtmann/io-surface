@@ -235,7 +235,7 @@ deliberately absent (stale doc, contradicts the decision record).
 CI) is actually still open and file it if so.
 22. Verify item 26 (SARIF enforcement property) shipped state — the strike
 text says shipped; confirm the SARIF payload carries it.
-23. Item 27 (provider DAG e2e through BuildFlow itself) — still open.
+23. ~~Item 27 (provider DAG e2e through BuildFlow itself) — still open.~~ **NOT-DO — DUPLICATE — item 27 of this same section is the tracked work; TODO row #170 owns it (minted 2026-11-15).**
 24. Item 28 (`version --json` commit/date stamping in CI release flow) —
 still open; v0.2.0-era released binaries affected.
 25. Item 32 (CI concurrency group to cancel superseded runs) — still open.

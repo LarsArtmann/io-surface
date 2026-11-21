@@ -177,7 +177,7 @@ waited out both buildflow pids, re-applied, and repaired the fallout
 **Carried from the dogfooding report (still open, unchanged):**
 36. InboxClean: commit the 4 pilot files (owner-policy question, still unanswered).
 37. gogenfilter: push + watch CI; claims pass for 5 sites.
-38. dnsblockd v1→v1.2 migration (owner-gated).
+38. ~~dnsblockd v1→v1.2 migration (owner-gated).~~ done — dnsblockd MIGRATION-v1.2.md 5.2 review landed 2026-11-15 (dnsblockd 83f35759 b16bc0cc); io-surface TODO #139 DONE
 39. Pilot CI observation loop (retro §f8/§f10).
 40. Next pilot cohort (go-taskqueue 37 findings).
 41. Forgejo push mirror (TODO #41, blocked on token).
