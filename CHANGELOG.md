@@ -93,7 +93,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - TODO_LIST purge (2026-11-21): Re-derive TODO_LIST evidence line numbers at the next docs audit (they rot) — DONE 2026-11-08
 - TODO_LIST purge (2026-11-21): Consider `go-release` flow for v0.1.1 once P0 items #1-4 land — DONE 2026-11-06
 - TODO_LIST purge (2026-11-21): Decide whether stdout/stderr writes belong in `scope.in` (currently implicit out-of-scope) — DONE 2026-11-08
-- TODO_LIST purge (2026-11-21): repro found 2026-11-21, draft ready, owner-gated
 - TODO_LIST purge (2026-11-21): Fixture: unexported-type method site in `testdata/extract` (permanent id-form regression guard) — DONE 2026-11-06
 - TODO_LIST purge (2026-11-21): Unit tests for renderer `displayWidth` wide-range + narrow-column (min-3) separator paths — DONE 2026-11-06
 - TODO_LIST purge (2026-11-21): Pin the cmdguard `describe` machine-readable contract with a test — DONE 2026-11-06
@@ -183,7 +182,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - TODO_LIST purge (2026-11-21): M14 dnsblockd migration decision packet from the T19 runbook + session schedule; map unblock path for #27 — DONE 2026-11-08
 - TODO_LIST purge (2026-11-21): M15 baseline shrink: inspect the 2 baselined sites; declare or remove; shrink-or-justify — DONE 2026-11-08
 - TODO_LIST purge (2026-11-21): M20 ROADMAP Q5 decision input: capability promotion evidence summary → owner decision → ROADMAP update — DONE 2026-11-15 — M20 evidence delivered 2026-11-15; decision leg pre-satisfied 2026-11-08
-- TODO_LIST purge (2026-11-21): packet verified 2026-11-21, draft ready, owner-gated
 - TODO_LIST purge (2026-11-21): InboxClean: run on-demand gates their hook skipped (nix flake check/lint/test) + push decision for commit `418ff69d` — DONE 2026-11-08
 - TODO_LIST purge (2026-11-21): Ask the N19 Q1–Q4 owner batch (first BLOCKING gate repo, flake timing, weak-tier `--strict-weak` policy, binary-blob purge) and record the outcomes in ROADMAP Q1–Q4 — DONE — asked+recorded 2026-11-08: ROADMAP Q1–Q4
 - TODO_LIST purge (2026-11-21): v1.3 session-shape decision owed by owner: one combined schema-v1.3 train carrying runtime-power capabilities (#136) AND claims.ownership (#135), or two separate sessions — DONE — decided 2026-11-08: one combined v1.3 train→#136
@@ -210,10 +208,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - TODO_LIST purge (2026-11-21): Report-level golden for the `check` text output (today only lint has byte goldens: `lint-text.golden` pins the lint face, while `check` prints its prose untested — a presentation regression in printReport would ship silently) — DONE 2026-11-21 — check-text golden shipped 2026-11-21
 - TODO_LIST purge (2026-11-21): docs-gates binary freshness tripwire: CI is pin-fresh by construction (`docs-gates@v0.3.1` via `go run`), but LOCAL runs have two entry points — `nix run github:…docs-gates` (flake HEAD) and the system `/run/current-system/sw/bin/docs-gates` — either can lag the pin and redden a gate the pinned rev passes; candidate shape: self-gate.sh already reads the pin from ci.yml, extend it (or doctor) to verify the invoked docs-gates version string matches the pin before running the battery — DONE 2026-11-21 — tripwire shipped 2026-11-21: both local entry points exposed off-pin
 - TODO_LIST purge (2026-11-21): Push io-surface master to the GitHub public mirror: Forgejo origin is current (pushed 2026-11-15..21 by a later session) but github/master lags 44 commits waiting — CI has NEVER seen the render --lint CI-step change (`freshness` step now `--lint --check`), the lint-SARIF artifact step, or the markdown render audit step; after push, verify the GitHub Actions run green end to end (2026-11-21 session, owner ordered the whole list done) — DONE 2026-11-21 — pushed + CI green 2026-11-21: 47-commit wait ended, run 44925881521 all green
-- TODO_LIST purge (2026-11-21): routing rule minted 2026-11-21 from the 12-56 replay
-- TODO_LIST purge (2026-11-21): probe script minted 2026-11-21
-- TODO_LIST purge (2026-11-21): tripwire severity question minted 2026-11-21
-- TODO_LIST purge (2026-11-21): class-A minimization minted 2026-11-21
 
 ### Fixed
 
