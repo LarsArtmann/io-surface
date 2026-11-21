@@ -111,6 +111,46 @@ scripts/check-md-render.sh ||
 		"docs/status reports are read on GitHub; a swallowed fence or dropped table hides evidence." \
 		"fix the named file (balance the fences, add the table separator row, or fix the badge path)"
 
+step "docs-gates entry points match the CI pin (stale-binary tripwire, TODO #169)"
+# The battery below runs the PIN via `go run @rev` (what CI runs), but local
+# verdicts often come from other entry points: the system binary and
+# `nix run github:…docs-gates` (flake HEAD). Either can lag or lead the pin
+# and redden a gate the pinned rev passes — the 2026-11-11 stale-binary
+# incident class. Compare every present entry point against the pin TAG's
+# actual commit (annotated tags are peeled with ^{}) — the go-run face
+# reports "dev" (proxy zips carry no VCS stamp), so hashes are the only
+# comparable identity.
+PIN_COMMIT=$(git ls-remote "https://github.com/Artmann-Technologies/docs-gates" \
+	"refs/tags/${GATES_REV}" "refs/tags/${GATES_REV}^{}" |
+	awk -v ref="refs/tags/${GATES_REV}^{}" '$2 == ref {print $1; exit}')
+if [[ -z "$PIN_COMMIT" ]]; then
+	PIN_COMMIT=$(git ls-remote "https://github.com/Artmann-Technologies/docs-gates" \
+		"refs/tags/${GATES_REV}" | awk 'NR==1 {print $1; exit}')
+fi
+if [[ -z "$PIN_COMMIT" ]]; then
+	fail "no commit found for docs-gates tag ${GATES_REV}" \
+		"the tripwire compares local entry points against the pin's commit; the tag vanished or moved upstream." \
+		"re-pin ci.yml's docs-gates step to a rev that exists, then update the sed pattern expectation here"
+fi
+entry_mismatch=0
+SYSTEM_HASH=$({ command -v docs-gates >/dev/null 2>&1 && docs-gates --version || echo none; } 2>/dev/null | awk 'NR==1 {print $2}')
+if [[ "$SYSTEM_HASH" != none && -n "$SYSTEM_HASH" && "$PIN_COMMIT" != "$SYSTEM_HASH"* ]]; then
+	printf 'system docs-gates (%s) is NOT the pinned commit (%s)\n' "$SYSTEM_HASH" "${PIN_COMMIT:0:12}" >&2
+	entry_mismatch=1
+fi
+FLAKE_REV=$(nix flake metadata "github:Artmann-Technologies/docs-gates" --json 2>/dev/null |
+	python3 -c 'import json, sys; print(json.load(sys.stdin).get("revision", ""))' 2>/dev/null || true)
+if [[ -n "$FLAKE_REV" && "$PIN_COMMIT" != "$FLAKE_REV"* ]]; then
+	printf 'flake HEAD (%s) is NOT the pinned commit (%s) — "nix run github:…docs-gates" without a rev runs UNPINNED code\n' \
+		"${FLAKE_REV:0:12}" "${PIN_COMMIT:0:12}" >&2
+	entry_mismatch=1
+fi
+if ((entry_mismatch)); then
+	fail "a local docs-gates entry point differs from the CI pin ${GATES_REV}" \
+		"a verdict from that entry point is not the verdict CI would produce — the stale-binary class that reddened gates on 2026-11-11." \
+		"run the pinned rev (go run github.com/Artmann-Technologies/docs-gates/cmd/docs-gates@${GATES_REV} run .) or rebuild the lagging entry point from the pin before trusting any local docs-gates verdict"
+fi
+
 step "docs gates (pin read from ci.yml)"
 GATES_REV="$(sed -n 's/.*docs-gates@\([0-9a-zA-Z][0-9a-zA-Z.-]*\).*/\1/p' .github/workflows/ci.yml | head -1)"
 if [[ -z "$GATES_REV" ]]; then
