@@ -125,7 +125,7 @@ mine) · **dnsblockd:** manifest edits in working tree, **uncommitted**
 8. If Secret Scanning is push-protection on pre-existing content: file/lift
    per InboxClean conventions (not io-surface's call alone)
 9. Record #25/#26 adoption in io-surface CHANGELOG + README status (#25c)
-10. Mark TODO_LIST #25/#26 (and their evidence lines) done with pointers
+10. ~~Mark TODO_LIST #25/#26 (and their evidence lines) done with pointers~~ done — TODO #25 + #26 DONE (InboxClean 7965e694, dnsblockd 50f19b10); purged to CHANGELOG 2026-11-21
 11. **NEW: ID-form validation in `manifest.Validate`** — reject
     dotted-subpackage forms that can never pair (dnsblockd lesson, cheap)
 12. **NEW: CHANGELOG entry for the gitignore fix** (currently only in commit

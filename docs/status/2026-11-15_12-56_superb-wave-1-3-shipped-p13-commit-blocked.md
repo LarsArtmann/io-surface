@@ -218,7 +218,7 @@ Every claim below names the command or commit that verifies it.
     the one unwatched class; owner call whether console reads matter).
 43. Mutation-recall corpus extension when new detectors land (P15's
     appendix is renderer-side; no new rules — n/a today, keep on radar).
-44. Cross-check other siblings for the TestVendorHashTripwire
+44. Cross-check other siblings for the TestVendorHashTripwire **→ routed to TODO_LIST Low impact #180 row (the vendorHash/lock-collision class follow-up lives there now)**
     lock-collision class (P18.6 buffer item).
 45. InboxClean pin bump to the provider-v0.5.1 BuildFlow once P13 lands
     (their CI consumes BuildFlow, not io-surface directly — verify

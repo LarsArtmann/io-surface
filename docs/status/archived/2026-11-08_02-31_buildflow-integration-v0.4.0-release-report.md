@@ -135,7 +135,7 @@ workflows, by design).
 
 1. Cut a BuildFlow release (markers + upgrade channel) → installed binaries
    run the two-face provider.
-2. Verify + drop the two stale `buildflow-pre-commit` stashes in io-surface.
+2. ~~Verify + drop the two stale `buildflow-pre-commit` stashes in io-surface.~~ done — final buildflow-pre-commit stash dropped 2026-11-21 (content superseded: v0.4.0 shipped, tables landed, #93 DONE)
 3. Push io-surface master (7+ commits ahead at last check) once the
    concurrent session's line is green.
 4. Finish TODO #92: the remaining 4 self-lint infos (concurrent session

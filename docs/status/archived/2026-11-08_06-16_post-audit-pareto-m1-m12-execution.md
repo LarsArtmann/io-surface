@@ -179,7 +179,7 @@ TODO rows flipped to DONE this session: **13** (#117, #118, #93, #116, #49,
 35. When M17 splits check.go, the facts.cue locations shift again — batch the refresh with the split commit (refresh ritual).
 36. The scaffold template's new scope.out line ships to NEW adoptions only when they re-run init — consider a pilot note (InboxClean/gogenfilter facts.cue files won't gain it until their next init --force; their CI stays green either way).
 37. dnsblockd migration session (when scheduled): the scaffold template change means its v1→v1.2 port should ALSO pick up the explicit stdio exclusion — one less decision mid-migration.
-38. Next release's CHANGELOG should mention the InboxClean pin bump as ecosystem news (pilot evidence).
+38. Next release's CHANGELOG should mention the InboxClean pin bump as ecosystem news (pilot evidence). **→ routed to TODO_LIST High impact #173 row (the release train owns the CHANGELOG ecosystem-news entry)**
 39. Sweep for TODO_LIST rows citing `commands.go` line numbers — M12's `_, _ =` edits shifted lines below each site (#123's evidence cites no lines; verify others).
 40. `main_test.go` Sscanf fix changed failure semantics (Fatalf on unparsable TOTAL line) — fine, but the extract text-format contract is now stricter in tests; note in #123's evidence (done).
 41. If go-finding ships the run propertyBag (f.21), ALSO reconsider surfacing `stats` in SARIF (consumers currently re-derive counts).
