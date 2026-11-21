@@ -1,0 +1,3 @@
+error   io-surface/undeclared-site       cmd/late.Late  cmd/late/late.go:6
+        undeclared I/O site (os.ReadFile); declare it in facts/claims or add it to baseline with a note
+io-surface: 17 declared, 18 extracted (14 resolved, 4 token), 0 baselined — 1 errors, 0 warnings, 0 infos
