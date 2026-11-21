@@ -1093,6 +1093,7 @@
           code review): unfixed findings are forward-looking work, not
           report-entombed trivia.
         </p>
+        <div class="table-wrap">
         <table>
           <thead>
             <tr><th>#</th><th>Severity</th><th>File</th><th>Issue</th><th>Track</th></tr>
@@ -1103,6 +1104,7 @@
             <tr><td>160</td><td><span class="badge badge-low">Low</span></td><td><code>internal/extract/detectors.go</code></td><td><code>RuleDef.Severity</code> is a raw string; a registry typo silently degrades to info in <code>lint.severityOf</code> &mdash; typed enum is an API change (owner call)</td><td><span class="badge badge-low">TODO</span></td></tr>
           </tbody>
         </table>
+        </div>
 
         <h2 id="observations"><span class="num">03</span>Observations (no action owed)</h2>
         <div class="card card-warning">
