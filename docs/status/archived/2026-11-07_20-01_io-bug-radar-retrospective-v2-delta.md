@@ -224,7 +224,7 @@ the path is asserted today).
 46. CHANGELOG v0.3.0 section: state `--enforce` escalation semantics
 precisely (it currently says rules never fail; modulation can escalate).
 47. Superb bar one-pager (from the strategy answer) into docs/planning.
-48. Link the fleet JSON location decision in both status reports (see 5).
+48. ~~Link the fleet JSON location decision in both status reports (see 5).~~ done — TODO #93 DONE (docs/evidence/ home + provenance contract landed)
 49. Per-rule doc anchor IDs for SARIF consumers to deep-link.
 50. Errors-that-help pass on lint's exit-0 policy note (users should not
 have to read the flag help to learn findings never fail by default).

@@ -49,6 +49,172 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   lands somewhere real. The lint face keeps the tool pseudo-file for its
   defensive empty-location case (no current detector produces one).
 
+- TODO_LIST purge (2026-11-21): `check --json` always emits JSON, incl. validation failures (as findings with a `validation` rule) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Print actual `violations` entries when CUE unification fails (not "incompatible list lengths") — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `audit.commit` = `git rev-parse --short HEAD` (+ `-dirty`), fallback `working-tree` — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `render --check` + BEGIN/END generated blocks (doc ↔ manifest drift gate) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): CI: regenerate facts and fail on drift (freshness gate against the committed snapshot) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Baseline "only shrinks": fail when it grows beyond the committed count unless a flag allows it — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Baseline entries gain `owner` + `expires`; an expired entry fails — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Hint when declared sites fall outside `--dirs` (18 silent findings on InboxClean) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Golden test for `render.Markdown` (multiple families, claims, scope, empty states) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `cmd/io-surface` tests: exit codes 0/1/2, flag parsing, `--json` shape — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `manifest` package tests: decode edge cases + planted constraint violation — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `render` package tests: claims columns, judgments section, scope OUT — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Record the enforcement policy (D4) in the manifest so a repo cannot silently opt out — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Gate io-surface outside CI (self-hosted pre-commit) (pre-commit hook or `bin/dev`) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Pin `gofmt`/`go vet` locally (pre-commit), not only in CI — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): SARIF emission via `go-finding` (suppression files + LSP diagnostics for free) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): BuildFlow provider via `go-finding/toolsdk` so `./bin/dev` runs `io-surface check` — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Add missing extraction families: `os.Stdin/Stdout/Stderr`, `net.ListenConfig` (`syscall.Mmap/Munmap`, `bufio` constructors, `http.ServeContent/ServeFile` landed 2026-11-06 with a table-reachability invariant test) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Derive seams from the manifest's `via` values instead of the hardcoded `seamIdent` table — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Cross-package seam support (a `pkg/` helper owning the raw call) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `io-surface baseline add <id> --note <text> --date <d>` (stop hand-editing CUE) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `version: "io-surface/v1"` field inside the manifest; bump on any schema change — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Gate InboxClean: commit `docs/architecture/` + a check in its CI (cross-repo) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Declare or baseline dnsblockd's 5 errors, get it to 0 errors (cross-repo) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Reconsider bare `.Do`/`.Close` tokens — classify as ambiguous rather than a family — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `extract --stats`: per-package histogram to spot outlier packages — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `io-surface version --json` with commit + build date — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Document the taxonomy freeze rule (a new family = a schema version bump) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Document ID migration for package moves (path change = a new ID set) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Register the repo in the fleet inventory (`meta` / stack-selection) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Run the checker under `-race` and on a very large repo; record results — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Run against crush-daily + ~10 daemon repos; publish a real family distribution — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Tag `v0.1.0` (version const, README Status and CHANGELOG all say 0.1.0; no git tag) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Smoke-test `go install github.com/larsartmann/io-surface/cmd/io-surface@latest` via proxy.golang.org — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Check pkg.go.dev indexes the module once the proxy caches it — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Handle the open Dependabot PR (actions group bump): review + merge or close — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Wire `docs-gates` into CI as a standing gate, pinned to a rev — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Add a CI job that installs the module from the public path (module-path tripwire) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Add "verified how" discipline to future health reports (name the command per claim) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Seed `.docs-gates.json` thresholds for this repo — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Re-derive TODO_LIST evidence line numbers at the next docs audit (they rot) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Consider `go-release` flow for v0.1.1 once P0 items #1-4 land — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Decide whether stdout/stderr writes belong in `scope.in` (currently implicit out-of-scope) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): repro found 2026-11-21, draft ready, owner-gated
+- TODO_LIST purge (2026-11-21): Fixture: unexported-type method site in `testdata/extract` (permanent id-form regression guard) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Unit tests for renderer `displayWidth` wide-range + narrow-column (min-3) separator paths — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Pin the cmdguard `describe` machine-readable contract with a test — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `manifest.Load` decode errors name the offending file (Dir-anchored context) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `check --strict-dirs`: fail instead of hint when declared sites fall outside `--dirs` — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `--allow-unused-baseline` grace flag before promoting unused-baseline to error — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): README: document the `init --force` + git-restore ritual for judgment files — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): CI: dprint-parity step proving INVENTORY.md survives a formatter pass — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): id-drift single-dotted pairing warning should name the correct slash form (like id-form does) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): `constraintError`: one deterministic conjunct walk instead of two overlapping dedupes — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Decide SARIF → GitHub code-scanning upload policy vs artifact-only — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): Index `docs/status/` reports (`docs/status/README.md` pattern, like dnsblockd) — DONE 2026-11-06
+- TODO_LIST purge (2026-11-21): Split the oversized core files to fleet-default 350 lines (extract tables/pairing/handlers) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): T1 Design: observation channel, detector registry, `lint` exit policy — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T2 Plumbing: `extract.Observation` + `ExtractWithObservations` + AST capture contexts — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T3 `err-dropped` rule + deliberate-ignore escape (`_ =` ok, `x, _ :=` flagged) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T4 Detector fixture tree + text/SARIF goldens + round-trip assert — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T5 `lint` command (no manifest, exit 0 unless `--enforce`) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T6 `closer-missing` (ctor table + defer/Close search + escape suppression) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T7 `closer-missing` http variant (`resp.Body` close duty) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T8 `ctx-dropped` (variant-pair table + ctx-in-scope) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T9 `ctx-dropped` fixtures/goldens — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T10 Dogfood: `lint` on io-surface; fix/baseline every hit before any severity promotion — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T11 Pilot FP sampling on 5 hotspot repos; per-rule go/no-go — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T12 `defer-in-loop` — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T13 `client-no-timeout` (Client literal sans Timeout; bare http.Get/Post) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T14 `stat-then-open` (identical-path-expr TOCTOU/double-syscall) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T15 `io-in-loop` (info only, N+1 shape) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T16 Fleet harness: committed 182-repo runner + FP aggregates — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T17 Severity promotion from evidence (thresholds, verdicts, promote, re-prove self-gate) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T18 Release v0.3.0 (CHANGELOG, README, tag both remotes, proxy check, BuildFlow pickup) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T19 Claims v1.2: `criticality`/`durability` schema (both schema.cue copies byte-identical) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T20 Severity modulation (claims x observations) + `claim-conflict` rule — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T21 `write-non-atomic` (temp+rename pattern + manifest-`via` seam whitelist) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T22 `tiny-buffer` (small Read buffer in loop) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T23 Pilot onboarding: init + claims + green gate + CI in 2-3 repos — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T24 Spike: golangci focus filter vs audit module vs `--precise` boundary + SARIF upload policy (→ #61) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T25 Docs sync: TODO_LIST/FEATURES/ROADMAP after suite lands — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): Expose io-bug-radar through the BuildFlow provider (gate + radar merged; manifestless = radar-only at info, never a step error) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): CI self-lint SARIF artifact step (implements the #61 artifact-only policy) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): Triage the self-lint infos: 6 of 11 ANSWERED by the go-atomic-write adoption (5 write-non-atomic + 1 stat-then-open gone); 4 io-in-loop remain (symbolVisible post-fix residual, 2 extract stat pairs, scaffold existence guard) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): SARIF: surface the enforcement policy as a SARIF property (emit it from `internal/emit` so consumers see gate vs audit posture per run) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): T1 Promotion policy v1 (thresholds, de-promotion, ratification) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T2 Fleet re-scan with the final ruleset; evidence report regenerated — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T3 FP verification protocol: 30× write-non-atomic/tiny-buffer/client-no-timeout — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T4 Evidence hygiene: docs/evidence/ home; /tmp citations fixed — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T5 Suppression mechanism: `//io-surface:ignore <rule> <reason>` — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T6 Self-lint CI step (report-only) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T7 CHANGELOG Unreleased fill (P3 features) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T8 Rule cards: README table (detects/FP classes/examples) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T9 Pilot SARIF artifact steps (gogenfilter + InboxClean CI) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T10 Mutation corpus + `TestMutationRecall` (recall % per rule, in CI) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T11 TODO #3: per-site validation error messages — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T12 go-taskqueue triage (37 findings) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T13 write-non-atomic/tiny-buffer semantics decisions from measured data — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T14 `lint --format github` (PR annotations) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T15 Contract polish: describe lint flags + SARIF ruleDescription — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T16 io-in-loop same-path refinement — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T17 FP-class decisions via suppression (os.Remove, force-kill) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T18 Ownership claims v1.3 design spike → ROADMAP Q6 ADR — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T19 dnsblockd migration runbook (inventory + mapping template; NO migration) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T20 gogenfilter claims port (5 sites + criticality) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T21 InboxClean review bundle (diff summary + rationale; NO commit) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T22 Benchmark lint on the biggest fleet repo (display-only) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T23 Pilot retro #2 prep (behavior metric + artifact instrumentation) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T24 Docs sync (AGENTS lint row, Theme 2 link, --enforce doc, errors-help) — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): T25 Wrap: status report v3 + cadence check + push — DONE 2026-11-07
+- TODO_LIST purge (2026-11-21): Same seam test for applyDoc (render doc-fingerprint capture) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Manifest `version` field: unknown-major refusal (Load/Validate rejects versions beyond the shipped contract) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Owner ratifications pending: promotion-policy numbers (policy §8) + ownership v1.3 scope (ROADMAP Q6) + InboxClean CI pin/SARIF step — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Bump `cmdguard` → v4.2.1 (later migrated to v5) + `go-atomic-write` → v0.6.2; full gates; refresh audit reports' version-currency rows — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Proxy-check latest versions for the 16 local-tag-only audit libs; resolve go-credentials-store v0.2.1-tag vs README-v0.3.1 — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Audit discoverability: README pointer to `docs/review/libs/`, screenshot link in index footer, README claims vs v0.4.0 — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Run full local CI battery (render, inventory-doc --check, SARIF emit, facts-freshness) — convert "gate green" to "CI green" — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): go-finding + go-finding/toolsdk utilization deep-dives in the `docs/review/libs/` series (+ index 22→24 rows) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): errcheck decision for the 8 `commands.go` stdout-sink warnings: adopt minimal config + fix, or documented waiver — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Version currency: `cuelang.org/go` v0.17.1 vs latest + toolsdk v1.16.0/go-finding v1.15.1 skew check — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Verify BuildFlow picked up provider v0.4.0 (sdk_imports pin; run one detect end-to-end) — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Series sweep: `docs/reviews/` + `docs/research/` overlap check + supersedes convention for the audit series — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Audit rendering checks: mobile check (render index.html at 320 px; only 1280 px was screenshotted) + visual pass of the 22 .md report files on GitHub (tables/badges render) — DONE 2026-11-21 — 320px audit done 2026-11-21: 3 reports contained, scrollWidth 305 ≤ 320
+- TODO_LIST purge (2026-11-21): fleetscan silent zero-scan: repos without `cmd/`+`internal/` scan as a clean 0 (project-discovery-sdk artifact) — DONE 2026-11-11
+- TODO_LIST purge (2026-11-21): `emit.positionOf`: an empty location anchors SARIF at the pseudo-file `io-surface` (RuleMissingLocation) — decide the honest shape — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): lint face prints findings in walk order; check sorts strongest-first — align lint's presentation (re-pins lint goldens deliberately) — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): `extract.RuleDef.Severity` is a raw string: a registry typo silently degrades to info in `lint.severityOf` — make it a typed enum — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Push the 13 unpushed master commits to BOTH remotes (origin + github); confirm CI triggered on the new HEAD — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Cut v0.5.0: version const + CHANGELOG heading + README status line + full gates + tags to both remotes + proxy check — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): M14 dnsblockd migration decision packet from the T19 runbook + session schedule; map unblock path for #27 — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): M15 baseline shrink: inspect the 2 baselined sites; declare or remove; shrink-or-justify — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): M20 ROADMAP Q5 decision input: capability promotion evidence summary → owner decision → ROADMAP update — DONE 2026-11-15 — M20 evidence delivered 2026-11-15; decision leg pre-satisfied 2026-11-08
+- TODO_LIST purge (2026-11-21): packet verified 2026-11-21, draft ready, owner-gated
+- TODO_LIST purge (2026-11-21): InboxClean: run on-demand gates their hook skipped (nix flake check/lint/test) + push decision for commit `418ff69d` — DONE 2026-11-08
+- TODO_LIST purge (2026-11-21): Ask the N19 Q1–Q4 owner batch (first BLOCKING gate repo, flake timing, weak-tier `--strict-weak` policy, binary-blob purge) and record the outcomes in ROADMAP Q1–Q4 — DONE — asked+recorded 2026-11-08: ROADMAP Q1–Q4
+- TODO_LIST purge (2026-11-21): v1.3 session-shape decision owed by owner: one combined schema-v1.3 train carrying runtime-power capabilities (#136) AND claims.ownership (#135), or two separate sessions — DONE — decided 2026-11-08: one combined v1.3 train→#136
+- TODO_LIST purge (2026-11-21): dnsblockd owner diff review of the mechanical v1.2 port (92 merged / 42 dropped keys / 21 UNREVIEWED fills) + resolve the 3 `claim-conflict` warnings the gate surfaces (loadTrialBlocklist, processor.Run, processor.writeMapping) — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): go-taskqueue claims judgment hour: fill 230 empty claims blocks (resource/trigger; durability on write-family sites) + triage the 20 write-non-atomic radar findings (real-bug-potential batch) — DONE 2026-11-15 — claims hour done 2026-11-15: 232/232 claimed, triage routed
+- TODO_LIST purge (2026-11-21): Push go-taskqueue onboarding commit `5d223a42` (repo is push-owner-gated; a concurrent session's v0.4.2 work was in-flight) — DONE — pushed 2026-11-08 21:06: rebased the 51-commit local line onto origin/master (concurrent fuzz commit 4d6250ac landed first), pushed through `aa5ab099` after the push-timing hook's 600s freshness guard; their CI: gate step PASSED, 2 failures are pre-existing v0.4.2 debt (missing internal/retryx/v0.4.2 tag + docsgates#4 windows test)
+- TODO_LIST purge (2026-11-21): Exercise the flake's test check: `nix flake check` (the enableTestCheck derivation exists but has NEVER run) + one full `buildflow` battery post-flake (flake-pin-drift now triggers on flake.nix) — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Root-cause the go-taskqueue BuildFlow fan-out count: 53 findings via `-s io-surface` vs 52 via root CLI — one leaf module re-counts the harvest site; advisory only but the evidence chain should explain the +1 — DONE 2026-11-15 — fan-out count RCA done 2026-11-15: 54==54 verified, no double-count at v0.5.1
+- TODO_LIST purge (2026-11-21): dnsblockd MIGRATION-v1.2.md §5: append the 3 live `claim-conflict` warnings (loadTrialBlocklist atomic-write-on-outbound, processor.Run + processor.writeMapping buffered-write-on-stream-copy) so the review deck matches the gate output — DONE 2026-11-15 — claim-conflict warnings dissolved by #139 overlay, verified 0 today
+- TODO_LIST purge (2026-11-21): Purge follow-through: confirm old GitHub Releases (v0.2.0/v0.4.0/v0.5.0) source archives resolve on rewritten tags; confirm proxy `@master` serves a post-purge zip; backup DECIDED+DELETED 2026-11-08 (owner chose delete; mirror trashed) — DONE 2026-11-21 — purge follow-through verified 2026-11-21: tags+archives+proxy all resolve
+- TODO_LIST purge (2026-11-21): GitHub billing blast-radius audit (SUPERSEDED-BY-#155 for the fix; the audit survives as the post-migration inventory): after the billing failure is fixed, enumerate which fleet repos/jobs were silently blocked (InboxClean's Nix Flake Check + Secret Scanning never started 2026-11-08: "recent account payments have failed") — DONE 2026-11-21 — audit-as-of-2026-11-21 recorded: InboxClean jobs still scheduler-blocked, fix rides #155
+- TODO_LIST purge (2026-11-21): cmd-level e2e test for `--strict-weak` flag parsing/exit code (check-level `TestRun_StrictWeakEscalates` exists; the `--strict-dirs` precedent also lacks a cmd test) — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Sweep BuildFlow's io-surface provider pin to v0.5.1 (its go.mod requires an older published provider tag; both faces ship through that loop) — DONE 2026-11-15 — sweep verified 2026-11-15: BuildFlow go.mod @ v0.5.1, commit 4e5def7b9
+- TODO_LIST purge (2026-11-21): W3 promotion re-scan per docs/planning/2026-11-07_promotion-policy.md §9 (detector evidence re-derivation at the next release train; feeds the D4 evaluation) — DONE 2026-11-15 — W3 re-scan done 2026-11-15: evidence committed, verdict NO PROMOTIONS
+- TODO_LIST purge (2026-11-21): AGENTS.md slim to ≤220 lines (fleet budget; ~335 now, flagged by buildflow preflight every run) — move detail to README/docs per the preflight fix hint — DONE 2026-11-15 — slimmed 2026-11-15: commit a8889d8
+- TODO_LIST purge (2026-11-21): `render --lint` appendix option: render the lint-findings report as an appendix inside the inventory doc — one doc, both faces (gate + radar) — DONE 2026-11-15 — render --lint shipped 2026-11-15: design + implement + self-hosted + CI-wired
+- TODO_LIST purge (2026-11-21): Decide `--json` vs `--format` consolidation now that SARIF has shipped and stabilized (current: `--json` is shorthand for `--format json`; README documents both) — keep the shorthand or deprecate it — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): `scripts/self-gate.sh` mirroring ci.yml's test job as ONE local command (facts re-check after last edit → self-check → self-render → inventory-doc --check → gofmt-empty) — the pre-push ritual that would have caught both of this session's CI breaks — DONE 2026-11-15 — self-gate shipped 2026-11-15: 12-step mirror verified green + failure path probed
+- TODO_LIST purge (2026-11-21): Set up renovate/dependabot (or a CI pin-bump check) for the `go run …@pin` module-path lines — the docs-gates pin in ci.yml (line 111) is hand-maintained and will rot silently — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Living-docs VERIFY + polish pass (README/FEATURES/ROADMAP/AGENTS/CHANGELOG content vs code) — the 2026-11-15 session polished crush-config's docs but only gate-fixed this repo's; the SUPERB bar is unverified here — DONE 2026-11-15 — verified 2026-11-15: commit 7d9e97d
+- TODO_LIST purge (2026-11-21): CONTRIBUTING.md staleness + docs-pointer existence check — add a CI/doctor check that AGENTS.md-referenced docs (docs/release-protocol.md, docs/check-semantics.md, docs/errcheck-policy.md) actually exist — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Rebuild `result` (`nix build .# -o result`) to clear the vulnix stale-target warning + record the result-dir policy (gitignored artifact vs checked pattern) in AGENTS.md or the plan errata — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Give the archived reports per-report tailored `> **Live remainder:**` banners where missing (docs-health ANNOTATE rigor; the cadence ritual's banner step was skipped for some of the 28) — DONE 2026-11-15
+- TODO_LIST purge (2026-11-21): Report-level golden for the `check` text output (today only lint has byte goldens: `lint-text.golden` pins the lint face, while `check` prints its prose untested — a presentation regression in printReport would ship silently) — DONE 2026-11-21 — check-text golden shipped 2026-11-21
+- TODO_LIST purge (2026-11-21): docs-gates binary freshness tripwire: CI is pin-fresh by construction (`docs-gates@v0.3.1` via `go run`), but LOCAL runs have two entry points — `nix run github:…docs-gates` (flake HEAD) and the system `/run/current-system/sw/bin/docs-gates` — either can lag the pin and redden a gate the pinned rev passes; candidate shape: self-gate.sh already reads the pin from ci.yml, extend it (or doctor) to verify the invoked docs-gates version string matches the pin before running the battery — DONE 2026-11-21 — tripwire shipped 2026-11-21: both local entry points exposed off-pin
+- TODO_LIST purge (2026-11-21): Push io-surface master to the GitHub public mirror: Forgejo origin is current (pushed 2026-11-15..21 by a later session) but github/master lags 44 commits waiting — CI has NEVER seen the render --lint CI-step change (`freshness` step now `--lint --check`), the lint-SARIF artifact step, or the markdown render audit step; after push, verify the GitHub Actions run green end to end (2026-11-21 session, owner ordered the whole list done) — DONE 2026-11-21 — pushed + CI green 2026-11-21: 47-commit wait ended, run 44925881521 all green
+- TODO_LIST purge (2026-11-21): routing rule minted 2026-11-21 from the 12-56 replay
+- TODO_LIST purge (2026-11-21): probe script minted 2026-11-21
+- TODO_LIST purge (2026-11-21): tripwire severity question minted 2026-11-21
+- TODO_LIST purge (2026-11-21): class-A minimization minted 2026-11-21
+
 ### Fixed
 
 - `check` report ordering is now strongest-first (error, warning, info).

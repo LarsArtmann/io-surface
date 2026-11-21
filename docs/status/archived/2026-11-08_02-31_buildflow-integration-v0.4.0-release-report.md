@@ -175,7 +175,7 @@ workflows, by design).
     BuildFlow repair (ROADMAP-sized).
 25. Decide lint `--include-tests` in the provider (current: tests skipped —
     record the decision somewhere durable).
-26. Forgejo push mirror for io-surface (TODO #41, blocked on API token #40). **→ routed to TODO_LIST Low Impact #41 row (blocked on the Forgejo API token, TODO #40)**
+26. Forgejo push mirror for io-surface (TODO #41, blocked on API token #40). **→ routed to TODO_LIST Low Impact #41 row (push_mirrors runbook ready 2026-11-21; blocked on the Forgejo API token #40)**
 27. GitHub billing fix (owner) → BuildFlow + InboxClean CI observable again.
 28. The superb-verification plan's own backlog (its session owns it; do not
     duplicate here).

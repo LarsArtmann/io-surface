@@ -240,7 +240,7 @@ untested; extract to a committed python file with a test).
 45. README: rule table with FP classes (see 20).
 ~~46. AGENTS.md: add `lint` to the Commands block.~~ done (docs-health pass done (verified 2026-11-15: AGENTS.md Commands block line 28 carries `go run ./cmd/io-surface lint --root .` — landed with the detector line))
 47. ROADMAP Theme 2 cross-link for write-non-atomic (planned-but-skipped).
-48. Status report: link the fleet JSON location decision (see 3).
+48. ~~Status report: link the fleet JSON location decision (see 3).~~ done — TODO #93 DONE (docs/evidence/ home + provenance contract landed; /tmp citations fixed corpus-wide)
 49. Describe contract: lint already registered; verify `describe --output
     json` includes lint flags (e2e asserts path only).
 50. CHANGELOG: retro-fix the v0.3.0 section to mention `--enforce` semantics
