@@ -19,6 +19,8 @@ package lint
 import (
 	"fmt"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
@@ -84,6 +86,26 @@ func Run(root string, opts Options) (*check.Report, error) {
 				sev = escalate(sev)
 			case manifest.DurabilityEphemeral:
 				continue
+			}
+		}
+		// Ownership weighs closer-missing (v1.3, Q6 ADR): a `caller` claim
+		// declares the handle leaves this function (return, registry, pool,
+		// long-lived session — shapes the AST cannot always see), so the
+		// finding drops; a `helper` claim drops only when the named helper
+		// is actually called in the enclosing function (receiver-insensitive
+		// base-name match against the observation's FuncCalls). Unclaimed
+		// and `self` keep today's behavior.
+		if o.Rule == extract.RuleCloserMissing && declared {
+			switch c.Ownership {
+			case manifest.OwnershipCaller:
+				continue
+			case manifest.OwnershipHelper:
+				// The claim silences only when the named helper is really
+				// called here; a claim whose helper is absent keeps the
+				// finding (a lying claim must not silence the detector).
+				if slices.Contains(o.FuncCalls, helperBase(c.Helper)) {
+					continue
+				}
 			}
 		}
 		f := check.Finding{
@@ -157,4 +179,16 @@ func severityOf(s extract.Severity) check.Severity {
 	}
 
 	return check.SeverityInfo
+}
+
+// helperBase reduces a claims.helper value to its receiver-insensitive base
+// name — the same canonicalization as internal/match: "util.Drain" and
+// "pkg.Type.Method" both record "Method"-style last segments, matching the
+// FuncCalls sets the detector observations carry.
+func helperBase(helper string) string {
+	if _, base, found := strings.Cut(helper, "."); found && base != "" {
+		return helperBase(base)
+	}
+
+	return helper
 }

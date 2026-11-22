@@ -58,6 +58,12 @@ type Claims struct {
 	// (normal / recoverable) without manifest edits.
 	Criticality string `json:"criticality,omitempty"`
 	Durability  string `json:"durability,omitempty"`
+	// Ownership vocabulary (v1.3, Q6 ADR): who closes a closable handle.
+	// Zero value = "self" = the pre-v1.3 behavior. Helper names the owning
+	// call when Ownership is helper; required in that case, forbidden
+	// otherwise (ValidateClaims enforces both directions).
+	Ownership string `json:"ownership,omitempty"`
+	Helper    string `json:"helper,omitempty"`
 }
 
 // Criticality/durability vocabularies (schema v1.2). The CUE closed enums in
@@ -72,6 +78,35 @@ const (
 	DurabilityRecoverable = "recoverable"
 	DurabilityDurable     = "durable"
 )
+
+// Ownership vocabulary (schema v1.3, Q6 ADR). Empty (unclaimed) behaves as
+// OwnershipSelf: this function closes what it opens.
+const (
+	OwnershipSelf   = "self"
+	OwnershipCaller = "caller"
+	OwnershipHelper = "helper"
+)
+
+// ValidateClaims checks the ownership claim pair: the vocabulary is closed
+// (the CUE enum enforces it when the schema is present — this guard covers
+// stale or missing schema copies), `helper` requires naming the helper, and
+// the helper name is forbidden under any other ownership value.
+func ValidateClaims(c Claims) error {
+	switch c.Ownership {
+	case "", OwnershipSelf, OwnershipCaller:
+		if c.Helper != "" {
+			return fmt.Errorf("claims.helper %q forbidden unless ownership is %q", c.Helper, OwnershipHelper)
+		}
+	case OwnershipHelper:
+		if c.Helper == "" {
+			return fmt.Errorf("ownership %q requires claims.helper to name the owning call", OwnershipHelper)
+		}
+	default:
+		return fmt.Errorf("claims.ownership %q outside the closed set (self, caller, helper)", c.Ownership)
+	}
+
+	return nil
+}
 
 // Site is one declared I/O surface entry.
 type Site struct {
@@ -250,6 +285,14 @@ func Load(dir string) (*Manifest, error) {
 	err = value.LookupPath(cue.ParsePath("sites")).Decode(&m.Sites)
 	if err != nil {
 		return nil, fmt.Errorf("decoding sites in %s: %w (facts.cue and claims.cue both contribute to sites — check the file you edited last)", dir, err)
+	}
+	// Ownership claim validation (v1.3): the pair (ownership, helper) has a
+	// cross-field contract the CUE conditional does not fully express —
+	// helper required under "helper", forbidden otherwise.
+	for id, s := range m.Sites {
+		if err := ValidateClaims(s.Claims); err != nil {
+			return nil, fmt.Errorf("claims for site %s: %w", id, err)
+		}
 	}
 	if len(m.Sites) == 0 {
 		return nil, fmt.Errorf("%w: %s declares no sites", ErrEmpty, dir)

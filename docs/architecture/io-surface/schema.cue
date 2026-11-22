@@ -93,6 +93,20 @@ enforcement?: "gate" | "audit"
 		// durability: what a lost write costs. Only meaningful for write
 		// families; `durable` sites escalate write-shaped findings (T21).
 		durability: "ephemeral" | "recoverable" | "durable" | *"recoverable"
+		// ownership (v1.3, Q6 ADR): who is responsible for closing a
+		// closable-constructor handle. Absent = "self" = today's behavior
+		// (this function must close it). `caller` declares the handle
+		// leaves this function (return, registry, pool, long-lived
+		// session) — shapes the AST cannot always see — so closer-missing
+		// drops. `helper` names the function that closes it (see helper).
+		// POLICY, not suppression: the site-level ignore directive stays
+		// the fine-grained tool.
+		ownership: "self" | "caller" | "helper" | *"self"
+		// helper: the owning helper, required exactly when ownership is
+		// "helper" (enforced in Go validation); the name matches the
+		// function's call expressions receiver-insensitively (same
+		// canonicalization as internal/match: pkg.Type.Method ≡ Method).
+		helper?: string
 	}
 }
 

@@ -25,6 +25,12 @@ type Observation struct {
 	Call     string `json:"call"`     // watched call, e.g. "os.ReadFile"
 	Location string `json:"location"` // repo-relative "path:line" of the call
 	Evidence string `json:"evidence"` // human clause, e.g. `x, _ := os.ReadFile(path)`
+	// FuncCalls carries the receiver-insensitive base names of every call
+	// expression in the enclosing function (v1.3, deduped + sorted): the
+	// claims.ownership="helper" modulation matches a claim's helper name
+	// against this set, so the lint face needs no second AST pass. Populated
+	// by emit for detector observations only.
+	FuncCalls []string `json:"funcCalls,omitempty"`
 }
 
 // Rule names for the detector vocabulary (D7: additive and stable; the lint
@@ -317,7 +323,52 @@ func (e *extractor) runDetectors(fnID string, fn *ast.FuncDecl, imports map[stri
 
 // emit builds one observation from a capture.
 func (e *extractor) emit(c *capture, rule, ev string) Observation {
-	return Observation{SiteID: c.id, Rule: rule, Call: c.sel, Location: c.location, Evidence: ev}
+	return Observation{
+		SiteID:    c.id,
+		Rule:      rule,
+		Call:      c.sel,
+		Location:  c.location,
+		Evidence:  ev,
+		FuncCalls: funcCallNames(c.fn),
+	}
+}
+
+// funcCallNames collects the deduped, sorted base names of every call
+// expression in a function body (receiver-insensitive: os.Create, w.Write
+// and helper.Drain all record their final identifier). Nil for a nil or
+// bodiless declaration. The ownership="helper" claim modulation matches
+// against this set (same canonicalization as internal/match).
+func funcCallNames(fn *ast.FuncDecl) []string {
+	if fn == nil || fn.Body == nil {
+		return nil
+	}
+
+	seen := map[string]bool{}
+	ast.Inspect(fn.Body, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		switch fun := call.Fun.(type) {
+		case *ast.Ident:
+			seen[fun.Name] = true
+		case *ast.SelectorExpr:
+			seen[fun.Sel.Name] = true
+		}
+
+		return true
+	})
+	if len(seen) == 0 {
+		return nil
+	}
+
+	out := make([]string, 0, len(seen))
+	for name := range seen {
+		out = append(out, name)
+	}
+	sort.Strings(out)
+
+	return out
 }
 
 // sortedObservations orders observations deterministically: by location, then

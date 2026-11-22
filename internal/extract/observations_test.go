@@ -1,6 +1,7 @@
 package extract
 
 import (
+	"reflect"
 	"slices"
 	"testing"
 )
@@ -76,7 +77,9 @@ func TestObservations_Deterministic(t *testing.T) {
 		t.Fatalf("observation count differs: %d vs %d", len(first), len(second))
 	}
 	for i := range first {
-		if first[i] != second[i] {
+		// FuncCalls is a slice: reflect.DeepEqual compares it by value,
+		// which is exactly the determinism this test pins.
+		if !reflect.DeepEqual(first[i], second[i]) {
 			t.Fatalf("observation %d differs: %+v vs %+v", i, first[i], second[i])
 		}
 	}
