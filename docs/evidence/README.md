@@ -72,7 +72,9 @@ Produced by: `scripts/320px-shot.sh <page.html>` (repo root; chrome-headless-she
 152.0.7977.30, shared libs resolved from nixpkgs per soname — no /tmp recipe).
 Per page: the page rendered at 320x2400; the horizontal scrollbar arrows in a
 PNG are the overflow detector (scrollWidth measured 305 <= 320 for all three
-after the fix, via the CDP-less iframe probe used during the audit).
+after the fix, via the CDP-less iframe probe used during the audit —
+reproduced 2026-11-22 by `scripts/320px-probe.sh docs/review/libs/index.html`
+→ `document scrollWidth 305 <= 320`, the probe is now a committed script).
 
 - index-320.png — docs/review/libs/index.html (library-audit landing page)
 - 2026-11-11_11-42_full-code-review-320.png — the full-code-review report

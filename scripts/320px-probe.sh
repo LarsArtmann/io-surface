@@ -121,6 +121,7 @@ f.onload = () => {
 HTML
 
 "$CHROME" --headless --disable-gpu --no-sandbox \
+  --allow-file-access-from-files \
   --window-size=$WIDTH,$HEIGHT \
   --virtual-time-budget=5000 \
   --dump-dom "file://$WRAPPER/probe.html" 2>/dev/null > "$WRAPPER/dom.html"
