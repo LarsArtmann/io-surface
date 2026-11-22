@@ -371,19 +371,19 @@ honest about in the pitch.
 
 ### P4 — repo hygiene and fleet placement
 
-| #  | Task                                                                                                                                         |
-| -- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 40 | `flake.nix` (buildGoModule + vendorHash + `checks.{build,test,fmt,self-check}`) — **pending decision §g-2**                                  |
-| 41 | `LICENSE` (MIT, as the README claims)                                                                                                        |
-| 42 | `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, `CHANGELOG.md` (house convention)                                                                |
-| 43 | Register the repo in the fleet inventory (`meta` / stack-selection) so it is discoverable                                                    |
-| 44 | ~~`io-surface version --json` with commit + build date~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE |
-| 45 | `io-surface baseline add <id> --note <text> --date <d>` (stop hand-editing CUE)                                                              |
-| 46 | `version: "io-surface/v1"` field inside the manifest; bump on any schema change                                                              |
+| #      | Task                                                                                                                                             |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 40     | `flake.nix` (buildGoModule + vendorHash + `checks.{build,test,fmt,self-check}`) — **pending decision §g-2**                                      |
+| 41     | `LICENSE` (MIT, as the README claims)                                                                                                            |
+| 42     | `AGENTS.md`, `FEATURES.md`, `TODO_LIST.md`, `CHANGELOG.md` (house convention)                                                                    |
+| 43     | Register the repo in the fleet inventory (`meta` / stack-selection) so it is discoverable                                                        |
+| 44     | ~~`io-surface version --json` with commit + build date~~ RESOLVED 2026-11-06: shipped (`runVersion` + `TestVersionJSON`); TODO_LIST #30 DONE     |
+| 45     | `io-surface baseline add <id> --note <text> --date <d>` (stop hand-editing CUE)                                                                  |
+| 46     | `version: "io-surface/v1"` field inside the manifest; bump on any schema change                                                                  |
 | ~~47~~ | ~~Document the taxonomy freeze rule (a new family = a schema version bump)~~ done — README Two-contract-rules + schema.cue prose (TODO #31 DONE) |
-| 48 | Document ID migration for package moves (path change = a new ID set; the diff shows it)                                                      |
-| 49 | `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`)                                                                          |
-| 50 | Run it against `crush-daily` (named tier-1 in the brainstorm, never executed) + ~10 daemon repos to publish a real family distribution       |
+| 48     | Document ID migration for package moves (path change = a new ID set; the diff shows it)                                                          |
+| 49     | `--ignore` globs for generated code (`*_templ.go`, `zz_generated*`)                                                                              |
+| 50     | Run it against `crush-daily` (named tier-1 in the brainstorm, never executed) + ~10 daemon repos to publish a real family distribution           |
 
 ---
 

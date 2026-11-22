@@ -72,13 +72,13 @@ Current: Forgejo `lars/io-surface` = **private**; GitHub mirror = **public**
 (this is what `go install github.com/larsartmann/io-surface/cmd/io-surface@latest`
 resolves through — #37/#44 verified that chain 2026-11-06).
 
-|                     | Forgejo stays private (status quo)      | Forgejo goes public (gogenfilter pattern) |
-| ------------------- | ---------------------------------------- | ----------------------------------------- |
-| module consumers    | unaffected (GitHub mirror serves them)   | unaffected (same, plus proxy redundancy)  |
-| leak surface        | none on the primary                      | the primary IS public: issues/commits become world-readable the moment they land |
-| daemon commits      | invisible                                | live (incl. the `chore: auto-commit` noise history) |
-| CI (post-#155)      | runs on the instance regardless          | identical                                  |
-| cost of flip        | none                                     | none (reversible in one click)             |
+|                  | Forgejo stays private (status quo)     | Forgejo goes public (gogenfilter pattern)                                        |
+| ---------------- | -------------------------------------- | -------------------------------------------------------------------------------- |
+| module consumers | unaffected (GitHub mirror serves them) | unaffected (same, plus proxy redundancy)                                         |
+| leak surface     | none on the primary                    | the primary IS public: issues/commits become world-readable the moment they land |
+| daemon commits   | invisible                              | live (incl. the `chore: auto-commit` noise history)                              |
+| CI (post-#155)   | runs on the instance regardless        | identical                                                                        |
+| cost of flip     | none                                   | none (reversible in one click)                                                   |
 
 Recommendation: **keep private until #155's burn-in completes, then decide
 once for the whole fleet** (gogenfilter went public as part of its cutover;
@@ -106,17 +106,17 @@ only) — the fleet "drop windows" policy is satisfied as-is.
 
 Mapping (`.github/workflows/ci.yml` → `.forgejo/workflows/ci.yml`):
 
-| GitHub job/step                    | Forgejo port                                                              |
-| ---------------------------------- | ------------------------------------------------------------------------- |
-| `setup-go` (go-version-file+cache) | drop — use the flake's go 1.27 (`nix develop -c go test ...` or flake-provided `go` on PATH), caches come from the unit env |
-| test job (build/vet/test-race/gofmt) | keep step-for-step inside the one job; `scripts/self-gate.sh` already mirrors this locally — consider invoking it directly |
-| Self-check + facts freshness + self-render + inventory-doc | unchanged (pure `go run`, no actions) |
-| dprint/check action                | `nix run nixpkgs#dprint -- check ...` (no GitHub action dependency)       |
-| SARIF emit + upload-artifact       | emit steps unchanged; artifacts: keep `upload-artifact` (works on Forgejo) or `cp` into a served dir — runner-host executor supports the action per gogenfilter probe.yml |
-| docs-gates `go run …@v0.3.1`       | unchanged                                                                 |
-| markdown render audit              | unchanged (`scripts/check-md-render.sh`)                                  |
-| capabilities job (Capslock)        | second job or sequential block, `continue-on-error: true` (non-blocking parity), capslock via `go install` through the proxy egress (works per V4) |
-| public-install job                 | keep as second job — it MUST keep egress to proxy.golang.org (V4 verified) |
+| GitHub job/step                                            | Forgejo port                                                                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `setup-go` (go-version-file+cache)                         | drop — use the flake's go 1.27 (`nix develop -c go test ...` or flake-provided `go` on PATH), caches come from the unit env                                               |
+| test job (build/vet/test-race/gofmt)                       | keep step-for-step inside the one job; `scripts/self-gate.sh` already mirrors this locally — consider invoking it directly                                                |
+| Self-check + facts freshness + self-render + inventory-doc | unchanged (pure `go run`, no actions)                                                                                                                                     |
+| dprint/check action                                        | `nix run nixpkgs#dprint -- check ...` (no GitHub action dependency)                                                                                                       |
+| SARIF emit + upload-artifact                               | emit steps unchanged; artifacts: keep `upload-artifact` (works on Forgejo) or `cp` into a served dir — runner-host executor supports the action per gogenfilter probe.yml |
+| docs-gates `go run …@v0.3.1`                               | unchanged                                                                                                                                                                 |
+| markdown render audit                                      | unchanged (`scripts/check-md-render.sh`)                                                                                                                                  |
+| capabilities job (Capslock)                                | second job or sequential block, `continue-on-error: true` (non-blocking parity), capslock via `go install` through the proxy egress (works per V4)                        |
+| public-install job                                         | keep as second job — it MUST keep egress to proxy.golang.org (V4 verified)                                                                                                |
 
 **Sequence:** owner lands the token (#40) → commit `.forgejo/workflows/ci.yml`
 on Forgejo-primary → watch the first run on `evo-x2` green → burn-in ≥ 1

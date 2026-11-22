@@ -65,7 +65,7 @@ go-finding's call; the requirement is only: survives the
 Proposed title:
 `run-level propertyBag: carry per-run metadata once instead of per-result`
 
-```markdown
+````markdown
 > [!NOTE]
 > This filing was drafted by GLM-5.3-flash (via Crush) from an AI-run investigation, not at my request.
 >
@@ -85,6 +85,7 @@ type sarifRun struct {
 	Results []sarifResult `json:"results"`
 }
 ```
+````
 
 While `sarifResult` already has `Properties map[string]any` (`sarif_types.go:96`). So the posture rides every result as `go-finding/meta/enforcement`, and a second consumer fact (rule descriptions) rides every result as `go-finding/meta/ruleDescription` — N results × 1 unchanged value, and both copies survive consumer-side result filtering only by redundancy.
 
@@ -100,17 +101,17 @@ report.SetRunProperty("go-finding/meta/enforcement", "gate")
 
 ## Delta
 
-|                    | today                                | desired                             |
-| ------------------ | ------------------------------------ | ----------------------------------- |
-| per-run metadata   | copied onto every result's `properties` | one `runs[].properties` bag      |
-| result filtering   | metadata survives only by redundancy | run bag independent of results      |
-| import round-trip  | per-result keys only                 | run bag preserved (`omitempty` when empty — zero diff for existing users) |
+|                   | today                                   | desired                                                                   |
+| ----------------- | --------------------------------------- | ------------------------------------------------------------------------- |
+| per-run metadata  | copied onto every result's `properties` | one `runs[].properties` bag                                               |
+| result filtering  | metadata survives only by redundancy    | run bag independent of results                                            |
+| import round-trip | per-result keys only                    | run bag preserved (`omitempty` when empty — zero diff for existing users) |
 
 Constraint honored either way: `map[string]any` stays confined to the SARIF layer per the doctrine comment at `sarif_types.go:81-86` — the public `Finding.Metadata` remains `map[string]string`; run properties would live on the export/import path like the existing result properties.
 
 💘 Generated with Crush
-```
 
+```
 ## Follow-through after the feature lands (do NOT start without the owner)
 
 1. go-finding release train (version bump + tag per go-release protocol).
@@ -119,3 +120,4 @@ Constraint honored either way: `map[string]any` stays confined to the SARIF laye
 3. Re-pin lint goldens if the SARIF shape changes; CHANGELOG entry per
    Keep a Changelog; then the provider release so BuildFlow picks it up
    (both faces ship through that loop — docs/release-protocol.md).
+```

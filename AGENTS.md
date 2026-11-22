@@ -157,7 +157,14 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
   dotted-subpackage mistakes — `id-form` confirms the slash variant against
   the extracted set.
 - Never revert in-flight changes you didn't author (concurrent sessions are
-  real — 2026-11-07 and 2026-11-15 both saw foreign edits mid-session).
+  real — 2026-11-07, 2026-11-15 and 2026-11-21 all saw foreign edits
+  mid-session).
+- **`docs-gates purge` collects ANY TODO_LIST line carrying a `~~` pair** —
+  keep inline `~~verdict~~` fragments off OPEN rows (they read as sub-part
+  notes but get purge-eaten with a fragment-only CHANGELOG bullet; 6 open
+  rows hit this 2026-11-21 and were restored from the pre-purge commit).
+  Also: a status report's §f heading must use the canon `## f)` shape —
+  `## §f` is invisible to freshness/audit-all/routing (upstream: TODO #178).
 - Fleet evidence (FP classes, T17 verdicts, pilot retro) lives in
   `docs/status/archived/2026-11-07_08-08_io-bug-radar-*.md`; reproduce via
   `./scripts/fleetscan.sh` — outputs go to `docs/evidence/` (gitignored:

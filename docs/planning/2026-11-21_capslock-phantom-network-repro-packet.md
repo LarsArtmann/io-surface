@@ -56,13 +56,13 @@ site `iter.go:41:14`.
 
 ## Discriminator matrix (all runs capslock v0.3.4, go1.27.3 linux/amd64)
 
-| variant                                                             | NETWORK entries |
-| ------------------------------------------------------------------- | --------------- |
-| plain func + `strings.SplitSeq` range + `_ = http.ParseCookie`      | **2**           |
-| same with generic instantiation `parseConfig[T any]`                | **2**           |
-| same shape but a custom local `iter.Seq` instead of `strings.SplitSeq` | 0             |
-| plain func + `strings.SplitSeq`, no `net/http` anywhere (the 11-06 attempt) | 0       |
-| `json.NewEncoder(os.Stdout).Encode(...)` standalone (class A minimal) | 0            |
+| variant                                                                     | NETWORK entries |
+| --------------------------------------------------------------------------- | --------------- |
+| plain func + `strings.SplitSeq` range + `_ = http.ParseCookie`              | **2**           |
+| same with generic instantiation `parseConfig[T any]`                        | **2**           |
+| same shape but a custom local `iter.Seq` instead of `strings.SplitSeq`      | 0               |
+| plain func + `strings.SplitSeq`, no `net/http` anywhere (the 11-06 attempt) | 0               |
+| `json.NewEncoder(os.Stdout).Encode(...)` standalone (class A minimal)       | 0               |
 
 `GOEXPERIMENT=jsonv2` is set in this environment; clearing it does NOT
 change the result (2 entries either way).
@@ -107,7 +107,7 @@ fixed in v0.3.4 — the report style below follows that precedent
 Proposed title:
 `NETWORK capability misattributed across stdlib range-over-func closures (strings.splitSeq$1 -> net/http.ParseCookie$1)`
 
-```markdown
+````markdown
 > [!NOTE]
 > This filing was drafted by GLM-5.3-flash (via Crush) from an AI-run investigation, not at my request.
 >
@@ -142,6 +142,7 @@ func main() {
 	parseConfig(File{})
 }
 ```
+````
 
 `capslock -output=json -packages=./...` yields 2 NETWORK entries:
 
@@ -153,8 +154,11 @@ func main() {
     { "name": "main" },
     { "name": "parseConfig" },
     { "name": "strings.splitSeq$1", "package": "strings" },
-    { "name": "net/http.ParseCookie$1", "package": "net/http",
-      "site": { "filename": "iter.go", "line": "41", "column": "14" } }
+    {
+      "name": "net/http.ParseCookie$1",
+      "package": "net/http",
+      "site": { "filename": "iter.go", "line": "41", "column": "14" }
+    }
   ]
 }
 ```
@@ -166,12 +170,12 @@ Two things are wrong in that last hop:
 
 ## Discriminators
 
-| variant                                                              | NETWORK entries |
-| -------------------------------------------------------------------- | --------------- |
-| plain func + `strings.SplitSeq` range + `_ = http.ParseCookie`       | 2               |
-| same with generic instantiation `parseConfig[T any]`                 | 2               |
-| plain func + custom local `iter.Seq` instead of `strings.SplitSeq`   | 0               |
-| plain func + `strings.SplitSeq`, no `net/http` anywhere              | 0               |
+| variant                                                            | NETWORK entries |
+| ------------------------------------------------------------------ | --------------- |
+| plain func + `strings.SplitSeq` range + `_ = http.ParseCookie`     | 2               |
+| same with generic instantiation `parseConfig[T any]`               | 2               |
+| plain func + custom local `iter.Seq` instead of `strings.SplitSeq` | 0               |
+| plain func + `strings.SplitSeq`, no `net/http` anywhere            | 0               |
 
 The trigger needs both a range over a stdlib Seq (closure `strings.splitSeq$1`) and `net/http` inside the analyzed universe (closure `ParseCookie$1`); the two then appear conflated into one chain.
 
@@ -188,10 +192,11 @@ The same edges show up on a real 12-package CLI (io-surface) whose own code neve
 Related: #318 was the same disease family (stdlib internals surfacing as a wrong capability) — this one survived that fix.
 
 💘 Generated with Crush
-```
 
+```
 ## Line-number freshness (per verify-before-filing §5)
 
 Re-verify `strings/iter.go:41`, `net/http/cookie.go:99`, and the capslock
 version output at the EXACT Go toolchain/capslock build used when posting,
 as the last step before `gh issue create`.
+```

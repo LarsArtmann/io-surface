@@ -142,22 +142,22 @@ stash — deliberately untouched.
 
 **Direct follow-ups (this week):**
 
-| #  | Task                                                                                                                         | Why it wins                                            |
-| -- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| 1  | Watch CI on pushed `21f6e68`; record the run link (d1 fix)                                                                   | closes the unverified-push assumption                  |
-| 2  | Push trailing daemon commit `44a54ba` (other session's doc edits)                                                            | keeps remotes authoritative                            |
-| 3  | Fix TODO_LIST row-number collision: renumber superb rows #94+                                                                | every future citation is ambiguous until then          |
-| 4  | Carry session lessons into AGENTS.md sharp edges (phantom-violation story, daemon-race read-back, 650 third strike)          | memory decay otherwise                                 |
-| 5  | Implement write-non-atomic carve-outs: `O_APPEND` handles, lockfile-name creates, probe patterns, golden/-update test writes | loudest rule, 5 mechanical classes, 16.7% → target <5% |
-| 6  | Re-sample write-non-atomic FP (N ≥ 30) post-carve-out; update the promotion ledger                                           | the policy's cadence rule demands it                   |
-| 7  | Finish go-taskqueue triage: remaining ~14 io-in-loop + ~14 wna                                                               | closes T12 honestly                                    |
-| 8  | Stratified-random FP sampling script (replace alphabetical-first-30)                                                         | removes the A-repo bias permanently                    |
-| 9  | Grow the mutation corpus: named-return, goroutine-closure, embedded-method mutators                                          | turns the recall floor into a rate                     |
-| 10 | Implement #116 manifest unknown-major version refusal                                                                        | oldest harvested gap                                   |
-| 11 | #115 applyDoc seam test (render fingerprint capture)                                                                         | mirrors the AppendBaseline seam test                   |
-| ~~12~~ | ~~gogenfilter: push (owner) so the SARIF artifact step runs in real CI~~ done — TODO #98 DONE (gogenfilter step landed and verified) | ~~the step is locally verified only~~ |
-| 13 | InboxClean: owner reviews the PILOT-REVIEW bundle, then decides ci.yml pin bump + SARIF step                                 | unblocks T9's second half                              |
-| 14 | dnsblockd: owner runs the v1.2 runbook (2 undeclared sites first)                                                            | turns the runbook into a green gate                    |
+| #      | Task                                                                                                                                 | Why it wins                                            |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| 1      | Watch CI on pushed `21f6e68`; record the run link (d1 fix)                                                                           | closes the unverified-push assumption                  |
+| 2      | Push trailing daemon commit `44a54ba` (other session's doc edits)                                                                    | keeps remotes authoritative                            |
+| 3      | Fix TODO_LIST row-number collision: renumber superb rows #94+                                                                        | every future citation is ambiguous until then          |
+| 4      | Carry session lessons into AGENTS.md sharp edges (phantom-violation story, daemon-race read-back, 650 third strike)                  | memory decay otherwise                                 |
+| 5      | Implement write-non-atomic carve-outs: `O_APPEND` handles, lockfile-name creates, probe patterns, golden/-update test writes         | loudest rule, 5 mechanical classes, 16.7% → target <5% |
+| 6      | Re-sample write-non-atomic FP (N ≥ 30) post-carve-out; update the promotion ledger                                                   | the policy's cadence rule demands it                   |
+| 7      | Finish go-taskqueue triage: remaining ~14 io-in-loop + ~14 wna                                                                       | closes T12 honestly                                    |
+| 8      | Stratified-random FP sampling script (replace alphabetical-first-30)                                                                 | removes the A-repo bias permanently                    |
+| 9      | Grow the mutation corpus: named-return, goroutine-closure, embedded-method mutators                                                  | turns the recall floor into a rate                     |
+| 10     | Implement #116 manifest unknown-major version refusal                                                                                | oldest harvested gap                                   |
+| 11     | #115 applyDoc seam test (render fingerprint capture)                                                                                 | mirrors the AppendBaseline seam test                   |
+| ~~12~~ | ~~gogenfilter: push (owner) so the SARIF artifact step runs in real CI~~ done — TODO #98 DONE (gogenfilter step landed and verified) | ~~the step is locally verified only~~                  |
+| 13     | InboxClean: owner reviews the PILOT-REVIEW bundle, then decides ci.yml pin bump + SARIF step                                         | unblocks T9's second half                              |
+| 14     | dnsblockd: owner runs the v1.2 runbook (2 undeclared sites first)                                                                    | turns the runbook into a green gate                    |
 
 **Ratification-dependent (owner boxes):**
 
@@ -187,33 +187,33 @@ stash — deliberately untouched.
 
 **Hygiene / docs:**
 
-| #  | Task                                                                                               |
-| -- | -------------------------------------------------------------------------------------------------- |
-| 31 | docs/status/README.md index: add 21-12, 22-30, this report                                         |
-| 32 | 21-12 evidence report editorial pass (assembled by accretion: c2/c3/d2/d3 ordering)                |
-| 33 | Split remaining >500-line files proactively (check.go pairing split is still TODO #64)             |
-| 34 | LSP stale-cache noise: restart gopls once and verify the phantom typecheck errors disappear        |
-| 35 | scripts/self-gate.sh mirroring ci.yml's test job (other session's §f9, still open)                 |
-| 36 | README: suppression section link from FEATURES.md                                                  |
+| #      | Task                                                                                                                                                                            |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 31     | docs/status/README.md index: add 21-12, 22-30, this report                                                                                                                      |
+| 32     | 21-12 evidence report editorial pass (assembled by accretion: c2/c3/d2/d3 ordering)                                                                                             |
+| 33     | Split remaining >500-line files proactively (check.go pairing split is still TODO #64)                                                                                          |
+| 34     | LSP stale-cache noise: restart gopls once and verify the phantom typecheck errors disappear                                                                                     |
+| 35     | scripts/self-gate.sh mirroring ci.yml's test job (other session's §f9, still open)                                                                                              |
+| 36     | README: suppression section link from FEATURES.md                                                                                                                               |
 | ~~37~~ | ~~Roadmap Theme 5: record the artifact-only SARIF policy's first pilot artifact (gogenfilter run)~~ done — TODO #98 DONE + ROADMAP Theme 5 (gogenfilter = first pilot artifact) |
-| 38 | Consider `io-surface lint --format github` adoption in THIS repo's CI (annotations on PRs)         |
-| 39 | Add a `make`-free local battery script (fmt+build+vet+test+check+docs-gates) to kill manual chains |
-| 40 | Prune `cmd/io-surface/io-surface` binary-blob question (#Q4) if still parked                       |
+| 38     | Consider `io-surface lint --format github` adoption in THIS repo's CI (annotations on PRs)                                                                                      |
+| 39     | Add a `make`-free local battery script (fmt+build+vet+test+check+docs-gates) to kill manual chains                                                                              |
+| 40     | Prune `cmd/io-surface/io-surface` binary-blob question (#Q4) if still parked                                                                                                    |
 
 **Longer arcs (ROADMAP fuel):**
 
-| #  | Task                                                                                            |
-| -- | ----------------------------------------------------------------------------------------------- |
-| 41 | Fleet re-scan cadence: decide a standing interval (per-release vs weekly)                       |
-| 42 | Pilot retro #2: run the findings→actions metric once artifact history exists (T23's definition) |
+| #      | Task                                                                                                                                                   |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 41     | Fleet re-scan cadence: decide a standing interval (per-release vs weekly)                                                                              |
+| 42     | Pilot retro #2: run the findings→actions metric once artifact history exists (T23's definition)                                                        |
 | ~~43~~ | ~~capabilities: Q5 decision (Capslock runtime-power vocabulary in or out)~~ done — ROADMAP Q5 decided FIRST-CLASS 2026-11-08 (implementation row #136) |
-| 44 | Forgejo API token + push mirror (carried birth-report Q1/Q2 — ends manual dual-push)            |
-| 45 | Dependabot PR on InboxClean (carried)                                                           |
-| 46 | Write the "how to add a detector rule" doc from the registry pattern (T8/T10 proved the loop)   |
-| 47 | Evaluate SARIF `--format code-scanning` upload once a rule promotes (policy-gated)              |
-| 48 | Mutator corpus: publish per-rule recall numbers in the README status line                       |
-| 49 | Baseline burn-down section in render (ROADMAP Theme 2 item)                                     |
-| 50 | `io-surface explain <id>` (Theme 2) — cheapest consumer output that justifies the manifest      |
+| 44     | Forgejo API token + push mirror (carried birth-report Q1/Q2 — ends manual dual-push)                                                                   |
+| 45     | Dependabot PR on InboxClean (carried)                                                                                                                  |
+| 46     | Write the "how to add a detector rule" doc from the registry pattern (T8/T10 proved the loop)                                                          |
+| 47     | Evaluate SARIF `--format code-scanning` upload once a rule promotes (policy-gated)                                                                     |
+| 48     | Mutator corpus: publish per-rule recall numbers in the README status line                                                                              |
+| 49     | Baseline burn-down section in render (ROADMAP Theme 2 item)                                                                                            |
+| 50     | `io-surface explain <id>` (Theme 2) — cheapest consumer output that justifies the manifest                                                             |
 
 ## g) Three questions I can NOT figure out myself
 
