@@ -53,6 +53,20 @@ Per rule (hits / FP-by-policy-definition / verified-fixed):
   Caveat: N per rule is below the policy's W4 floor (30) — this sample
   strengthens the FP-class taxonomy, it does not qualify any promotion.
 
+fp-sample-write-non-atomic-2026-11-22 (the first §7-compliant N≥30 re-sample)
+Produced by: `./scripts/fp-sample.sh io-surface/write-non-atomic
+docs/evidence/fleetscan-2026-11-15.json 30` then hand adjudication of all
+30 sites (every flagged location read in its repo, policy §2 vocabulary).
+Verdict: 3 verified / 27 FP = 90% FP rate — stays info under W2 by a wide
+margin. The FP mass sits in four classes the rule card does not yet carve
+out: repository-adapter write-through contracts (5 sites), setup/scaffolding
+writers (7), cache/derived sidecars (4), test/golden tooling (4); plus
+timestamped/regenerable artifacts (7). The 3 verified sites are persistent
+stores writing final paths without temp+rename (Cyberdom memory store
+Write+Append, DiscordSync blobstore Store — the blobstore has no read-path
+checksum, so a crash mid-copy persists a truncated blob undetected).
+Ledger row: docs/planning/2026-11-07_promotion-policy.md §9 (updated).
+
 320px-audit/ (2026-11-21, TODO #127 — mobile render evidence)
 Produced by: `scripts/320px-shot.sh <page.html>` (repo root; chrome-headless-shell
 152.0.7977.30, shared libs resolved from nixpkgs per soname — no /tmp recipe).

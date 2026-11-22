@@ -12,240 +12,246 @@
    "location": "cmd/modelbench/main.go:734",
    "id": "cmd/modelbench.saveResults",
    "message": "os.WriteFile(path, data, outputFilePerm) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "timestamped benchmark_<ts> artifact; new file per run, never overwritten; torn write discards a scratch result"
   },
   {
    "project": "ActaFlow",
    "location": "internal/performance/regression_core.go:153",
    "id": "internal/performance.PerformanceRegressionTester.saveResults",
    "message": "os.WriteFile(currentResultsPath, data, 0o600) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "-current.json is a per-run artifact fully rewritten next run; the baseline lives in a separate file"
   },
   {
    "project": "BuildFlow",
    "location": "internal/cli/precommit_service_1.go:156",
    "id": "internal/cli.PrecommitService.writeHook",
    "message": "os.WriteFile(precommitPath, content, constants.PermFileExecutable) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "setup scaffolding (hook template); re-run heals"
   },
   {
    "project": "BuildFlow",
    "location": "internal/cli/setup_config.go:33",
    "id": "internal/cli.createSetupConfig",
    "message": "os.WriteFile(configPath, []byte(configContent), filePermissionReadWrite) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "setup scaffolding (.buildflow.yml creation)"
   },
   {
    "project": "BuildFlow",
    "location": "internal/cli/setup_devshell.go:46",
    "id": "internal/cli.generateDevShellFlake",
    "message": "os.WriteFile(FlakeNixFile, []byte(content), filePermissionReadWrite) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "setup scaffolding (flake.nix generation); note: no existence guard seen \u2014 overwrite risk beyond torn-state"
   },
   {
    "project": "BuildFlow",
    "location": "internal/cli/config_cmd_init.go:92",
    "id": "internal/cli.runConfigInit",
    "message": "os.WriteFile(defaultConfigPath, []byte(defaultConfig), constants.PermUserWrite) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "setup scaffolding (config init)"
   },
   {
    "project": "BuildFlow",
    "location": "internal/cli/explain_cmd.go:92",
    "id": "internal/cli.runExplainDAGWithOutput",
    "message": "os.Create(dagOutput) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "user-requested DAG output artifact, regenerable by re-running explain"
   },
   {
    "project": "BuildFlow",
    "location": "internal/cli/setup_config.go:170",
    "id": "internal/cli.setupGitHooks",
    "message": "os.WriteFile(preCommitFile, []byte(hookContent), hookPermissionExecute) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "setup scaffolding (pre-commit hook)"
   },
   {
    "project": "Cyberdom",
    "location": "internal/memory/store.go:205",
    "id": "internal/memory.Store.Append",
    "message": "os.WriteFile(path, []byte(content), 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "VERIFIED",
+   "note": "persistent memory store Append is read-modify-write; crash mid-write loses the whole entry, no temp+rename"
   },
   {
    "project": "Cyberdom",
    "location": "internal/memory/store.go:161",
    "id": "internal/memory.Store.Write",
    "message": "os.WriteFile(path, []byte(content), 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "VERIFIED",
+   "note": "persistent memory store Write overwrites named memory content; crash mid-write truncates it persistently"
   },
   {
    "project": "Domination",
    "location": "internal/focusguard/state.go:46",
    "id": "internal/focusguard.Service.persistBreakIntent",
    "message": "os.WriteFile(s.statePath, data, 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "best-effort break-state sidecar (slog.Warn on failure is the deliberate semantic)"
   },
   {
    "project": "Domination",
    "location": "internal/health/doctor.go:84",
    "id": "internal/health.checkDataDir",
    "message": "os.WriteFile(probe, []byte(\"x\"), 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": ".doctor-probe writability probe, written then immediately removed"
   },
   {
    "project": "Domination",
    "location": "internal/storage/repo.go:339",
    "id": "internal/storage.Repository.journalAndMetaLocked",
    "message": "os.OpenFile(journalPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "audit journal O_APPEND append-only; journal explicitly not a state store (ARCH-021), torn tail line is the accepted append class"
   },
   {
    "project": "Domination",
    "location": "internal/storage/repo.go:98",
    "id": "internal/storage.Repository.lock",
    "message": "os.OpenFile(lockPath, os.O_CREATE|os.O_RDWR, 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": ".lock file carries no content semantics; syscall.Flock is the mechanism"
   },
   {
    "project": "GoReleaser-Wizard",
    "location": "cmd/goreleaser-wizard/simple_filesystem.go:41",
    "id": "cmd/goreleaser-wizard.SimpleFileSystemRepository.CreateFile",
    "message": "os.Create(path) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "repository-adapter CreateFile: write-through interface contract; atomicity is the caller decision"
   },
   {
    "project": "GoReleaser-Wizard",
    "location": "cmd/goreleaser-wizard/simple_filesystem.go:29",
    "id": "cmd/goreleaser-wizard.SimpleFileSystemRepository.WriteFile",
    "message": "os.WriteFile(path, data, perm) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "repository-adapter WriteFile: write-through interface contract"
   },
   {
    "project": "GoReleaser-Wizard",
    "location": "cmd/goreleaser-wizard/validation_fixes.go:39",
    "id": "cmd/goreleaser-wizard.attemptFixes",
    "message": "os.WriteFile(goreleaserConfigFilename, []byte(configContent), configFilePermission) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "existence-guarded creation (only when !results.ConfigExists)"
   },
   {
    "project": "GoReleaser-Wizard",
    "location": "cmd/goreleaser-wizard/test_helpers.go:30",
    "id": "cmd/goreleaser-wizard.createBasicGoProject",
    "message": "os.WriteFile(filepath.Join(dir, \"main.go\"), []byte(mainContent), 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "test helper (t.Helper) fixture scaffold"
   },
   {
    "project": "GoReleaser-Wizard",
    "location": "cmd/goreleaser-wizard/test_helpers.go:16",
    "id": "cmd/goreleaser-wizard.writeGoModFile",
    "message": "os.WriteFile(filepath.Join(dir, \"go.mod\"), []byte(goMod), 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "test helper (t.Helper) fixture scaffold"
   },
   {
    "project": "GoReleaser-Wizard",
    "location": "cmd/goreleaser-wizard/generators/template_utils.go:24",
    "id": "cmd/goreleaser-wizard/generators.WriteFile",
    "message": "os.WriteFile(path, data, perm) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "generic WriteFile util wrapper; write-through contract"
   },
   {
    "project": "DiscordSync",
    "location": "cmd/attachment-match-report/main.go:86",
    "id": "cmd/attachment-match-report.run",
    "message": "os.WriteFile(*outPath, []byte(report), reportFilePerm) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "user-requested report artifact via -out flag; regenerable"
   },
   {
    "project": "DiscordSync",
    "location": "cmd/gallery/capture.go:191",
    "id": "cmd/gallery.capturePage",
    "message": "os.WriteFile(outputPath, screenshotBuf, 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "screenshot capture artifact, regenerable by re-capture"
   },
   {
    "project": "DiscordSync",
    "location": "cmd/gallery/capture.go:74",
    "id": "cmd/gallery.runCapture",
    "message": "os.WriteFile(htmlPath, []byte(galleryHTML), 0o644) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "gallery index.html, regenerable"
   },
   {
    "project": "DiscordSync",
    "location": "internal/blobstore/local.go:103",
    "id": "internal/blobstore.LocalBackend.Store",
    "message": "os.Create(fullPath) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "VERIFIED",
+   "note": "primary blob store: os.Create + io.Copy under a logical (validated-format, NOT content-addressed) key; no read-path checksum exists, so a crash mid-copy persists a truncated blob undetected"
   },
   {
    "project": "DiscordSync",
    "location": "internal/blobstore/compress.go:219",
    "id": "internal/blobstore.sidecarSetup",
    "message": "os.Create(sidecarPath) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "derived compression sidecar (regenerable); caveat: no read-path checksum, same undetected-torn-sidecar exposure as the verified site"
   },
   {
    "project": "DiscordSync",
    "location": "internal/mediapipeline/video_poster.go:110",
    "id": "internal/mediapipeline.GenerateAndCacheVideoPoster",
    "message": "os.WriteFile(VideoPosterPath(localPath), data, sidecarPerms) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "poster cache sidecar; write failure deliberately non-fatal (nilerr comment)"
   },
   {
    "project": "DiscordSync",
    "location": "internal/mediapipeline/thumbnails.go:108",
    "id": "internal/mediapipeline.GenerateThumbnailFromFile",
    "message": "os.WriteFile(thumbPath, data, thumbnailFileMode) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "thumbnail cache sidecar"
   },
   {
    "project": "DiscordSync",
    "location": "internal/web/golden/golden.go:215",
    "id": "internal/web/golden.assertInDir",
    "message": "os.WriteFile(goldenPath, []byte(normalized), goldenFilePerm) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "golden -update test tooling"
   },
   {
    "project": "SQLC-Wizzard",
    "location": "internal/adapters/filesystem_real.go:44",
    "id": "internal/adapters.RealFileSystemAdapter.WriteFile",
    "message": "os.WriteFile(path, data, perm) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "filesystem adapter write-through contract"
   },
   {
    "project": "SQLC-Wizzard",
    "location": "internal/adapters/migration_real.go:269",
    "id": "internal/adapters.RealMigrationAdapter.CreateMigration",
    "message": "os.WriteFile(upFile, []byte(upContent), DefaultFilePermissions) \u2014 direct final-path write without a temp+rename in this function; a crash mid-write tears the file \u2014 a crash mid-write tears the file; write a temp file and os.Rename it into place (or declare the write harmless with claims durability \"ephemeral\")",
-   "adjudication": "UNADJUDICATED",
-   "note": ""
+   "adjudication": "FP",
+   "note": "timestamped migration scaffold, unique name per invocation"
   }
- ]
+ ],
+ "adjudicatedAt": "2026-11-22",
+ "summary": {
+  "verified": 3,
+  "fp": 27,
+  "unadjudicated": 0
+ }
 }
