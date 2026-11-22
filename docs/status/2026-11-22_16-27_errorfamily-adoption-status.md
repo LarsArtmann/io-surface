@@ -98,4 +98,5 @@
 3. **How far should errorfamily adoption go in this CLI — codes only, or codes + What/Why/Fix templates + family exit codes?** I deliberately stopped at codes (exit contract stays local in `exitCode`, What/Why/Fix layer unwired). "SDKs totally to be used if useful" suggests you may want the full stack; that is a UX and exit-contract decision I cannot make from code.
 
 ---
-*Point-in-time snapshot — goes stale by design. §f is HARVEST input, not a commitment list. Verifying commands are named inline; the rendering sample and every exit code were read from the tools' own output.*
+
+_Point-in-time snapshot — goes stale by design. §f is HARVEST input, not a commitment list. Verifying commands are named inline; the rendering sample and every exit code were read from the tools' own output._

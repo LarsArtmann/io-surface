@@ -23,7 +23,7 @@
    - `runBaselineAdd` → `errUsage` + `%w` (commands.go:520);
    - `normalizeDepth` → `ErrCapabilityType` + `%w` on both failure arms (internal/absorb/absorb.go), test substring "unknown capability type" preserved;
    - `docBlock` → `ErrDocBlock` + `%w` on all three marker failures (internal/render/blocks.go).
-   Sentinels live in per-package `errors.go` files per convention: new `cmd/io-surface/errors.go` (also receives the relocated `errFindings` from main.go), new `internal/absorb/errors.go`, new `internal/render/errors.go`.
+     Sentinels live in per-package `errors.go` files per convention: new `cmd/io-surface/errors.go` (also receives the relocated `errFindings` from main.go), new `internal/absorb/errors.go`, new `internal/render/errors.go`.
 2. **`capability.Families` deleted as production-dead** instead of coded: zero callers outside its own test (verified three ways — file grep, `lsp_references`, and reading `Sets` in full); `fmt` import removed with it; `TestFamiliesUnion` deleted. Git history preserves it if the owner reserved it (question §g.2).
 3. **Test coverage grew where the sentinels landed**: new `TestRunInit_NoSites` (init on an I/O-free tree → `errors.Is(err, errNoSites)` + exit class 2 — this path had NO e2e test before); new "missing ID is a usage error" subtest asserting `errors.Is(err, errUsage)`; `errors.Is` assertions added to `TestRunRejectsUnknownType` (absorb) and `TestApplyToDoc_Errors` (render).
 4. **Pre-existing gopls diagnostics fixed in files this session touched**: `internal/absorb/absorb.go` `CUE()` single-concatenation `WriteString` split into 13 sequential calls (byte-identical output — `TestCUEBytes` green), clearing the `writestring` warning; `splitAnnotationLocation` modernized to `strings.CutLast` (commands.go:651 hint cleared, LSP-restarted to confirm zero diagnostics in all three touched files).
@@ -71,7 +71,7 @@
 
 ## §f THINGS WE SHOULD GET DONE NEXT (40, brainstorm-grade — most are ROADMAP fuel, not commitments; HARVEST must route with extra rigor)
 
-1. Add the CHANGELOG `[Unreleased]` entry: changed error-message prefixes (baseline add usage, render marker errors, absorb capability type) + internal `capability.Families` removal note. *(Closes §d.5 — highest priority.)*
+1. Add the CHANGELOG `[Unreleased]` entry: changed error-message prefixes (baseline add usage, render marker errors, absorb capability type) + internal `capability.Families` removal note. _(Closes §d.5 — highest priority.)_
 2. Decide the erraudit CI posture (§g.1) and, if advisory: add `erraudit lint ./... --max --disable generic_return` as a non-gating self-gate stage so the strict audit is exercised regularly.
 3. File the gopls `infertypeargs` false positive upstream: minimal repro against cmdguard v5.1.0 generics, verify-before-filing gate first, github-voice for the text (§b.2).
 4. Run `erraudit fix ./...` dry-run once and record the result in the policy doc (closes §d.6's unmeasured claim).
@@ -119,4 +119,5 @@
 3. **Do changed CLI error strings warrant a CHANGELOG entry in this repo's 0.x practice?** Keep a Changelog is the stated convention and I missed it (§d.5) — but before writing the entry I want the granularity call: are sentinel-prefixed internal CLI messages ("usage error: …") changelog-worthy, or below the bar like `_, _ =` policy detail? One line from you sets the precedent for every future error-text change.
 
 ---
-*Point-in-time snapshot — goes stale by design. §f is the input for docs-health HARVEST (TODO_LIST/ROADMAP), not a commitment list; most items beyond the top five are ROADMAP fuel. Verifying commands for every claim are named inline.*
+
+_Point-in-time snapshot — goes stale by design. §f is the input for docs-health HARVEST (TODO_LIST/ROADMAP), not a commitment list; most items beyond the top five are ROADMAP fuel. Verifying commands for every claim are named inline._
