@@ -138,9 +138,9 @@ func normalizeDepth(t string) (string, error) {
 	case "CAPABILITY_TYPE_TRANSITIVE":
 		return "TRANSITIVE", nil
 	case "":
-		return "", fmt.Errorf("capability entry without a type")
+		return "", fmt.Errorf("%w: capability entry without a type", ErrCapabilityType)
 	default:
-		return "", fmt.Errorf("unknown capability type %q (engine newer than this schema?)", t)
+		return "", fmt.Errorf("%w: unknown capability type %q (engine newer than this schema?)", ErrCapabilityType, t)
 	}
 }
 

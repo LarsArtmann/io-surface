@@ -198,7 +198,7 @@ func runInit(_ context.Context, root *rootFlags, flags initFlags) error {
 		if len(scanned) == 0 {
 			scanned = extract.DefaultDirs()
 		}
-		return fmt.Errorf("no I/O sites found under %s (scanned dirs: %s; widen --dirs if the I/O lives elsewhere)", root.Root, strings.Join(scanned, ", "))
+		return fmt.Errorf("%w under %s (scanned dirs: %s; widen --dirs if the I/O lives elsewhere)", errNoSites, root.Root, strings.Join(scanned, ", "))
 	}
 	dir, err := scaffold.Write(root.Root, sites, time.Now().UTC().Format("2006-01-02"), flags.Force)
 	if err != nil {
@@ -517,7 +517,7 @@ func manifestDir(root, flagValue string) string {
 func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags) error {
 	args := v5.ArgsFromContext(ctx)
 	if len(args) != 1 {
-		return fmt.Errorf("baseline add takes exactly one site ID argument (usage: io-surface baseline add <pkg.Func> --note \"why\")")
+		return fmt.Errorf("%w: baseline add takes exactly one site ID argument (usage: io-surface baseline add <pkg.Func> --note \"why\")", errUsage)
 	}
 	id := args[0]
 

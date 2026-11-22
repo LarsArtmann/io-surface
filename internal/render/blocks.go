@@ -60,15 +60,15 @@ func CheckDoc(doc, block string) (stored, fresh string, err error) {
 func docBlock(doc string) (start, end int, err error) {
 	start = strings.Index(doc, BeginMarker)
 	if start < 0 {
-		return 0, 0, fmt.Errorf("no %s marker: wrap the generated inventory in %s/%s", BeginMarker, BeginMarker, EndMarker)
+		return 0, 0, fmt.Errorf("%w: no %s marker: wrap the generated inventory in %s/%s", ErrDocBlock, BeginMarker, BeginMarker, EndMarker)
 	}
 	end = strings.Index(doc[start:], EndMarker)
 	if end < 0 {
-		return 0, 0, fmt.Errorf("unbalanced block: %s without %s", BeginMarker, EndMarker)
+		return 0, 0, fmt.Errorf("%w: %s without %s", ErrDocBlock, BeginMarker, EndMarker)
 	}
 	end += start
 	if strings.Contains(doc[end+len(EndMarker):], BeginMarker) {
-		return 0, 0, fmt.Errorf("multiple %s blocks: one document carries one inventory", BeginMarker)
+		return 0, 0, fmt.Errorf("%w: multiple %s blocks: one document carries one inventory", ErrDocBlock, BeginMarker)
 	}
 
 	return start, end, nil

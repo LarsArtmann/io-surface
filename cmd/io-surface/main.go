@@ -48,8 +48,6 @@ func exitCode(err error) int {
 	return 2
 }
 
-var errFindings = errors.New("gate findings")
-
 // rootFlags are the persistent flags every subcommand inherits.
 type rootFlags struct {
 	Root   string `flag:"root" default:"." help:"repository root"`
