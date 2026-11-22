@@ -53,6 +53,11 @@ const (
 	RuleShadowCapability   = "io-surface/shadow-capability"
 	RuleManifestValidation = "io-surface/manifest-validation"
 	RuleClaimConflict      = "io-surface/claim-conflict"
+	// RuntimePowerDirect (v1.3, Q5): advisory-only reachability report —
+	// artifact-only until a D4 promotion (same evidence bar as every
+	// detector rule; expected fleet volume is large, so it ships at info
+	// and stays there absent FP≈0 evidence).
+	RuleRuntimePowerDirect = "io-surface/runtime-power-direct"
 )
 
 // Severity of a finding.
@@ -288,6 +293,10 @@ func Run(root string, m *manifest.Manifest, opts Options) (*Report, error) {
 	// forever unless an enforcement policy says otherwise) — the blind-spot
 	// run measured three false-positive classes in one small repo.
 	shadowCapabilities(m, baselined, usedBaseline, rep)
+	// v1.3 (Q5 first-class): runtime-power reachability is stored signal.
+	// The advisory report fires per package whose DIRECT set carries one —
+	// info forever, baseline-suppressible like every other advisory.
+	runtimePowerDirect(m, baselined, usedBaseline, rep)
 
 	// Baseline lifecycle: the baseline only shrinks, so an entry that
 	// suppresses nothing today is a stale suppression (warning — it would
@@ -367,6 +376,11 @@ func shadowCapabilities(m *manifest.Manifest, baselined map[string]bool, usedBas
 			if !capability.Valid(name) {
 				continue // manifest.Validate already reports unknown names
 			}
+			// v1.3: runtime-power caps have no site families — they report
+			// through runtime-power-direct, never as shadows.
+			if capability.RuntimePower(cn) {
+				continue
+			}
 			covered := false
 			for _, fam := range capability.FamiliesFor(cn) {
 				if declaredFamilies[cap.Pkg][fam] {
@@ -386,6 +400,38 @@ func shadowCapabilities(m *manifest.Manifest, baselined map[string]bool, usedBas
 			Rule: RuleShadowCapability, Severity: SeverityInfo, ID: cap.Pkg,
 			Message: fmt.Sprintf("reachability engine observes %s in this package, but no declared site covers those families — declare the hidden I/O, or baseline this package deliberately",
 				strings.Join(shadowed, ", ")),
+		})
+	}
+}
+
+// runtimePowerDirect emits one info per package whose DIRECT reachability
+// carries a runtime-power capability (v1.3 closed ten: REFLECT, RUNTIME,
+// SYSTEM_CALLS, UNSAFE_POINTER, OPERATING_SYSTEM, READ/MODIFY_SYSTEM_STATE).
+// Stored signal, advisory report: the engine's transitive conflation makes
+// these noisy-but-real — never gate-failing, baseline-suppressible.
+func runtimePowerDirect(m *manifest.Manifest, baselined map[string]bool, usedBaseline map[string]bool, rep *Report) {
+	for _, cap := range m.Capabilities {
+		var powers []string
+		for _, name := range cap.Direct {
+			cn := capability.Name(name)
+			if capability.Valid(name) && capability.RuntimePower(cn) {
+				powers = append(powers, name)
+			}
+		}
+		if len(powers) == 0 {
+			continue
+		}
+		canonical := match.Canonical(cap.Pkg)
+		if baselined[canonical] {
+			usedBaseline[canonical] = true
+
+			continue
+		}
+		sort.Strings(powers)
+		rep.add(Finding{
+			Rule: RuleRuntimePowerDirect, Severity: SeverityInfo, ID: cap.Pkg,
+			Message: fmt.Sprintf("reachability engine observes %s through this package's own code (runtime-power, stored as package-level facts since v1.3) — advisory only; baseline the package if the reach is deliberate noise",
+				strings.Join(powers, ", ")),
 		})
 	}
 }

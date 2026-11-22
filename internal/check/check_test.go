@@ -1,9 +1,11 @@
 package check
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/larsartmann/io-surface/internal/manifest"
+	"github.com/larsartmann/io-surface/internal/match"
 )
 
 // fixtureManifest declares a subset of testdata/extract so the checker has both
@@ -168,5 +170,69 @@ func TestSortFindings_StrongestFirst(t *testing.T) {
 		if f.Severity != want[i] {
 			t.Fatalf("position %d: got %s, want %s (full order: %v)", i, f.Severity, want[i], fs)
 		}
+	}
+}
+
+// TestRuntimePowerDirectRule pins the v1.3 split (Q5): DIRECT runtime-power
+// reachability reports through runtime-power-direct (info, baseline-
+// suppressible), and the SAME caps never fire shadow-capability (they have
+// no site families; shadowing them would be a permanent noise floor).
+func TestRuntimePowerDirectRule(t *testing.T) {
+	m := &manifest.Manifest{
+		Capabilities: []manifest.Capability{
+			{Pkg: "internal/render", Direct: []string{"REFLECT", "FILES"}, Deep: []string{"REFLECT", "FILES", "NETWORK"}},
+			{Pkg: "internal/store", Direct: []string{"FILES"}, Deep: []string{"FILES"}},
+		},
+	}
+
+	rep := &Report{}
+	used := map[string]bool{}
+	runtimePowerDirect(m, map[string]bool{}, used, rep)
+	shadowCapabilities(m, map[string]bool{}, used, rep)
+
+	var powerFound, storeShadow bool
+	for _, f := range rep.Findings {
+		switch {
+		case f.Rule == RuleRuntimePowerDirect:
+			powerFound = true
+			if f.ID != "internal/render" {
+				t.Errorf("runtime-power fired on %q, want internal/render only", f.ID)
+			}
+			if f.Severity != SeverityInfo {
+				t.Errorf("severity = %q, want info (advisory forever)", f.Severity)
+			}
+			if !strings.Contains(f.Message, "REFLECT") || strings.Contains(f.Message, "FILES") {
+				t.Errorf("message must name the runtime-power caps only: %q", f.Message)
+			}
+		case f.Rule == RuleShadowCapability && f.ID == "internal/render":
+			// FILES still shadows (mapped cap, no covering family); the
+			// assertion is that REFLECT never appears in the shadow set.
+			if strings.Contains(f.Message, "REFLECT") {
+				t.Errorf("shadow message must not name runtime-power caps: %q", f.Message)
+			}
+		case f.Rule == RuleShadowCapability && f.ID == "internal/store":
+			storeShadow = true
+		}
+	}
+	if !powerFound {
+		t.Fatal("runtime-power-direct did not fire on a DIRECT REFLECT package")
+	}
+	if !storeShadow {
+		t.Error("mapped cap FILES without a covering family still shadows (semantics unchanged for mapped caps)")
+	}
+
+	// Baseline suppression: the canonical-key entry keeps the rule silent
+	// AND marks the baseline used (only-shrinks contract).
+	baselined := map[string]bool{match.Canonical("internal/render"): true}
+	used2 := map[string]bool{}
+	rep2 := &Report{}
+	runtimePowerDirect(m, baselined, used2, rep2)
+	for _, f := range rep2.Findings {
+		if f.Rule == RuleRuntimePowerDirect && f.ID == "internal/render" {
+			t.Fatal("baselined package must not report runtime-power-direct")
+		}
+	}
+	if !used2[match.Canonical("internal/render")] {
+		t.Error("baselined entry must be marked used")
 	}
 }
