@@ -37,20 +37,6 @@ func TestFamiliesFor(t *testing.T) {
 	}
 }
 
-func TestFamiliesUnion(t *testing.T) {
-	got, err := Families([]Name{Network, Exec, Files})
-	if err != nil {
-		t.Fatalf("Families: %v", err)
-	}
-	want := []string{"database", "embed", "file-read", "file-write", "ipc-subprocess", "listener", "outbound"}
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("Families union = %v, want %v", got, want)
-	}
-	if _, err := Families([]Name{"CGO"}); err == nil {
-		t.Error("Families(CG0) should error on a name outside the closed enum")
-	}
-}
-
 func TestSets(t *testing.T) {
 	edges := []Edge{
 		{PackageDir: "github.com/larsartmann/io-surface/internal/extract", CapabilityName: "FILES", Depth: "DIRECT"},

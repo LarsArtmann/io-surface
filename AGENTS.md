@@ -185,6 +185,12 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
 - errcheck policy: report writes are deliberately unchecked (`_, _ =`);
   rationale in `docs/errcheck-policy.md`. Don't "fix" those sites or add
   linter config without reopening the decision.
+- erraudit policy: bare `error` returns stay (generic_return disabled as a
+  recorded posture; the strict audit is
+  `erraudit lint ./... --max --disable generic_return`). Failures stay
+  classifiable via per-package `errors.go` sentinels + `%w` — NOT
+  go-error-family (would be a fifth direct dep). Rationale:
+  `docs/erraudit-policy.md`.
 - Manifest editing: `facts.cue` is mechanical (regenerate, never hand-edit
   locations); `claims.cue`/`baseline.cue` are human judgment (never
   overwrite). `schema.cue` source of truth is `internal/scaffold/schema.cue`.

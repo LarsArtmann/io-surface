@@ -518,6 +518,12 @@ func TestRunBaselineAdd(t *testing.T) {
 		t.Fatalf("plant undeclared site: %v", err)
 	}
 
+	t.Run("missing ID is a usage error", func(t *testing.T) {
+		if _, err := runApp(t, "baseline", "add", "--root", root, "--note", "why"); !errors.Is(err, errUsage) {
+			t.Fatalf("baseline add without an ID err = %v, want errUsage", err)
+		}
+	})
+
 	t.Run("noteless call is a usage error", func(t *testing.T) {
 		if _, err := runApp(t, "baseline", "add", "--root", root, "internal/store.Late"); err == nil {
 			t.Fatal("--note is required")
@@ -571,6 +577,29 @@ func TestRunBaselineAdd(t *testing.T) {
 			t.Errorf("missing advisory warning: %s", out)
 		}
 	})
+}
+
+// TestRunInit_NoSites pins the empty-tree failure: init refuses to scaffold a
+// manifest with nothing to snapshot, and the refusal is classifiable.
+func TestRunInit_NoSites(t *testing.T) {
+	root := t.TempDir()
+	for _, dir := range []string{"cmd", "internal"} {
+		if err := os.MkdirAll(filepath.Join(root, dir), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	pure := filepath.Join(root, "internal", "pure.go")
+	if err := os.WriteFile(pure, []byte("package internal\n\nfunc Pure() int { return 42 }\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err := runApp(t, "init", "--root", root)
+	if !errors.Is(err, errNoSites) {
+		t.Fatalf("init on an I/O-free tree err = %v, want errNoSites", err)
+	}
+	if exitCode(err) != 2 {
+		t.Errorf("no-sites exit class = %d, want 2", exitCode(err))
+	}
 }
 
 // TestExtractStats pins the histogram shape: a header, per-package rows, and

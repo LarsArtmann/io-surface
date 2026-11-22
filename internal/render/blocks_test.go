@@ -1,6 +1,7 @@
 package render
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -72,8 +73,14 @@ func TestApplyToDoc_Errors(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			if _, err := ApplyToDoc(tc.doc, Block(fixtureManifest())); err == nil {
+			_, err := ApplyToDoc(tc.doc, Block(fixtureManifest()))
+			if err == nil {
 				t.Errorf("expected error for %s", tc.name)
+
+				return
+			}
+			if !errors.Is(err, ErrDocBlock) {
+				t.Errorf("error = %v, want ErrDocBlock", err)
 			}
 		})
 	}

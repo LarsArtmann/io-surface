@@ -1,6 +1,7 @@
 package absorb
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -73,7 +74,7 @@ func TestRun(t *testing.T) {
 func TestRunRejectsUnknownType(t *testing.T) {
 	root := writeGoMod(t, "example.com/repo")
 	bad := `{"capabilityInfo": [{"capabilityName": "FILES", "capabilityType": "CAPABILITY_TYPE_HOLOGRAPHIC", "packageDir": "example.com/repo/internal/x"}]}`
-	if _, err := Run(root, []byte(bad), Options{}); err == nil || !strings.Contains(err.Error(), "unknown capability type") {
+	if _, err := Run(root, []byte(bad), Options{}); err == nil || !errors.Is(err, ErrCapabilityType) || !strings.Contains(err.Error(), "unknown capability type") {
 		t.Fatalf("want unknown-type error, got %v", err)
 	}
 }

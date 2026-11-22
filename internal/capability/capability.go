@@ -21,7 +21,6 @@
 package capability
 
 import (
-	"fmt"
 	"slices"
 	"sort"
 	"strings"
@@ -65,29 +64,6 @@ func FamiliesFor(name Name) []string {
 	sort.Strings(out)
 
 	return out
-}
-
-// Families returns the deduplicated union of families for a capability set,
-// sorted. An unknown name is skipped by Valid's contract upstream; this
-// function treats unknown names as an error to keep call sites honest.
-func Families(names []Name) ([]string, error) {
-	seen := map[string]bool{}
-	var out []string
-	for _, n := range names {
-		fs, ok := familiesFor[n]
-		if !ok {
-			return nil, fmt.Errorf("capability %q is not in the closed enum", n)
-		}
-		for _, f := range fs {
-			if !seen[f] {
-				seen[f] = true
-				out = append(out, f)
-			}
-		}
-	}
-	sort.Strings(out)
-
-	return out, nil
 }
 
 // Edge is one Capslock observation: packageDir reached capabilityName with
