@@ -122,6 +122,7 @@ HTML
 
 "$CHROME" --headless --disable-gpu --no-sandbox \
   --window-size=$WIDTH,$HEIGHT \
+  --virtual-time-budget=5000 \
   --dump-dom "file://$WRAPPER/probe.html" 2>/dev/null > "$WRAPPER/dom.html"
 
 python3 - "$WRAPPER/dom.html" "$WRAPPER/result.txt" << 'PY'
