@@ -125,9 +125,10 @@ func TestSARIF_DocumentShape(t *testing.T) {
 }
 
 // TestSARIF_EnforcementProperty pins the D4 posture contract (TODO #93):
-// every result of a run carries the report's enforcement policy as the
-// `go-finding/meta/enforcement` property, for BOTH postures, so a consumer
-// can tell a gate run from an audit run off the artifact alone.
+// the run-level propertyBag carries the report's enforcement policy as
+// `go-finding/meta/enforcement` ONCE (go-finding v1.16.0 run bag), for BOTH
+// postures, so a consumer can tell a gate run from an audit run off the
+// artifact alone — and the per-result copies stay gone.
 func TestSARIF_EnforcementProperty(t *testing.T) {
 	for _, posture := range []string{"gate", "audit"} {
 		rep := sampleReport()
@@ -139,7 +140,8 @@ func TestSARIF_EnforcementProperty(t *testing.T) {
 
 		var doc struct {
 			Runs []struct {
-				Results []struct {
+				Properties map[string]any `json:"properties"`
+				Results    []struct {
 					RuleID     string         `json:"ruleId"`
 					Properties map[string]any `json:"properties"`
 				} `json:"results"`
@@ -151,42 +153,51 @@ func TestSARIF_EnforcementProperty(t *testing.T) {
 		if len(doc.Runs) != 1 || len(doc.Runs[0].Results) != 3 {
 			t.Fatalf("posture %s: want one run with 3 results", posture)
 		}
+		if got := doc.Runs[0].Properties["go-finding/meta/enforcement"]; got != posture {
+			t.Fatalf("posture %s: runs[0].properties[enforcement] = %v", posture, got)
+		}
 		for _, res := range doc.Runs[0].Results {
-			got, ok := res.Properties["go-finding/meta/enforcement"]
-			if !ok {
-				t.Errorf("posture %s, rule %s: no enforcement property", posture, res.RuleID)
-				continue
-			}
-			if got != posture {
-				t.Errorf("posture %s, rule %s: enforcement = %v", posture, res.RuleID, got)
+			if _, ok := res.Properties["go-finding/meta/enforcement"]; ok {
+				t.Errorf("posture %s, rule %s: per-result enforcement copy must stay dropped", posture, res.RuleID)
 			}
 		}
 	}
 }
 
-// TestToFindings_EnforcementRidesMetadata checks the source of the SARIF
-// property: the report's posture lands in every finding's metadata, merged
-// with (not clobbering) the detector rule description.
-func TestToFindings_EnforcementRidesMetadata(t *testing.T) {
+// TestToReport_RunBag checks the migration target: the posture and the
+// detector rule-description table ride the REPORT's run propertyBag, and
+// ToFindings carries no per-result metadata anymore.
+func TestToReport_RunBag(t *testing.T) {
 	rep := sampleReport()
 	rep.Enforcement = "audit"
-	rep.Findings[0].Rule = "io-surface/err-dropped" // detector rule → gets ruleDescription
-	fs := ToFindings(rep)
-	if len(fs) != 3 {
-		t.Fatalf("got %d findings, want 3", len(fs))
+	rep.Findings[0].Rule = "io-surface/err-dropped" // detector rule → description table
+
+	report := ToReport(rep, "0.1.0")
+	props := report.RunProperties()
+	if props["go-finding/meta/enforcement"] != "audit" {
+		t.Errorf("run-bag enforcement: %v", props["go-finding/meta/enforcement"])
 	}
-	first := fs[0]
-	if first.Metadata["enforcement"] != "audit" {
-		t.Errorf("enforcement metadata: %q", first.Metadata["enforcement"])
+	descriptions, ok := props["go-finding/meta/ruleDescriptions"].(map[string]string)
+	if !ok {
+		t.Fatalf("ruleDescriptions missing from the run bag: %v", props["go-finding/meta/ruleDescriptions"])
 	}
-	if first.Metadata["ruleDescription"] == "" {
-		t.Error("ruleDescription lost when enforcement rides along")
+	if def := descriptions["io-surface/err-dropped"]; def == "" {
+		t.Errorf("ruleDescriptions[io-surface/err-dropped] = %q, want the registry description", def)
+	}
+
+	for _, f := range ToFindings(rep) {
+		if _, ok := f.Metadata["enforcement"]; ok {
+			t.Error("ToFindings must not carry per-result enforcement anymore")
+		}
+		if _, ok := f.Metadata["ruleDescription"]; ok {
+			t.Error("ToFindings must not carry per-result ruleDescription anymore")
+		}
 	}
 
 	rep.Enforcement = ""
-	fs = ToFindings(rep)
-	if _, ok := fs[0].Metadata["enforcement"]; ok {
-		t.Error("empty enforcement must not emit the property")
+	props = ToReport(rep, "0.1.0").RunProperties()
+	if _, ok := props["go-finding/meta/enforcement"]; ok {
+		t.Error("empty enforcement must not emit the run property")
 	}
 }
 

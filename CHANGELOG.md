@@ -15,6 +15,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Nothing yet.
 
+## [0.7.0] - 2026-11-22
+
+### Changed
+
+- **SARIF run-level metadata** (with go-finding v1.16.0's new run propertyBag,
+  LarsArtmann/go-finding#53): the enforcement posture
+  (`go-finding/meta/enforcement`) and the detector rule descriptions now ride
+  `runs[0].properties` ONCE per run — posture as a string, descriptions as a
+  single `go-finding/meta/ruleDescriptions` map keyed by rule ID — instead of
+  being copied onto every result. Consumers that read the per-result keys
+  must move to the run bag; per-result noise drops from N copies to one.
+  The `positionOf`/`anchorFor` behavior is unchanged.
+
 ## [0.6.0] - 2026-11-22
 
 ### Added

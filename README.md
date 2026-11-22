@@ -376,6 +376,12 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
+`v0.7.0` — the run-metadata line (with go-finding v1.16.0): SARIF carries the
+enforcement posture and the detector rule descriptions ONCE in the run-level
+propertyBag (`runs[0].properties`) instead of copying them onto every result —
+N results × 2 unchanged values becomes one run bag, and consumers can tell the
+gate, audit, and lint faces apart off the artifact alone.
+
 `v0.6.0` — the integration line: the lint radar embeds into the rendered
 inventory document (`render --lint`, one doc carries the gate inventory and
 the detector findings), detector severities become a typed vocabulary,
