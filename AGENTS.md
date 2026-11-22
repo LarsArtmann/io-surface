@@ -132,6 +132,11 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
   mid-edit — re-read before editing when one is running (`pgrep -af
   buildflow`) and verify edits landed on disk. Mid-run gate reds can vanish
   once the run settles; re-run before acting.
+- gopls's `infertypeargs` hint can LIE about cmdguard generics: on
+  `v5.NewParentCommand[rootFlags, baselineAddFlags]` it claims the type args
+  are unnecessary, but the compiler cannot infer `T` without them (build
+  red 2026-11-22). Keep explicit type args on cmdguard generic calls;
+  the compiler outranks the hint.
 - A STALE system `buildflow`/`docs-gates` binary produces FALSE gate reds.
   Fix recipe (re-verified 2026-11-15): rebuild in the BuildFlow repo
   (`nix build .# && nix run .#reinstall`); if `buildflow doctor` still
