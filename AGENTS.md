@@ -5,9 +5,10 @@ call site from a Go tree via a stdlib-only AST walk, compares it against a CUE
 manifest, and fails the build on I/O nobody documented — AND (since v0.3.0,
 io-bug-radar) a detector layer that finds bad I/O via `io-surface lint`
 (manifestless, exit 0 unless `--enforce`; rules ship at info, promotion is
-evidence-gated). Single Go module (`go 1.27`), four direct dependencies
+evidence-gated). Single Go module (`go 1.27`), five direct dependencies
 (`cuelang.org/go` for the manifest, `cmdguard/v5` for the CLI, `go-finding`
-for SARIF, `go-atomic-write` for the tool's own file writes — the gate core
+for SARIF, `go-atomic-write` for the tool's own file writes,
+`go-error-family` for coded errors — the gate core
 `internal/extract` itself stays stdlib-only). `flake.nix` (fleet
 `go-standard` module, go 1.27, linux-only): `nix run .# -- check --root .`
 is the sandbox-native gate. No Makefile/justfile.
@@ -185,16 +186,19 @@ case. Type-fact resolution is out of scope BY DESIGN: such sites get
 
 - Package doc comments are load-bearing (why hermetic, why tiers, why
   pairing order) — extend them when changing design rationale.
-- Go code: gofmt-clean, tabs, stdlib-first. Errors wrap context; sentinels
-  live in per-package `errors.go`.
+- Go code: gofmt-clean, tabs. The gate core (`internal/extract`) stays
+  stdlib-only; error surfaces use coded go-error-family rejections (family +
+  machine-readable code, fleet style like `cli.usage`), sentinels in
+  per-package `errors.go`; the 0/1/2 exit contract stays local in `exitCode`.
 - errcheck policy: report writes are deliberately unchecked (`_, _ =`);
   rationale in `docs/errcheck-policy.md`. Don't "fix" those sites or add
   linter config without reopening the decision.
 - erraudit policy: bare `error` returns stay (generic_return disabled as a
   recorded posture; the strict audit is
-  `erraudit lint ./... --max --disable generic_return`). Failures stay
-  classifiable via per-package `errors.go` sentinels + `%w` — NOT
-  go-error-family (would be a fifth direct dep). Rationale:
+  `erraudit lint ./... --max --disable generic_return`). Failures are coded
+  go-error-family rejections (owner directive 2026-11-22: ALL LarsArtmann/*
+  SDKs are to be used where useful); the 11 remaining stdlib-constructor
+  functions are the measured migration backlog. Rationale:
   `docs/erraudit-policy.md`.
 - Manifest editing: `facts.cue` is mechanical (regenerate, never hand-edit
   locations); `claims.cue`/`baseline.cue` are human judgment (never

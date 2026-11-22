@@ -33,6 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **CLI failure surfaces are coded go-error-family rejections** (owner
+  directive: ALL LarsArtmann/* SDKs are to be used where useful): the
+  init/baseline-add/absorb/render failures now carry a behavioral family and
+  a machine-readable code (`init.no-sites`, `cli.usage`, `capability.type`,
+  `render.doc-block`) and render as `[Rejection:code] message`; callers and
+  tests classify with `errors.Is` (code+family) and `errorfamily.Code`. The
+  0/1/2 exit contract is unchanged. `go-error-family` moved from indirect to
+  direct dependency.
 - **`--format` is the canonical output flag** (owner decision, TODO #154):
   every consumer and fleet script uses `--format json|sarif|github`; the
   `--json` shorthand stays functional and documented for interactive use,

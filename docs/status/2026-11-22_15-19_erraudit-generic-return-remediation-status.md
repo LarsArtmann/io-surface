@@ -1,5 +1,17 @@
 # Status: erraudit `--max` sweep cleared — 5 anonymous-failure functions coded stdlib-first, production-dead `capability.Families` deleted, generic_return accepted as a recorded posture
 
+> **Same-day supersede (2026-11-22, owner directive):** go-error-family IS
+> the standard ("ALL LarsArtmann/* SDKs are totally to be used if useful").
+> §c.2, §e's errorfamily rejection rationale, §f.16/§f.22, and §a's
+> stdlib-sentinel mechanism are superseded: the five failure surfaces are now
+> coded rejections (`[Rejection:code] message`), `go-error-family` is a
+> direct dependency (go.mod), AGENTS.md's conventions and architecture
+> paragraph name five direct deps, and `docs/erraudit-policy.md` states the
+> adopted standard. Standing: the exit-contract analysis (families carry
+> semantics; 0/1/2 stays local in `exitCode`), the dead-code deletion, and
+> every verification command. Plain `--max` dropped 15 → 11 findings because
+> coded constructors are what the linter wants.
+
 **Created:** 2026-11-22 15:19 CET · Crush agent (glm-5.3-flash) · backlog basis: owner pasted `erraudit lint ./... --max` output (16 findings, exit 2, `[Rejection:violations.found]`) with the directive "READ, UNDERSTAND, RESEARCH, REFLECT … execute and verify one step at a time".
 
 **Scope — what this report VERIFIED (all commands run by this session, last state 2026-11-22 15:1x):** `scripts/self-gate.sh` exit 0 twice, final run AFTER every edit (all ci.yml test-job stages incl. docs-gates 5/5); `go build ./... && go vet ./...` clean; `go test ./...` all `ok` (read raw, not via a filter); `gofmt -l .` empty; `erraudit lint ./... --max --disable generic_return` exit 0 (AFTER final edits); `erraudit lint ./... --max` = 15 findings, all carrying erraudit's own "already returns distinctive values (sentinel reference, %w wrap) … treat this advisory as accepted" verdict, exit 2 (re-counted AFTER final edits); `git diff facts.cue` = audit-commit hash refresh only, zero site-location drift. **What this report did NOT verify and why:** `nix build .#` (not run; go.sum unchanged so the vendorHash red class has no trigger, but the flake build is unproven this session); GitHub CI (nothing pushed — pushes are owner-gated); the erraudit `fix ./...` dry-run (skill Step 1 — skipped, see §d.6); `golangci-lint` (repo deliberately does not run it, per `docs/errcheck-policy.md`); whether TODO_LIST/ROADMAP absorbed §f (HARVEST not yet run — §f is its input, not its substitute). **Concurrent session:** the docs-health mega-purge session (its 14:57 report) worked this repo the same day; no collision hit this session's files, and the tree at report time carries exactly two modified files (`AGENTS.md`, `facts.cue`) with all code daemon-committed.
