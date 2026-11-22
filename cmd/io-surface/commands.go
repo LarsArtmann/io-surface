@@ -15,6 +15,7 @@ import (
 
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 	atomicwrite "github.com/larsartmann/go-atomic-write"
+	"github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/io-surface/internal/absorb"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/emit"
@@ -198,7 +199,7 @@ func runInit(_ context.Context, root *rootFlags, flags initFlags) error {
 		if len(scanned) == 0 {
 			scanned = extract.DefaultDirs()
 		}
-		return fmt.Errorf("%w under %s (scanned dirs: %s; widen --dirs if the I/O lives elsewhere)", errNoSites, root.Root, strings.Join(scanned, ", "))
+		return errorfamily.NewRejection(codeNoSites, fmt.Sprintf("no I/O sites found under %s (scanned dirs: %s; widen --dirs if the I/O lives elsewhere)", root.Root, strings.Join(scanned, ", ")))
 	}
 	dir, err := scaffold.Write(root.Root, sites, time.Now().UTC().Format("2006-01-02"), flags.Force)
 	if err != nil {
@@ -517,7 +518,7 @@ func manifestDir(root, flagValue string) string {
 func runBaselineAdd(ctx context.Context, root *rootFlags, flags baselineAddFlags) error {
 	args := v5.ArgsFromContext(ctx)
 	if len(args) != 1 {
-		return fmt.Errorf("%w: baseline add takes exactly one site ID argument (usage: io-surface baseline add <pkg.Func> --note \"why\")", errUsage)
+		return errorfamily.NewRejection(codeUsage, "baseline add takes exactly one site ID argument (usage: io-surface baseline add <pkg.Func> --note \"why\")")
 	}
 	id := args[0]
 

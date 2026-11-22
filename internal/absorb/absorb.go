@@ -26,6 +26,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/io-surface/internal/capability"
 	"github.com/larsartmann/io-surface/internal/manifest"
 )
@@ -138,9 +139,9 @@ func normalizeDepth(t string) (string, error) {
 	case "CAPABILITY_TYPE_TRANSITIVE":
 		return "TRANSITIVE", nil
 	case "":
-		return "", fmt.Errorf("%w: capability entry without a type", ErrCapabilityType)
+		return "", errorfamily.NewRejection(codeCapabilityType, "capability entry without a type")
 	default:
-		return "", fmt.Errorf("%w: unknown capability type %q (engine newer than this schema?)", ErrCapabilityType, t)
+		return "", errorfamily.NewRejection(codeCapabilityType, fmt.Sprintf("unknown capability type %q (engine newer than this schema?)", t))
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/manifest"
 )
@@ -81,6 +82,9 @@ func TestApplyToDoc_Errors(t *testing.T) {
 			}
 			if !errors.Is(err, ErrDocBlock) {
 				t.Errorf("error = %v, want ErrDocBlock", err)
+			}
+			if got := errorfamily.Code(err); got != "render.doc-block" {
+				t.Errorf("doc-block code = %q, want render.doc-block", got)
 			}
 		})
 	}

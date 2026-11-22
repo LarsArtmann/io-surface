@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	atomicwrite "github.com/larsartmann/go-atomic-write"
+	"github.com/larsartmann/go-error-family"
 	"github.com/larsartmann/io-surface/internal/check"
 	"github.com/larsartmann/io-surface/internal/extract"
 	"github.com/larsartmann/io-surface/internal/manifest"
@@ -519,8 +520,12 @@ func TestRunBaselineAdd(t *testing.T) {
 	}
 
 	t.Run("missing ID is a usage error", func(t *testing.T) {
-		if _, err := runApp(t, "baseline", "add", "--root", root, "--note", "why"); !errors.Is(err, errUsage) {
+		_, err := runApp(t, "baseline", "add", "--root", root, "--note", "why")
+		if !errors.Is(err, errUsage) {
 			t.Fatalf("baseline add without an ID err = %v, want errUsage", err)
+		}
+		if got := errorfamily.Code(err); got != "cli.usage" {
+			t.Errorf("usage code = %q, want cli.usage", got)
 		}
 	})
 
@@ -596,6 +601,9 @@ func TestRunInit_NoSites(t *testing.T) {
 	_, err := runApp(t, "init", "--root", root)
 	if !errors.Is(err, errNoSites) {
 		t.Fatalf("init on an I/O-free tree err = %v, want errNoSites", err)
+	}
+	if got := errorfamily.Code(err); got != "init.no-sites" {
+		t.Errorf("no-sites code = %q, want init.no-sites", got)
 	}
 	if exitCode(err) != 2 {
 		t.Errorf("no-sites exit class = %d, want 2", exitCode(err))
