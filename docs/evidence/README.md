@@ -55,7 +55,17 @@ Per rule (hits / FP-by-policy-definition / verified-fixed):
 
 fp-sample-write-non-atomic-2026-11-22 (the first §7-compliant N≥30 re-sample)
 Produced by: `./scripts/fp-sample.sh io-surface/write-non-atomic
-docs/evidence/fleetscan-2026-11-15.json 30` then hand adjudication of all
+docs/evidence/fleetscan-2026-11-15.json
+Produced by: `./scripts/fleetscan.sh docs/evidence/fleetscan-2026-11-15.json`
+(io-surface @ master 2026-11-15, v0.5.1 binary, 170 repos).
+Headline: 170/170 scanned, 115 with findings.
+Hygiene note resolved (TODO #176, verified 2026-11-22): the aggregate lists
+`DiscordSync` (/home/lars/projects/DiscordSync) AND `discordsync`
+(/home/lars/projects/discordsync) with identical 294-site counts — two
+real paths on disk that day, not a pma discovery bug; the lowercase
+duplicate checkout has since been removed from disk, so the next fleetscan
+sees exactly one entry (pma today: 247 entries, one DiscordSync). The
+double-counted 294 sites inflated this aggregate's totals by one repo. 30` then hand adjudication of all
 30 sites (every flagged location read in its repo, policy §2 vocabulary).
 Verdict: 3 verified / 27 FP = 90% FP rate — stays info under W2 by a wide
 margin. The FP mass sits in four classes the rule card does not yet carve
