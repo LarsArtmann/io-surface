@@ -94,6 +94,68 @@ its own packages. Two edge families:
   encoding/json/v2 v2_stream.go:156` (observed only on the full tree; the
   standalone json-encoder repro yields 0 — minimization not yet achieved).
 
+## CLASS A MINIMIZED (2026-11-22 — TODO #183 closed)
+
+The json-encoder shape was the wrong trigger (variants A1–A3: Encode +
+`_ = http.ParseCookie`, + SplitSeq range, + custom Write sink — all 0).
+Bisecting the full-tree universe found the real pair: **templ's runtime
+buffer streaming**. A ~10-line module rendering ONE templ component to a
+`bytes.Buffer` reproduces 3 phantom NETWORK edges — no `encoding/json`, no
+range-over-func in OWN code, and **no `net/http` anywhere in the analyzed
+universe** (module deps = `github.com/a-h/templ` only; packageInfo carries
+no net/http — capslock names methods of a package it never analyzed).
+
+`go.mod`: `module classa-templ` + `go 1.27` + `require github.com/a-h/templ v0.3.1100`;
+`hello.templ` one `<div>` component, codegen via
+`go run github.com/a-h/templ/cmd/templ@v0.3.1100 generate`.
+
+```go
+package main
+
+import (
+	"bytes"
+	"context"
+)
+
+func main() {
+	var buf bytes.Buffer
+	_ = hello("world").Render(context.Background(), &buf)
+}
+```
+
+Command: `capslock -output=json -packages=./...` → 3 NETWORK entries:
+`(*templ/runtime.Buffer).WriteString → (*bufio.Writer).WriteString →
+(*net/http.response).WriteString` (via component closure `hello$1`),
+`Buffer.Flush → (*net/http.response).Flush` (via `hello$1$1`), plus the
+same chain rooted at `main`. GOEXPERIMENT-independent (3 with jsonv2 on,
+3 with it unset, go1.27.3, capslock v0.3.4).
+
+Same misattribution signature as class B, one level up: the analyzed
+universe contains buffered-write methods (`bufio.Writer`, templ's own
+`Buffer`); the SSA unifies their `WriteString`/`Flush` shapes with the
+same-named `net/http.response` methods and stamps the NETWORK capability
+with the OUT-OF-UNIVERSE name. The full-tree json face (`Encode →
+response.Write`) is the same collision reached through json v2's stream
+writer once templ enters the universe (io-surface's cmdguard→go-output
+chain pulls templ into cmd/io-surface's graph — CI artifact 45044551330:
+7 class-A entries rooted at runCheck/runExtract/runLint).
+
+Filing note for #50: both families now carry standalone repros; the issue
+can state the general claim (capability misattribution across same-named
+stdlib methods via range-over-func closure machinery, name resolvable to a
+package outside the analyzed universe) with class B (strings/iter.go:41)
+and class A (templ Buffer) as the two proofs. Re-verify line numbers and
+the templ version at posting time.
+
+## Full-tree census refresh (2026-11-22, CI run 45044551330 artifact)
+
+Still 63 NETWORK entries (identical to 2026-11-21): extract 30, main 13,
+manifest 6, check 3, lint 3, absorb 2, emit 2, provider 2, render 1,
+scaffold 1; 7 class-A (v2_stream/response) rooted at cmd/io-surface entry
+points, the rest class-B shaped. The phantom is stable across
+capslock v0.3.4 builds and CI/local environments; re-verify
+`net/http/cookie.go:99` and `strings/iter.go:41` anchors at posting time.
+
 ## Upstream duplicate check (Gate 5, 2026-11-21)
 
 No open/closed capslock issue mentions ParseCookie/SplitSeq/phantom-NETWORK.
