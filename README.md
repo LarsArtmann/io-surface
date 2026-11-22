@@ -376,6 +376,14 @@ command that verified it (`check --root .` → `0 errors`, `go test -race ./...`
 
 ## Status
 
+`v0.6.0` — the integration line: the lint radar embeds into the rendered
+inventory document (`render --lint`, one doc carries the gate inventory and
+the detector findings), detector severities become a typed vocabulary,
+`check --strict-weak` gives heuristic sites opt-in teeth, `--format` is the
+canonical machine-output flag for every command, CLI failures carry
+machine-readable go-error-family rejection codes, and SARIF locations anchor
+at the file where the fix happens.
+
 `v0.5.1` — the hygiene line: the 35 MB build binary the auto-commit daemon
 once committed is purged from git history (`git filter-repo`; fresh clones
 dropped from ~54 MB to ~4 MB), and every version published before the purge

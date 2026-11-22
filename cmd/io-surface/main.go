@@ -19,7 +19,7 @@ import (
 	v5 "github.com/larsartmann/cmdguard/v5/pkg/cmdguard/v5"
 )
 
-const version = "0.5.1"
+const version = "0.6.0"
 
 func main() {
 	app, err := newApp()

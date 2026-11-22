@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.6.0] - 2026-11-22
+
+### Added
+
 - `render --lint`: the lint radar embeds into the inventory document as an
   appendix inside the generated block — one doc carries both the gate
   inventory and the detector findings, and `--doc --check` freshness covers
