@@ -406,7 +406,8 @@ const absorbFixtureReport = `{
     {"capabilityName": "FILES", "capabilityType": "CAPABILITY_TYPE_DIRECT", "packageDir": "example.com/fixture/internal/store"},
     {"capabilityName": "NETWORK", "capabilityType": "CAPABILITY_TYPE_DIRECT", "packageDir": "example.com/fixture/internal/store"},
     {"capabilityName": "EXEC", "capabilityType": "CAPABILITY_TYPE_TRANSITIVE", "packageDir": "example.com/fixture/internal/store"},
-    {"capabilityName": "REFLECT", "capabilityType": "CAPABILITY_TYPE_TRANSITIVE", "packageDir": "example.com/fixture/internal/store"}
+    {"capabilityName": "REFLECT", "capabilityType": "CAPABILITY_TYPE_TRANSITIVE", "packageDir": "example.com/fixture/internal/store"},
+    {"capabilityName": "UNANALYZED", "capabilityType": "CAPABILITY_TYPE_TRANSITIVE", "packageDir": "example.com/fixture/internal/store"}
   ]
 }`
 
@@ -435,20 +436,20 @@ func TestRunAbsorb_WritesCapabilitiesOnly(t *testing.T) {
 	if !strings.Contains(out, "capabilities.cue") || !strings.Contains(out, "v0.3.4") {
 		t.Errorf("absorb summary missing facts: %s", out)
 	}
-	if !strings.Contains(out, "REFLECT") {
-		t.Errorf("unmapped capability must be reported loudly, out: %s", out)
+	if !strings.Contains(out, "UNANALYZED") {
+		t.Errorf("truly unknown capability must be reported loudly (v1.3 stores runtime-power names; unmapped still drop), out: %s", out)
 	}
 
 	body, err := os.ReadFile(filepath.Join(root, scaffold.Dir, "capabilities.cue"))
 	if err != nil {
 		t.Fatalf("capabilities.cue missing: %v", err)
 	}
-	for _, want := range []string{`pkg: "internal/store"`, `direct: ["FILES", "NETWORK"]`, `deep: ["EXEC", "FILES", "NETWORK"]`, `engine:  "capslock"`} {
+	for _, want := range []string{`pkg: "internal/store"`, `direct: ["FILES", "NETWORK"]`, `deep: ["EXEC", "FILES", "NETWORK", "REFLECT"]`, `engine:  "capslock"`} {
 		if !strings.Contains(string(body), want) {
 			t.Errorf("capabilities.cue missing %q:\n%s", want, body)
 		}
 	}
-	for _, forbidden := range []string{"claims:", "baseline:", "sites:"} {
+	for _, forbidden := range []string{"claims:", "baseline:", "sites:", "UNANALYZED"} {
 		if strings.Contains(string(body), forbidden) {
 			t.Errorf("capabilities.cue must never carry %q", forbidden)
 		}
