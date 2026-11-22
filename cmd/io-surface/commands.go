@@ -648,12 +648,12 @@ func splitAnnotationLocation(loc string) (file, line string) {
 	if loc == "" {
 		return "", ""
 	}
-	i := strings.LastIndex(loc, ":")
-	if i < 0 {
+	file, line, found := strings.CutLast(loc, ":")
+	if !found {
 		return loc, ""
 	}
 
-	return loc[:i], loc[i+1:]
+	return file, line
 }
 
 // githubEscape escapes the three characters the workflow-command data syntax

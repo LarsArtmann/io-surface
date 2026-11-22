@@ -186,16 +186,26 @@ func CUE(r *Result, audit Audit) []byte {
 	var b strings.Builder
 	b.WriteString(`// capabilities.cue — reachability facts observed by an external engine.
 //
-// Written ONLY by ` + "`io-surface absorb`" + ` (from pinned Capslock output);
+// Written ONLY by `)
+	b.WriteString("`io-surface absorb`")
+	b.WriteString(` (from pinned Capslock output);
 // never hand-edit locations, and never let another tool touch this file.
 // Advisory tier: capability findings never fail the gate by themselves.
 package io_surface
 
 capabilityAudit: {
-	engine:  ` + quote(audit.Engine) + `
-	version: ` + quote(audit.Version) + `
-	commit:  ` + quote(audit.Commit) + `
-	date:    ` + quote(audit.Date) + `
+	engine:  `)
+	b.WriteString(quote(audit.Engine))
+	b.WriteString(`
+	version: `)
+	b.WriteString(quote(audit.Version))
+	b.WriteString(`
+	commit:  `)
+	b.WriteString(quote(audit.Commit))
+	b.WriteString(`
+	date:    `)
+	b.WriteString(quote(audit.Date))
+	b.WriteString(`
 }
 
 capabilities: [
