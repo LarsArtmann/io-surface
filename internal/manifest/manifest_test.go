@@ -201,7 +201,7 @@ func TestLoad_VersionRefusal(t *testing.T) {
 	site := `sites: "a.B": {location: ["a.go:1"], family: "env", facts: {call: ["os.Getenv"]}}`
 
 	t.Run("shipped versions and absent load", func(t *testing.T) {
-		for _, version := range []string{"", "io-surface/v1", "io-surface/v1.1", "io-surface/v1.2"} {
+		for _, version := range []string{"", "io-surface/v1", "io-surface/v1.1", "io-surface/v1.2", "io-surface/v1.3"} {
 			facts := "package io_surface\n\n" + site
 			if version != "" {
 				facts = "package io_surface\n\nversion: \"" + version + "\"\n\n" + site
@@ -230,7 +230,7 @@ func TestLoad_VersionRefusal(t *testing.T) {
 		if !errors.Is(err, ErrUnsupportedVersion) {
 			t.Fatalf("want ErrUnsupportedVersion, got %v", err)
 		}
-		if !strings.Contains(err.Error(), "io-surface/v1.2") {
+		if !strings.Contains(err.Error(), "io-surface/v1.3") {
 			t.Errorf("error must name the newest supported version, got: %v", err)
 		}
 	})
@@ -238,7 +238,7 @@ func TestLoad_VersionRefusal(t *testing.T) {
 	t.Run("typo is refused without a schema enum", func(t *testing.T) {
 		dir := writeManifest(t, map[string]string{
 			"schema.cue": schemaBody,
-			"facts.cue":  "package io_surface\n\nversion: \"io-surface/v1.3\"\n\n" + site,
+			"facts.cue":  "package io_surface\n\nversion: \"io-surface/v1.4\"\n\n" + site,
 		})
 		_, err := Load(dir)
 		if !errors.Is(err, ErrUnsupportedVersion) {

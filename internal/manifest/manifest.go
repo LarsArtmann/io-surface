@@ -140,7 +140,7 @@ const (
 // exactly these and refuses anything else loudly instead of mis-decoding,
 // because sites written for a newer contract can carry fields and vocabulary
 // this tool has no meaning for.
-const SupportedVersions = "io-surface/v1, io-surface/v1.1, io-surface/v1.2"
+const SupportedVersions = "io-surface/v1, io-surface/v1.1, io-surface/v1.2, io-surface/v1.3"
 
 // versionsSupported is the lookup set behind SupportedVersions; keep in sync
 // with the closed enum in internal/scaffold/schema.cue (the schema refuses
@@ -150,6 +150,7 @@ var versionsSupported = map[string]bool{
 	"io-surface/v1":   true,
 	"io-surface/v1.1": true,
 	"io-surface/v1.2": true,
+	"io-surface/v1.3": true,
 }
 
 // checkVersion refuses manifests declaring a contract version beyond the

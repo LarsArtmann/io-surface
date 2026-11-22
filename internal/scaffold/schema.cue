@@ -27,15 +27,17 @@
 // lands in location, whichever section spelled it.
 package io_surface
 
-// Contract version (io-surface/v1.2). Absent in v1 manifests; new scaffolds
+// Contract version (io-surface/v1.3). Absent in v1 manifests; new scaffolds
 // declare the newest. A schema change bumps the minor: a new family,
 // capability name, or claims vocabulary is a version bump, never a casual
 // edit (taxonomy freeze). v1.1 added capabilities; v1.2 added the
-// claims.criticality/durability severity-modulation vocabulary. The TOOL
-// refuses any version outside this set at load time (manifest.ErrUnsupportedVersion):
+// claims.criticality/durability severity-modulation vocabulary; v1.3 added
+// the closed-ten capability vocabulary (runtime-power caps stored at
+// package level) and claims.ownership. The TOOL refuses any version outside
+// this set at load time (manifest.ErrUnsupportedVersion):
 // a stale schema copy or a manifest written for a newer tool fails loudly,
 // it is never silently mis-decoded.
-version?: "io-surface/v1" | "io-surface/v1.1" | "io-surface/v1.2"
+version?: "io-surface/v1" | "io-surface/v1.1" | "io-surface/v1.2" | "io-surface/v1.3"
 
 // Enforcement policy (decision D4: new undeclared sites fail the build).
 // "gate" is the default and the birth decision; "audit" reports findings
@@ -101,11 +103,14 @@ sites: {[string]: #Site}
 // dev shells — never imported by the hermetic gate). Written only by
 // `io-surface absorb` into capabilities.cue; claims justify them like sites.
 //
-// The enum is the mapped vocabulary ONLY. Runtime-power capabilities (CGO,
-// UNSAFE_POINTER, REFLECT, RUNTIME, SYSTEM_CALLS, ...) are out-of-scope per
-// ROADMAP Q5. The single-source mapping lives in
-// internal/capability/capability.go — keep the two in sync.
-#CapabilityName: "FILES" | "NETWORK" | "EXEC"
+// v1.3 (ROADMAP Q5 first-class decision): the enum is the CLOSED TEN — the
+// three site-relevant caps plus the runtime-power set, stored at PACKAGE
+// level only (the site contract never grows runtime-power disciplines; the
+// transitive-everywhere noise class stays out of per-site claims). Exact
+// engine names from the 2026-11-06 blind-spot run; MODIFY_SYSTEM_STATE
+// sub-variants normalize to the base name at absorb. The single-source
+// mapping lives in internal/capability/capability.go — keep the two in sync.
+#CapabilityName: "FILES" | "NETWORK" | "EXEC" | "REFLECT" | "RUNTIME" | "SYSTEM_CALLS" | "UNSAFE_POINTER" | "OPERATING_SYSTEM" | "READ_SYSTEM_STATE" | "MODIFY_SYSTEM_STATE"
 
 #CapabilitySet: {
 	// Repo/root-relative package path, e.g. "internal/extract".
