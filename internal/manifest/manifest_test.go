@@ -620,3 +620,72 @@ scope: {in: [], out: []}
 		t.Errorf("unclaimed fields must decode to the schema defaults, got %+v", s.Claims)
 	}
 }
+
+// TestLoad_V13OwnershipClaims pins the v1.3 ownership vocabulary and its
+// cross-field contract: caller decodes, helper+helper decodes, the helper
+// name is required under "helper" and forbidden under any other value, and
+// unknown ownership values refuse at load (the Go guard behind a possibly
+// stale schema copy).
+func TestLoad_V13OwnershipClaims(t *testing.T) {
+	base := map[string]string{
+		"schema.cue": v12Schema(t),
+		"facts.cue": `package io_surface
+
+sites: "internal/store.LoadConfig": {
+	location: ["internal/store/store.go:9"]
+	family:   "file-read"
+}
+`,
+		"meta.cue": `package io_surface
+
+audit: {commit: "abc1234", date: "2026-11-22", claims: 1, method: "test audit"}
+scope: {in: [], out: []}
+`,
+	}
+	withClaims := func(claims string) map[string]string {
+		m := map[string]string{}
+		maps.Copy(m, base)
+		m["claims.cue"] = "package io_surface\n\nsites: \"internal/store.LoadConfig\": claims: " + claims + "\n"
+
+		return m
+	}
+
+	t.Run("caller decodes", func(t *testing.T) {
+		m, err := Load(writeManifest(t, withClaims(`{ownership: "caller", rationale: "handle goes to the registry"}`)))
+		if err != nil {
+			t.Fatalf("caller claim rejected: %v", err)
+		}
+		if got := m.Sites["internal/store.LoadConfig"].Claims.Ownership; got != "caller" {
+			t.Errorf("ownership = %q, want caller", got)
+		}
+	})
+
+	t.Run("helper pair decodes", func(t *testing.T) {
+		m, err := Load(writeManifest(t, withClaims(`{ownership: "helper", helper: "util.Drain"}`)))
+		if err != nil {
+			t.Fatalf("helper pair rejected: %v", err)
+		}
+		c := m.Sites["internal/store.LoadConfig"].Claims
+		if c.Ownership != "helper" || c.Helper != "util.Drain" {
+			t.Errorf("ownership pair decoded wrong: %+v", c)
+		}
+	})
+
+	t.Run("helper without name refused", func(t *testing.T) {
+		if _, err := Load(writeManifest(t, withClaims(`{ownership: "helper"}`))); err == nil {
+			t.Fatal("ownership=helper without claims.helper must refuse at load")
+		}
+	})
+
+	t.Run("helper name forbidden without helper ownership", func(t *testing.T) {
+		if _, err := Load(writeManifest(t, withClaims(`{ownership: "caller", helper: "util.Drain"}`))); err == nil {
+			t.Fatal("claims.helper under ownership=caller must refuse at load")
+		}
+	})
+
+	t.Run("unknown ownership refused", func(t *testing.T) {
+		if _, err := Load(writeManifest(t, withClaims(`{ownership: "everyone"}`))); err == nil {
+			t.Fatal("out-of-vocabulary ownership must refuse at load")
+		}
+	})
+}

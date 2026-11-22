@@ -147,6 +147,88 @@ scope: {in: [], out: []}
 	}
 }
 
+// TestRun_OwnershipModulation pins the v1.3 Q6 semantics on the real
+// detector tree: a `caller` claim drops closer-missing unconditionally (the
+// declared transfer-out covers shapes the AST cannot see), a `helper` claim
+// drops only when the named helper is really called in the enclosing
+// function, and a helper claim that names a call the function never makes
+// KEEPS the finding (a lying claim must not silence the detector).
+func TestRun_OwnershipModulation(t *testing.T) {
+	dir := t.TempDir()
+	manifestFiles := map[string]string{
+		"schema.cue": schemaOf(t),
+		"facts.cue": `package io_surface
+
+sites: {
+	"internal/store.leakUsedNotClosed": {
+		location: ["internal/store/closers.go:21"]
+		family:   "file-read"
+	}
+	"internal/store.leakNeverUsed": {
+		location: ["internal/store/closers.go:11"]
+		family:   "file-read"
+	}
+	"cmd/app.leakBody": {
+		location: ["cmd/app/http.go:11"]
+		family:   "outbound"
+	}
+}
+`,
+		"claims.cue": `package io_surface
+
+sites: {
+	"internal/store.leakUsedNotClosed": claims: ownership: "caller"
+	"cmd/app.leakBody": claims: {
+		ownership: "helper"
+		helper:    "io.ReadAll"
+	}
+	"internal/store.leakNeverUsed": claims: {
+		ownership: "helper"
+		helper:    "store.drain"
+	}
+}
+`,
+		"baseline.cue": "package io_surface\n\nbaseline: []\n",
+		"meta.cue": `package io_surface
+
+audit: {commit: "abc", date: "2026-11-22", claims: 3, method: "test audit"}
+scope: {in: [], out: []}
+`,
+	}
+	manifestPath := filepath.Join(dir, "docs", "architecture", "io-surface")
+	if err := os.MkdirAll(manifestPath, 0o755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	for name, body := range manifestFiles {
+		if err := os.WriteFile(filepath.Join(manifestPath, name), []byte(body), 0o644); err != nil {
+			t.Fatalf("write %s: %v", name, err)
+		}
+	}
+
+	rep, err := Run("../../testdata/detectors", Options{Manifest: manifestPath})
+	if err != nil {
+		t.Fatalf("run: %v", err)
+	}
+	present := map[string]bool{}
+	for _, f := range rep.Findings {
+		if f.Rule == RuleID("closer-missing") {
+			present[f.ID] = true
+		}
+	}
+	if present["internal/store.leakUsedNotClosed"] {
+		t.Error("caller claim must drop closer-missing (declared transfer-out policy)")
+	}
+	if present["cmd/app.leakBody"] {
+		t.Error("helper claim whose helper is really called (io.ReadAll) must drop closer-missing")
+	}
+	if !present["internal/store.leakNeverUsed"] {
+		t.Error("helper claim naming an uncalled helper (store.drain) must KEEP closer-missing")
+	}
+	if !present["cmd/app.statusOnlyLeak"] {
+		t.Error("unclaimed site keeps the finding (self default)")
+	}
+}
+
 // schemaOf reads the real standard schema (cycle-free, like the manifest
 // package's own v1.2 test).
 func schemaOf(t *testing.T) string {
