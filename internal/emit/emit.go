@@ -25,21 +25,11 @@ import (
 // ToolName is the tool identity inside go-finding reports and SARIF output.
 const ToolName = "io-surface"
 
-// ToFindings converts a check report into go-finding findings. Detector
-// rules carry their registry description as result-level
-// `properties.ruleDescription` (T15): go-finding's SARIF export has no
-// tool-level rules array, so the description rides the result — SARIF
-// consumers see WHAT a rule means without a second lookup.
-//
-// Every finding also carries the run's enforcement posture (D4, TODO #93) as
-// result metadata ("enforcement" → SARIF property
-// `go-finding/meta/enforcement`; values "gate", "audit", or lint-face
-// "lint"): consumers can tell the run faces apart off the SARIF artifact
-// alone. Result-level is deliberate
-// over run-level: go-finding has no run propertyBag today, and per-result
-// properties survive consumer-side filtering that would drop a run bag. If
-// go-finding grows a run propertyBag, migrate there and drop this key in a
-// minor release (CHANGELOG note).
+// ToFindings converts a check report into go-finding findings. Run-level
+// facts (the enforcement posture, the rule-description table) are NOT
+// per-result anymore: since go-finding v1.16.0 they ride the run-level
+// SARIF propertyBag once (see ToReport, go-finding#53). A finding here
+// carries only its own face: rule, message, severity, position.
 func ToFindings(rep *check.Report) []finding.Finding {
 	out := make([]finding.Finding, 0, len(rep.Findings))
 	for _, f := range rep.Findings {
@@ -51,15 +41,6 @@ func ToFindings(rep *check.Report) []finding.Finding {
 			positionOf(f.Rule, f.Location, rep.Enforcement),
 			1.0,
 		)
-		if def, ok := detectorRuleDescription(f.Rule); ok {
-			fnd.Metadata = map[string]string{"ruleDescription": def}
-		}
-		if rep.Enforcement != "" {
-			if fnd.Metadata == nil {
-				fnd.Metadata = make(map[string]string, 1)
-			}
-			fnd.Metadata["enforcement"] = rep.Enforcement
-		}
 		out = append(out, fnd)
 	}
 
@@ -81,9 +62,30 @@ func detectorRuleDescription(ruleID string) (string, bool) {
 	return def.Description, true
 }
 
-// ToReport builds a go-finding Report from a check report.
+// ToReport builds a go-finding Report from a check report. Run-level facts
+// ride the run propertyBag (go-finding v1.16.0, #53): the enforcement
+// posture ("gate"/"audit"/"lint") as `go-finding/meta/enforcement`, and
+// the detector descriptions present in this run as a single
+// `go-finding/meta/ruleDescriptions` map keyed by rule ID — one map instead
+// of one copy of one description per result.
 func ToReport(rep *check.Report, version string) *finding.Report {
-	return finding.NewReportFromFindings(finding.ToolInfo{Name: ToolName, Version: version}, ToFindings(rep))
+	report := finding.NewReportFromFindings(finding.ToolInfo{Name: ToolName, Version: version}, ToFindings(rep))
+
+	if rep.Enforcement != "" {
+		report.SetRunProperty("go-finding/meta/enforcement", rep.Enforcement)
+	}
+
+	descriptions := make(map[string]string)
+	for _, f := range rep.Findings {
+		if def, ok := detectorRuleDescription(f.Rule); ok {
+			descriptions[f.Rule] = def
+		}
+	}
+	if len(descriptions) > 0 {
+		report.SetRunProperty("go-finding/meta/ruleDescriptions", descriptions)
+	}
+
+	return report
 }
 
 // SARIF renders the check report as a SARIF document.
