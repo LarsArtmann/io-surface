@@ -53,6 +53,40 @@ Per rule (hits / FP-by-policy-definition / verified-fixed):
   Caveat: N per rule is below the policy's W4 floor (30) — this sample
   strengthens the FP-class taxonomy, it does not qualify any promotion.
 
+provider DAG e2e through BuildFlow (TODO #170, 2026-11-22)
+Reproduced by: scratch module (module e2e-dag, go 1.27, git init, one
+`cmd/e2e/main.go` carrying an undeclared `os.WriteFile` final-path write,
+`.buildflow.yml` with `version: 1` + `max_file_size: 650`), then
+`buildflow run` (binary be700ae, go1.27.3). The provider pipeline reported:
+`providers: 130 total` → `✔ io-surface` → `⚠ io-surface 1 finding reported`,
+and `buildflow --format finding` carries the finding in BuildFlow's own
+model: `"id": "io-surface:io-surface/write-non-atomic:cmd/e2e/main.go:8"`,
+rule `io-surface/write-non-atomic`, severity info, SARIF-anchored position.
+That is the whole chain the unit tests only mock: toolsdk Detect face
+(manifestless module → radar-only) → io-surface lint → go-finding findings
+→ BuildFlow report. The scratch repo is throwaway; this paragraph + the
+four-file recipe are the committed proof.
+
+template-readme err-dropped triage (TODO #177, 2026-11-22)
+Reproduced by: `/tmp build of io-surface; lint --root
+/home/lars/projects/template-readme --dirs .` → 17 err-dropped hits
+(the 11-15 aggregate's 17/28 cluster, still exact).
+Verdict: a CARVE-OUT class, not real bugs — 15/17 are best-effort
+cleanup/removal on cache/temp/test paths (`os.Remove` of temp files after
+use or rename-failure, cache auto-repair eviction, `os.RemoveAll` of test
+temp dirs; a failed removal is harmless there — the cache read already
+treats the entry as invalid and the next run re-creates), 2/17 are explicit
+deliberate ignores (`// Ignore errors` on the preferences save + dir
+create in config/config/defaults.go). One borderline site worth a
+second look: defaults.go:496 `os.WriteFile(preferencesPath, …)` — the
+deliberate ignore hides user-visible behavior (preferences silently not
+persisted); recommended fix is a site-level
+`//io-surface:ignore err-dropped best-effort preferences save` (mandatory
+reason) rather than a rule change. No production bug found; the
+rule-carve-out (cleanup-removal on cache/temp paths) is a candidate
+detector refinement, NOT minted as a TODO (detector work rides the
+schema-v1.3 train's test plan).
+
 fp-sample-write-non-atomic-2026-11-22 (the first §7-compliant N≥30 re-sample)
 Produced by: `./scripts/fp-sample.sh io-surface/write-non-atomic
 docs/evidence/fleetscan-2026-11-15.json
