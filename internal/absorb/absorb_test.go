@@ -64,11 +64,11 @@ func TestRun(t *testing.T) {
 	if want := []capability.Name{"FILES", "NETWORK"}; !reflect.DeepEqual(set.Direct, want) {
 		t.Errorf("direct = %v, want %v", set.Direct, want)
 	}
-	if want := []capability.Name{"EXEC", "FILES", "NETWORK"}; !reflect.DeepEqual(set.Deep, want) {
+	if want := []capability.Name{"EXEC", "FILES", "NETWORK", "REFLECT"}; !reflect.DeepEqual(set.Deep, want) {
 		t.Errorf("deep = %v, want %v", set.Deep, want)
 	}
-	if res.Dropped["REFLECT"] != 1 || res.Dropped["UNANALYZED"] != 1 {
-		t.Errorf("dropped = %v, want REFLECT:1 UNANALYZED:1", res.Dropped)
+	if res.Dropped["UNANALYZED"] != 1 {
+		t.Errorf("dropped = %v, want UNANALYZED:1 (runtime-power names store since v1.3; truly unknown names still drop)", res.Dropped)
 	}
 }
 
@@ -105,15 +105,15 @@ func TestCUEBytes(t *testing.T) {
 		`engine:  "capslock"`,
 		`version: "v0.3.4"`,
 		`commit:  "abc1234"`,
-		`pkg: "internal/store", direct: ["FILES", "NETWORK"], deep: ["EXEC", "FILES", "NETWORK"]`,
+		`pkg: "internal/store", direct: ["FILES", "NETWORK"], deep: ["EXEC", "FILES", "NETWORK", "REFLECT"]`,
 		"package io_surface",
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("CUE body missing %q\n---\n%s", want, body)
 		}
 	}
-	if strings.Contains(body, "REFLECT") || strings.Contains(body, "claims:") || strings.Contains(body, "baseline:") {
-		t.Error("capabilities.cue must carry only capability facts, never judgment sections")
+	if strings.Contains(body, "UNANALYZED") || strings.Contains(body, "claims:") || strings.Contains(body, "baseline:") {
+		t.Error("capabilities.cue must carry only closed-ten capability facts, never judgment sections or unmapped names")
 	}
 }
 

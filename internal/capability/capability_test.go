@@ -13,8 +13,17 @@ func TestValid(t *testing.T) {
 		{"FILES", true},
 		{"NETWORK", true},
 		{"EXEC", true},
-		{"REFLECT", false},
-		{"RUNTIME", false},
+		// v1.3 closed ten: the runtime-power set is valid (stored at package level).
+		{"REFLECT", true},
+		{"RUNTIME", true},
+		{"SYSTEM_CALLS", true},
+		{"UNSAFE_POINTER", true},
+		{"OPERATING_SYSTEM", true},
+		{"READ_SYSTEM_STATE", true},
+		{"MODIFY_SYSTEM_STATE", true},
+		// Still outside the closed ten: dropped loudly.
+		{"CGO", false},
+		{"UNANALYZED", false},
 		{"files", false},
 		{"", false},
 	}
@@ -22,6 +31,22 @@ func TestValid(t *testing.T) {
 		if got := Valid(tt.name); got != tt.want {
 			t.Errorf("Valid(%q) = %v, want %v", tt.name, got, tt.want)
 		}
+	}
+}
+
+func TestRuntimePower(t *testing.T) {
+	for _, n := range []Name{Reflect, Runtime, SystemCalls, UnsafePointer, OperatingSystem, ReadSystemState, ModifySystemState} {
+		if !RuntimePower(n) {
+			t.Errorf("RuntimePower(%q) = false, want true", n)
+		}
+	}
+	for _, n := range []Name{Files, Network, Exec} {
+		if RuntimePower(n) {
+			t.Errorf("RuntimePower(%q) = true, want false (site-mapped cap)", n)
+		}
+	}
+	if RuntimePower(Name("CGO")) {
+		t.Error("RuntimePower(CGO) = true, want false (not in the closed ten)")
 	}
 }
 
@@ -49,8 +74,9 @@ func TestSets(t *testing.T) {
 	}
 	got := Sets("github.com/larsartmann/io-surface", edges)
 
-	if len(got.Sets) != 2 {
-		t.Fatalf("Sets len = %d (%v), want 2 first-party packages", len(got.Sets), got.Sets)
+	// v1.3: REFLECT stores, so all three first-party packages appear.
+	if len(got.Sets) != 3 {
+		t.Fatalf("Sets len = %d (%v), want 3 first-party packages", len(got.Sets), got.Sets)
 	}
 	extractSet := got.Sets[1]
 	if extractSet.Pkg != "internal/extract" {
@@ -63,14 +89,18 @@ func TestSets(t *testing.T) {
 		t.Errorf("extract direct = %v, want %v", extractSet.Direct, want)
 	}
 	checkSet := got.Sets[0]
-	if checkSet.Pkg != "internal/check" || !reflect.DeepEqual(checkSet.Deep, []Name{Files}) {
-		t.Errorf("check set = %+v, want pkg internal/check deep [FILES] (REFLECT dropped)", checkSet)
+	if checkSet.Pkg != "internal/check" || !reflect.DeepEqual(checkSet.Deep, []Name{Files, Reflect}) {
+		t.Errorf("check set = %+v, want pkg internal/check deep [FILES REFLECT] (runtime-power stores since v1.3)", checkSet)
 	}
 	if len(checkSet.Direct) != 0 {
 		t.Errorf("check direct = %v, want empty", checkSet.Direct)
 	}
-	if got.Dropped["REFLECT"] != 2 {
-		t.Errorf("dropped REFLECT = %d, want 2", got.Dropped["REFLECT"])
+	renderSet := got.Sets[2]
+	if renderSet.Pkg != "internal/render" || !reflect.DeepEqual(renderSet.Deep, []Name{Reflect}) {
+		t.Errorf("render set = %+v, want pkg internal/render deep [REFLECT]", renderSet)
+	}
+	if got.Dropped["REFLECT"] != 0 {
+		t.Errorf("dropped REFLECT = %d, want 0 (stored since v1.3)", got.Dropped["REFLECT"])
 	}
 	if got.Dropped["FILES"] != 0 {
 		t.Errorf("dropped FILES = %d, want 0", got.Dropped["FILES"])
